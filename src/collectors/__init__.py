@@ -1,0 +1,1 @@
+# Data collectors package for stock monitoring system 
