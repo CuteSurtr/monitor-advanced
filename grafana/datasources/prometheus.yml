@@ -1,0 +1,56 @@
+# Grafana datasource configuration for Prometheus
+
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true
+    basicAuth: false
+    jsonData:
+      httpMethod: POST
+      queryTimeout: 60s
+      timeInterval: 15s
+      manageAlerts: true
+      prometheusType: Prometheus
+      prometheusVersion: 2.40.0
+      cacheLevel: High
+      incrementalQuerying: true
+      incrementalQueryOverlapWindow: 10m
+    secureJsonData: {}
+    
+  - name: InfluxDB
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    database: market_data
+    user: admin
+    basicAuth: false
+    isDefault: false
+    editable: true
+    jsonData:
+      version: Flux
+      organization: stock_monitor
+      defaultBucket: market_data
+      maxSeries: 1000
+    secureJsonData:
+      token: your_influxdb_token_here
+      
+  - name: Elasticsearch
+    type: elasticsearch
+    access: proxy
+    url: http://elasticsearch:9200
+    database: "[logs-]YYYY.MM.DD"
+    basicAuth: false
+    isDefault: false
+    editable: true
+    jsonData:
+      interval: Daily
+      timeField: "@timestamp"
+      maxConcurrentShardRequests: 5
+      logMessageField: message
+      logLevelField: level
+    secureJsonData: {}

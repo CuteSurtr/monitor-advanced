@@ -1,0 +1,181 @@
+# Prometheus configuration for Stock Market Monitor - Desktop Edition
+# Enhanced configuration for desktop environments with higher resources
+
+global:
+  scrape_interval: 10s        # Faster scraping for desktop
+  evaluation_interval: 10s    # Faster rule evaluation
+  scrape_timeout: 8s
+  external_labels:
+    monitor: 'stock-market-monitor'
+    environment: 'desktop'
+    instance: 'desktop-primary'
+
+rule_files:
+  - "rules/*.yml"
+  - "alerts/*.yml"
+  - "desktop-rules/*.yml"
+
+scrape_configs:
+  # Stock Monitor Application - Enhanced
+  - job_name: 'stock-monitor'
+    static_configs:
+      - targets: ['stock_monitor:8080']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    scrape_timeout: 8s
+    honor_labels: true
+    params:
+      format: ['prometheus']
+    
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+    scrape_interval: 30s
+    
+  # PostgreSQL with enhanced metrics
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres:5432']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    params:
+      collect[]:
+        - 'pg_stat_database'
+        - 'pg_stat_user_tables'
+        - 'pg_stat_activity'
+        - 'pg_locks'
+        - 'pg_stat_replication'
+    
+  # Redis with enhanced metrics
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    
+  # InfluxDB
+  - job_name: 'influxdb'
+    static_configs:
+      - targets: ['influxdb:8086']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    
+  # Grafana with detailed metrics
+  - job_name: 'grafana'
+    static_configs:
+      - targets: ['grafana:3000']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    
+  # Jupyter Lab
+  - job_name: 'jupyter'
+    static_configs:
+      - targets: ['jupyter:8888']
+    metrics_path: '/metrics'
+    scrape_interval: 60s
+    
+  # Nginx reverse proxy
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['nginx:80']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    
+  # Elasticsearch
+  - job_name: 'elasticsearch'
+    static_configs:
+      - targets: ['elasticsearch:9200']
+    metrics_path: '/_prometheus/metrics'
+    scrape_interval: 30s
+    
+  # Stock Monitor Custom Metrics (Enhanced)
+  - job_name: 'stock-monitor-business-metrics'
+    static_configs:
+      - targets: ['stock_monitor:8000']
+    metrics_path: '/metrics'
+    scrape_interval: 5s         # Very frequent for real-time trading
+    honor_labels: true
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'stock_price_.*'
+        target_label: 'metric_type'
+        replacement: 'price'
+      - source_labels: [__name__]
+        regex: 'portfolio_.*'
+        target_label: 'metric_type'
+        replacement: 'portfolio'
+      - source_labels: [__name__]
+        regex: 'alert_.*'
+        target_label: 'metric_type'
+        replacement: 'alert'
+        
+  # Celery Worker Metrics
+  - job_name: 'celery-worker'
+    static_configs:
+      - targets: ['celery_worker:8001']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    
+  # Flower Celery Monitoring
+  - job_name: 'flower'
+    static_configs:
+      - targets: ['flower:5555']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    
+  # System metrics (if node_exporter is available)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['localhost:9100']
+    scrape_interval: 15s
+    honor_labels: true
+    
+  # Docker container metrics
+  - job_name: 'docker'
+    static_configs:
+      - targets: ['localhost:9323']
+    scrape_interval: 30s
+
+# Enhanced alerting configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+      timeout: 10s
+      api_version: v2
+
+# Enhanced storage configuration for desktop
+storage:
+  tsdb:
+    path: /prometheus
+    retention.time: 90d           # 3 months retention
+    retention.size: 50GB          # Larger storage for desktop
+    min-block-duration: 2h
+    max-block-duration: 25h
+    no-lockfile: false
+    wal-compression: true         # Compress WAL files
+    
+# Enhanced web configuration  
+web:
+  console.templates: /etc/prometheus/consoles
+  console.libraries: /etc/prometheus/console_libraries
+  enable-lifecycle: true
+  enable-admin-api: true
+  max-connections: 1024           # More connections for desktop
+  read-timeout: 30s
+  route-prefix: /
+  external-url: http://localhost:9090
+
+# Remote write configuration (optional)
+# remote_write:
+#   - url: "https://prometheus-remote-write-endpoint.com/api/v1/write"
+#     write_relabel_configs:
+#       - source_labels: [__name__]
+#         regex: 'stock_.*|portfolio_.*|alert_.*'
+#         action: keep
+
+# Remote read configuration (optional)  
+# remote_read:
+#   - url: "https://prometheus-remote-read-endpoint.com/api/v1/read"

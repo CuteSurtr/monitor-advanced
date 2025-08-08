@@ -1,0 +1,88 @@
+# Desktop-optimized Dockerfile for Stock Market Monitor
+# Uses Python 3.11 with performance optimizations for desktop environments
+
+FROM python:3.11-slim
+
+# Set environment variables for performance
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONOPTIMIZE=1
+ENV PYTHONPATH=/app
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Set work directory
+WORKDIR /app
+
+# Install system dependencies optimized for desktop
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    curl \
+    wget \
+    git \
+    build-essential \
+    pkg-config \
+    libpq-dev \
+    libffi-dev \
+    libssl-dev \
+    libjpeg-dev \
+    libpng-dev \
+    libfreetype6-dev \
+    libblas-dev \
+    liblapack-dev \
+    libatlas-base-dev \
+    gfortran \
+    # For better performance
+    libomp-dev \
+    # For Jupyter
+    nodejs \
+    npm \
+    # For web scraping
+    chromium \
+    chromium-driver \
+    # Cleanup
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies with optimizations
+COPY requirements.txt .
+COPY requirements.desktop.txt .
+
+# Upgrade pip and setuptools
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
+
+# Install requirements with optimizations
+RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.desktop.txt
+
+# Install additional desktop-specific packages
+RUN pip install --no-cache-dir \
+    jupyter \
+    jupyterlab \
+    nbconvert \
+    ipywidgets \
+    plotly-dash \
+    streamlit \
+    fastapi-users \
+    python-multipart
+
+# Copy project
+COPY . .
+
+# Create necessary directories with proper permissions
+RUN mkdir -p logs data backups temp cache exports notebooks static \
+    && useradd --create-home --shell /bin/bash app \
+    && chown -R app:app /app
+
+# Switch to non-root user
+USER app
+
+# Expose ports
+EXPOSE 8080 8000 8888
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# Default command
+CMD ["python", "src/main.py"]

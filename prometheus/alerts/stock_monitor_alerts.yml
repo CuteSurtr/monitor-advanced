@@ -1,0 +1,222 @@
+# Prometheus alerting rules for Stock Market Monitor
+
+groups:
+  - name: stock_monitor.critical
+    interval: 15s
+    rules:
+      # Critical system alerts
+      - alert: StockMonitorDown
+        expr: up{job="stock-monitor"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: application
+        annotations:
+          summary: "Stock Monitor application is down"
+          description: "Stock Monitor application has been down for more than 1 minute"
+          
+      - alert: DatabaseDown
+        expr: up{job="postgres"} == 0
+        for: 30s
+        labels:
+          severity: critical
+          component: database
+        annotations:
+          summary: "Database is down"
+          description: "PostgreSQL database has been down for more than 30 seconds"
+          
+      - alert: CacheDown
+        expr: up{job="redis"} == 0
+        for: 30s
+        labels:
+          severity: critical
+          component: cache
+        annotations:
+          summary: "Cache is down"
+          description: "Redis cache has been down for more than 30 seconds"
+          
+      - alert: HighSystemCPU
+        expr: system_cpu_usage_percent > 90
+        for: 5m
+        labels:
+          severity: critical
+          component: system
+        annotations:
+          summary: "Critical CPU usage detected"
+          description: "System CPU usage has been above 90% for more than 5 minutes"
+          
+      - alert: HighSystemMemory
+        expr: system:memory_utilization:5m > 95
+        for: 2m
+        labels:
+          severity: critical
+          component: system
+        annotations:
+          summary: "Critical memory usage detected"
+          description: "System memory usage has been above 95% for more than 2 minutes"
+          
+      - alert: DiskSpaceCritical
+        expr: system_disk_usage_percent > 95
+        for: 1m
+        labels:
+          severity: critical
+          component: system
+        annotations:
+          summary: "Critical disk space usage"
+          description: "Disk usage is above 95% on {{ $labels.mount_point }}"
+
+  - name: stock_monitor.warning
+    interval: 30s
+    rules:
+      # Warning level alerts
+      - alert: HighAPILatency
+        expr: api:latency_p95:5m > 5
+        for: 5m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "High API latency detected"
+          description: "95th percentile API latency has been above 5 seconds for {{ $labels.provider }}/{{ $labels.endpoint }}"
+          
+      - alert: HighAPIErrorRate
+        expr: api:error_rate:5m > 0.1
+        for: 3m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "High API error rate"
+          description: "API error rate has been above 10% for more than 3 minutes"
+          
+      - alert: DataCollectionDelay
+        expr: business:data_freshness > 300
+        for: 2m
+        labels:
+          severity: warning
+          component: data_collection
+        annotations:
+          summary: "Data collection delay detected"
+          description: "Stock data hasn't been updated for more than 5 minutes"
+          
+      - alert: LowCacheHitRate
+        expr: cache_hit_rate < 0.8
+        for: 10m
+        labels:
+          severity: warning
+          component: cache
+        annotations:
+          summary: "Low cache hit rate"
+          description: "Cache hit rate has been below 80% for more than 10 minutes"
+          
+      - alert: HighDatabaseConnections
+        expr: database_connections_active > 80
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "High database connection usage"
+          description: "Database connections are above 80 for more than 5 minutes"
+
+  - name: business_alerts
+    interval: 60s
+    rules:
+      # Business logic alerts
+      - alert: LargePortfolioDrawdown
+        expr: business:portfolio_daily_return < -10
+        for: 0s
+        labels:
+          severity: critical
+          component: portfolio
+        annotations:
+          summary: "Large portfolio drawdown detected"
+          description: "Portfolio has declined by more than 10% today"
+          
+      - alert: UnusualTradingVolume
+        expr: abs(business:volume_trend_1h - business:volume_trend_1h offset 24h) / business:volume_trend_1h offset 24h > 5
+        for: 30m
+        labels:
+          severity: warning
+          component: trading
+        annotations:
+          summary: "Unusual trading volume detected"
+          description: "Trading volume is significantly different from the same time yesterday"
+          
+      - alert: MLModelDegraded
+        expr: ml:prediction_accuracy:avg_1h < 0.7
+        for: 2h
+        labels:
+          severity: warning
+          component: ml_model
+        annotations:
+          summary: "ML model accuracy degraded"
+          description: "Machine learning model accuracy has been below 70% for 2 hours"
+          
+      - alert: ExcessiveAlerts
+        expr: alerts:rate_per_hour > 100
+        for: 1h
+        labels:
+          severity: warning
+          component: alerting
+        annotations:
+          summary: "Excessive alert volume"
+          description: "More than 100 alerts per hour have been triggered"
+
+  - name: market_alerts
+    interval: 30s
+    rules:
+      # Market-specific alerts
+      - alert: StockPriceSpike
+        expr: abs(stock:price_change_percent:1m) > 10
+        for: 0s
+        labels:
+          severity: warning
+          component: market_data
+        annotations:
+          summary: "Stock price spike detected"
+          description: "{{ $labels.symbol }} price changed by more than 10% in 1 minute"
+          
+      - alert: HighVolatility
+        expr: stock:price_volatility:5m > stock:price_volatility:5m offset 24h * 3
+        for: 5m
+        labels:
+          severity: warning
+          component: market_data
+        annotations:
+          summary: "High volatility detected"
+          description: "{{ $labels.symbol }} volatility is 3x higher than yesterday"
+          
+      - alert: MarketDataStale
+        expr: time() - timestamp(stock_price_usd) > 600
+        for: 1m
+        labels:
+          severity: critical
+          component: market_data
+        annotations:
+          summary: "Market data is stale"
+          description: "Market data for {{ $labels.symbol }} hasn't been updated for more than 10 minutes"
+
+  - name: performance_alerts
+    interval: 60s
+    rules:
+      # Performance alerts
+      - alert: SlowDataCollection
+        expr: data_collection:latency_p90:5m > 10
+        for: 5m
+        labels:
+          severity: warning
+          component: performance
+        annotations:
+          summary: "Slow data collection detected"
+          description: "90th percentile data collection latency has been above 10 seconds"
+          
+      - alert: SystemHealthDegraded
+        expr: infra:system_health_score < 0.8
+        for: 10m
+        labels:
+          severity: warning
+          component: performance
+        annotations:
+          summary: "System health degraded"
+          description: "Overall system health score has been below 80% for 10 minutes"
