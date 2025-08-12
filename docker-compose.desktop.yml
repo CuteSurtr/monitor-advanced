@@ -162,9 +162,9 @@ services:
       GF_ANALYTICS_REPORTING_ENABLED: false
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
-      - ./grafana/datasources:/etc/grafana/provisioning/datasources
-      - ./grafana/desktop:/etc/grafana/provisioning/plugins
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
     ports:
       - "3000:3000"
     restart: unless-stopped
@@ -192,6 +192,8 @@ services:
       - PYTHONPATH=/app:/app/src
       - PYTHONOPTIMIZE=1
       - PYTHONDONTWRITEBYTECODE=1
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
       # Desktop performance settings
       - MAX_WORKERS=8
       - MEMORY_LIMIT=4GB
@@ -244,6 +246,8 @@ services:
       - PYTHONPATH=/app:/app/src
       - PYTHONOPTIMIZE=1
       - C_FORCE_ROOT=1
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
     volumes:
       - ./config:/app/config
       - ./data:/app/data
@@ -251,9 +255,12 @@ services:
       - ./cache:/app/cache
     restart: unless-stopped
     depends_on:
-      - redis
-      - postgres
-      - stock_monitor
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      stock_monitor:
+        condition: service_healthy
     deploy:
       resources:
         limits:
@@ -277,14 +284,18 @@ services:
       - CONFIG_PATH=/app/config/config.desktop.yaml
       - PYTHONPATH=/app:/app/src
       - PYTHONOPTIMIZE=1
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
     volumes:
       - ./config:/app/config
       - ./data:/app/data
       - ./logs:/app/logs
     restart: unless-stopped
     depends_on:
-      - redis
-      - postgres
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
     deploy:
       resources:
         limits:
@@ -310,14 +321,18 @@ services:
       - CONFIG_PATH=/app/config/config.desktop.yaml
       - PYTHONPATH=/app:/app/src
       - FLOWER_BASIC_AUTH=admin:admin
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
     ports:
       - "5555:5555"
     volumes:
       - ./data:/app/data
     restart: unless-stopped
     depends_on:
-      - redis
-      - celery_worker
+      redis:
+        condition: service_healthy
+      celery_worker:
+        condition: service_healthy
     deploy:
       resources:
         limits:
@@ -363,7 +378,7 @@ services:
     image: prometheuscommunity/postgres-exporter:latest
     container_name: stock_monitor_postgres_exporter
     environment:
-      DATA_SOURCE_NAME: "postgresql://stock_user:stock_password@stock_monitor_postgres_desktop:5432/stock_monitor?sslmode=disable"
+      DATA_SOURCE_NAME: "postgresql://stock_user:stock_password@postgres:5432/stock_monitor?sslmode=disable"
     ports:
       - "9187:9187"
     restart: unless-stopped
@@ -401,7 +416,7 @@ services:
   redis_exporter:
     image: oliver006/redis_exporter:latest
     container_name: stock_monitor_redis_exporter
-    command: ["--redis.addr=redis://stock_monitor_redis_desktop:6379"]
+    command: ["--redis.addr=redis://redis:6379"]
     ports:
       - "9121:9121"
     restart: unless-stopped
