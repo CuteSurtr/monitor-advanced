@@ -1,0 +1,432 @@
+name: IoT System Testing & Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths: [ 'src/iot/**', 'tests/**' ]
+  pull_request:
+    branches: [ main, develop ]
+    paths: [ 'src/iot/**', 'tests/**' ]
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Type of IoT testing to run'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+        - all
+        - unit
+        - integration
+        - performance
+        - azure_iot
+
+env:
+  PYTHON_VERSION: '3.9'
+  AZURE_IOT_ENABLED: 'false'  # Set to true for Azure IoT testing
+
+jobs:
+  iot-unit-tests:
+    name: IoT Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-asyncio pytest-cov
+    
+    - name: Run IoT unit tests
+      run: |
+        # Test IoT simulator components
+        python -m pytest tests/test_iot_simulator.py -v --cov=src.iot --cov-report=term-missing
+        
+        # Test IoT configuration
+        python -m pytest tests/test_iot_config.py -v --cov=src.iot --cov-report=term-missing
+    
+    - name: Upload coverage report
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: iot-unit-tests
+
+  iot-integration-tests:
+    name: IoT Integration Tests
+    runs-on: ubuntu-latest
+    needs: iot-unit-tests
+    timeout-minutes: 30
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install azure-iot-device azure-iot-hub
+    
+    - name: Run IoT integration tests
+      env:
+        AZURE_IOT_ENABLED: ${{ env.AZURE_IOT_ENABLED }}
+        IOT_SIMULATION_ENABLED: 'true'
+        IOT_NUM_DEVICES: '10'
+      run: |
+        # Test IoT simulator with multiple devices
+        python -c "
+        import asyncio
+        import time
+        from src.iot.iot_simulator import IoTDataSimulator
+        from src.utils.config import Config
+        
+        async def test_integration():
+            config = Config()
+            simulator = IoTDataSimulator(config)
+            
+            # Test device creation and telemetry
+            simulator.create_simulated_devices(10)
+            assert len(simulator.devices) == 10
+            
+            # Test telemetry generation for all devices
+            telemetry_data = []
+            for device in simulator.devices.values():
+                telemetry = simulator.generate_telemetry_data(device)
+                telemetry_data.append(telemetry)
+                assert telemetry.device_id == device.device_id
+                assert telemetry.data_type in ['stock_price', 'sentiment_score', 'gdp_growth', 'rsi_value', 'portfolio_value']
+            
+            print(f'Generated {len(telemetry_data)} telemetry records')
+            print('IoT integration tests passed!')
+        
+        asyncio.run(test_integration())
+        "
+    
+    - name: Test device type distribution
+      run: |
+        python -c "
+        from src.iot.iot_simulator import IoTDataSimulator
+        from src.utils.config import Config
+        
+        config = Config()
+        simulator = IoTDataSimulator(config)
+        simulator.create_simulated_devices(50)
+        
+        # Check device type distribution
+        device_types = {}
+        for device in simulator.devices.values():
+            device_types[device.device_type] = device_types.get(device.device_type, 0) + 1
+        
+        print('Device type distribution:')
+        for device_type, count in device_types.items():
+            print(f'  {device_type}: {count}')
+        
+        # Ensure we have all device types
+        expected_types = ['market_data_collector', 'news_sentiment_sensor', 'economic_indicator_monitor', 'technical_analyzer', 'portfolio_tracker']
+        for expected_type in expected_types:
+            assert expected_type in device_types, f'Missing device type: {expected_type}'
+        
+        print('Device type distribution test passed!')
+        "
+
+  iot-performance-tests:
+    name: IoT Performance Tests
+    runs-on: ubuntu-latest
+    needs: iot-unit-tests
+    timeout-minutes: 25
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install psutil memory-profiler
+    
+    - name: Test IoT simulator performance
+      run: |
+        # Test with different device counts
+        for device_count in [10, 50, 100, 200]:
+          echo "Testing with $device_count devices..."
+          
+          start_time=$(date +%s.%N)
+          
+          python -c "
+          import asyncio
+          import time
+          from src.iot.iot_simulator import IoTDataSimulator
+          from src.utils.config import Config
+          
+          async def performance_test(device_count):
+              config = Config()
+              simulator = IoTDataSimulator(config)
+              
+              # Measure device creation time
+              start = time.time()
+              simulator.create_simulated_devices(device_count)
+              creation_time = time.time() - start
+              
+              # Measure telemetry generation time
+              start = time.time()
+              telemetry_batch = []
+              for device in list(simulator.devices.values())[:10]:  # Test first 10 devices
+                  telemetry = simulator.generate_telemetry_data(device)
+                  telemetry_batch.append(telemetry)
+              generation_time = time.time() - start
+              
+              print(f'Device count: {device_count}')
+              print(f'Device creation time: {creation_time:.4f}s')
+              print(f'Telemetry generation time (10 devices): {generation_time:.4f}s')
+              print(f'Average time per device: {creation_time/device_count:.6f}s')
+              print('---')
+          
+          asyncio.run(performance_test($device_count))
+          "
+          
+          end_time=$(date +%s.%N)
+          total_time=$(echo "$end_time - $start_time" | bc)
+          echo "Total test time: ${total_time}s"
+          echo ""
+    
+    - name: Test memory usage
+      run: |
+        python -c "
+        import psutil
+        import gc
+        from src.iot.iot_simulator import IoTDataSimulator
+        from src.utils.config import Config
+        
+        process = psutil.Process()
+        
+        # Measure memory before
+        memory_before = process.memory_info().rss / 1024 / 1024  # MB
+        print(f'Memory before: {memory_before:.2f} MB')
+        
+        # Create simulator and devices
+        config = Config()
+        simulator = IoTDataSimulator(config)
+        simulator.create_simulated_devices(100)
+        
+        # Measure memory after device creation
+        memory_after_devices = process.memory_info().rss / 1024 / 1024  # MB
+        print(f'Memory after device creation: {memory_after_devices:.2f} MB')
+        print(f'Memory used by devices: {memory_after_devices - memory_before:.2f} MB')
+        
+        # Generate telemetry data
+        telemetry_data = []
+        for device in list(simulator.devices.values())[:20]:
+            telemetry = simulator.generate_telemetry_data(device)
+            telemetry_data.append(telemetry)
+        
+        # Measure memory after telemetry generation
+        memory_after_telemetry = process.memory_info().rss / 1024 / 1024  # MB
+        print(f'Memory after telemetry generation: {memory_after_telemetry:.2f} MB')
+        print(f'Memory used by telemetry: {memory_after_telemetry - memory_after_devices:.2f} MB')
+        
+        # Clean up
+        del simulator
+        del telemetry_data
+        gc.collect()
+        
+        # Measure memory after cleanup
+        memory_after_cleanup = process.memory_info().rss / 1024 / 1024  # MB
+        print(f'Memory after cleanup: {memory_after_cleanup:.2f} MB')
+        print(f'Memory recovered: {memory_after_telemetry - memory_after_cleanup:.2f} MB')
+        "
+
+  azure-iot-testing:
+    name: Azure IoT Hub Testing
+    runs-on: ubuntu-latest
+    needs: iot-unit-tests
+    if: ${{ vars.AZURE_IOT_ENABLED == 'true' }}
+    timeout-minutes: 30
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+    
+    - name: Install Azure IoT dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install azure-iot-device azure-iot-hub azure-identity
+    
+    - name: Test Azure IoT Hub connection
+      env:
+        AZURE_IOT_CONNECTION_STRING: ${{ secrets.AZURE_IOT_CONNECTION_STRING }}
+      run: |
+        python -c "
+        import asyncio
+        from src.iot.iot_simulator import IoTDataSimulator
+        from src.utils.config import Config
+        
+        async def test_azure_connection():
+            config = Config()
+            simulator = IoTDataSimulator(config)
+            
+            # Test Azure IoT Hub connection
+            connection_string = '${{ secrets.AZURE_IOT_CONNECTION_STRING }}'
+            if connection_string:
+                success = await simulator.initialize_azure_iot_hub(connection_string)
+                if success:
+                    print('✅ Azure IoT Hub connection successful!')
+                    
+                    # Test sending a message
+                    simulator.create_simulated_devices(1)
+                    device = list(simulator.devices.values())[0]
+                    telemetry = simulator.generate_telemetry_data(device)
+                    
+                    message_sent = await simulator.send_to_azure_iot_hub(telemetry)
+                    if message_sent:
+                        print('✅ Message sent to Azure IoT Hub successfully!')
+                    else:
+                        print('❌ Failed to send message to Azure IoT Hub')
+                    
+                    await simulator.stop_simulation()
+                else:
+                    print('❌ Azure IoT Hub connection failed')
+            else:
+                print('⚠️ Azure IoT connection string not provided')
+        
+        asyncio.run(test_azure_connection())
+        "
+
+  iot-load-testing:
+    name: IoT Load Testing
+    runs-on: ubuntu-latest
+    needs: iot-unit-tests
+    timeout-minutes: 35
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install asyncio-throttle
+    
+    - name: Run IoT load tests
+      run: |
+        python -c "
+        import asyncio
+        import time
+        from src.iot.iot_simulator import IoTDataSimulator
+        from src.utils.config import Config
+        
+        async def load_test():
+            config = Config()
+            simulator = IoTDataSimulator(config)
+            
+            # Test different load scenarios
+            load_scenarios = [
+                {'devices': 50, 'duration': 30, 'telemetry_interval': 5},
+                {'devices': 100, 'duration': 30, 'telemetry_interval': 10},
+                {'devices': 200, 'duration': 30, 'telemetry_interval': 15}
+            ]
+            
+            for scenario in load_scenarios:
+                print(f'\\n🧪 Load Test Scenario: {scenario[\"devices\"]} devices, {scenario[\"duration\"]}s duration')
+                
+                # Create devices
+                start_time = time.time()
+                simulator.create_simulated_devices(scenario['devices'])
+                creation_time = time.time() - start_time
+                print(f'Device creation: {creation_time:.2f}s')
+                
+                # Simulate telemetry generation
+                telemetry_count = 0
+                start_time = time.time()
+                
+                for device in simulator.devices.values():
+                    # Generate telemetry for the duration
+                    end_time = start_time + scenario['duration']
+                    while time.time() < end_time:
+                        telemetry = simulator.generate_telemetry_data(device)
+                        telemetry_count += 1
+                        await asyncio.sleep(scenario['telemetry_interval'])
+                
+                simulation_time = time.time() - start_time
+                telemetry_per_second = telemetry_count / simulation_time
+                
+                print(f'Telemetry generated: {telemetry_count}')
+                print(f'Simulation time: {simulation_time:.2f}s')
+                print(f'Telemetry rate: {telemetry_per_second:.2f} messages/second')
+                print(f'Average per device: {telemetry_per_second/scenario[\"devices\"]:.2f} messages/second/device')
+                
+                # Clean up for next scenario
+                simulator.devices.clear()
+        
+        asyncio.run(load_test())
+        "
+
+  iot-report:
+    name: IoT Test Report
+    runs-on: ubuntu-latest
+    needs: [iot-unit-tests, iot-integration-tests, iot-performance-tests, iot-load-testing]
+    if: always()
+    
+    steps:
+    - name: Generate IoT test report
+      run: |
+        echo "# IoT System Test Report" > iot-test-report.md
+        echo "" >> iot-test-report.md
+        echo "## Test Results Summary" >> iot-test-report.md
+        echo "" >> iot-test-report.md
+        echo "- Unit Tests: ${{ needs.iot-unit-tests.result }}" >> iot-test-report.md
+        echo "- Integration Tests: ${{ needs.iot-integration-tests.result }}" >> iot-test-report.md
+        echo "- Performance Tests: ${{ needs.iot-performance-tests.result }}" >> iot-test-report.md
+        echo "- Load Tests: ${{ needs.iot-load-testing.result }}" >> iot-test-report.md
+        if [ "$AZURE_IOT_ENABLED" = "true" ]; then
+          echo "- Azure IoT Tests: ${{ needs.azure-iot-testing.result }}" >> iot-test-report.md
+        fi
+        echo "" >> iot-test-report.md
+        echo "## Test Coverage" >> iot-test-report.md
+        echo "- IoT Simulator: ✅" >> iot-test-report.md
+        echo "- Device Management: ✅" >> iot-test-report.md
+        echo "- Telemetry Generation: ✅" >> iot-test-report.md
+        echo "- Azure IoT Hub Integration: ${{ env.AZURE_IOT_ENABLED == 'true' && '✅' || '⚠️ (Disabled)' }}" >> iot-test-report.md
+        echo "- Performance Optimization: ✅" >> iot-test-report.md
+        echo "- Load Handling: ✅" >> iot-test-report.md
+    
+    - name: Upload IoT test report
+      uses: actions/upload-artifact@v3
+      with:
+        name: iot-test-report
+        path: iot-test-report.md

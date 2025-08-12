@@ -1,0 +1,2 @@
+gunicorn --bind=0.0.0.0 --timeout 600 --workers 4 --worker-class gunicorn.workers.ggevent --worker-connections 1000 --max-requests 1000 --max-requests-jitter 100 --keep-alive 2 --log-level info --access-logfile - --error-logfile - --log-file - --log-syslog-prefix gunicorn --capture-output --enable-stdio-inheritance --preload src.flask_api.app:app
+
