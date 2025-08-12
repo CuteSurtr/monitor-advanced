@@ -8,7 +8,7 @@ from kombu import Queue, Exchange
 from celery.schedules import crontab
 from datetime import timedelta
 
-from .utils.config import get_config
+from src.utils.config import get_config
 
 # Get configuration
 config = get_config()

@@ -13,8 +13,8 @@ import psutil
 import redis
 import psycopg2
 
-from ..utils.database import DatabaseManager
-from ..utils.cache import CacheManager
+from src.utils.database import DatabaseManager
+from src.utils.cache import CacheManager
 
 logger = logging.getLogger(__name__)
 

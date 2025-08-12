@@ -8,12 +8,12 @@ from datetime import datetime, timedelta
 import asyncio
 import numpy as np
 
-from ..celery_app import celery_app
-from ..analytics.analytics_engine import AnalyticsEngine
-from ..analytics.anomaly_detector import AnomalyDetector
-from ..utils.database import get_database_manager
-from ..utils.cache import get_cache_manager
-from ..monitoring.prometheus_client import get_prometheus_client
+from src.celery_app import celery_app
+from src.analytics.analytics_engine import AnalyticsEngine
+from src.analytics.anomaly_detector import AnomalyDetector
+from src.utils.database import get_database_manager
+from src.utils.cache import get_cache_manager
+from src.monitoring.prometheus_client import get_prometheus_client
 
 logger = logging.getLogger(__name__)
 

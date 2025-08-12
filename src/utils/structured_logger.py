@@ -14,7 +14,7 @@ from pathlib import Path
 import structlog
 from pythonjsonlogger import jsonlogger
 
-from .config import get_config
+from src.utils.config import get_config
 
 
 class StructuredLogger:

@@ -8,7 +8,7 @@ import pickle
 from typing import Any, Optional, Dict, List, Union
 from datetime import datetime, timedelta
 import redis.asyncio as redis
-from .logger import get_logger
+from src.utils.logger import get_logger
 
 class CacheManager:
     """Redis cache manager for the stock monitoring system."""

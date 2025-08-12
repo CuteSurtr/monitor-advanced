@@ -10,8 +10,8 @@ from datetime import datetime, timedelta
 import pytz
 from ratelimit import limits, sleep_and_retry
 
-from utils.logger import get_logger, log_api_request
-from utils.cache import CacheManager
+from src.utils.logger import get_logger, log_api_request
+from src.utils.cache import CacheManager
 
 class StockDataCollector:
     """Collects real-time stock data from multiple sources."""

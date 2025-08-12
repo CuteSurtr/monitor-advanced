@@ -16,10 +16,10 @@ from datetime import datetime, timedelta
 from src.utils.logger import get_logger
 from src.utils.database import DatabaseManager
 from src.utils.cache import CacheManager
-from .technical_indicators import TechnicalIndicators, IndicatorResult
-from .correlation_analyzer import CorrelationAnalyzer, CorrelationResult
-from .volatility_analyzer import VolatilityAnalyzer, VolatilityResult, RiskMetrics
-from .anomaly_detector import AnomalyDetector, AnomalyResult
+from src.analytics.technical_indicators import TechnicalIndicators, IndicatorResult
+from src.analytics.correlation_analyzer import CorrelationAnalyzer, CorrelationResult
+from src.analytics.volatility_analyzer import VolatilityAnalyzer, VolatilityResult, RiskMetrics
+from src.analytics.anomaly_detector import AnomalyDetector, AnomalyResult
 
 logger = get_logger(__name__)
 

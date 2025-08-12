@@ -16,7 +16,7 @@ scrape_configs:
   # Stock Monitor Application
   - job_name: 'stock-monitor'
     static_configs:
-      - targets: ['localhost:8080']
+      - targets: ['stock_monitor_app_desktop:8080']
     metrics_path: '/metrics'
     scrape_interval: 15s
     scrape_timeout: 10s
@@ -35,15 +35,15 @@ scrape_configs:
     scrape_interval: 15s
     
   # PostgreSQL Exporter
-  - job_name: 'postgres-exporter'
+  - job_name: 'postgres'
     static_configs:
-      - targets: ['localhost:9187']
+      - targets: ['postgres_exporter:9187']
     scrape_interval: 30s
     
   # Redis Exporter
-  - job_name: 'redis-exporter'
+  - job_name: 'redis'
     static_configs:
-      - targets: ['localhost:9121']
+      - targets: ['redis_exporter:9121']
     scrape_interval: 30s
     
   # Grafana
@@ -56,7 +56,7 @@ scrape_configs:
   # Stock Monitor Custom Metrics
   - job_name: 'stock-monitor-metrics'
     static_configs:
-      - targets: ['localhost:8000']
+      - targets: ['stock_monitor_app_desktop:8000']
     metrics_path: '/metrics'
     scrape_interval: 10s
     honor_labels: true
@@ -71,22 +71,3 @@ alerting:
     - static_configs:
         - targets:
           - alertmanager:9093
-
-# Storage configuration
-storage:
-  tsdb:
-    path: /prometheus
-    retention.time: 90d
-    retention.size: 50GB
-    min-block-duration: 2h
-    max-block-duration: 25h
-    no-lockfile: false
-    
-# Web configuration  
-web:
-  console.templates: /etc/prometheus/consoles
-  console.libraries: /etc/prometheus/console_libraries
-  enable-lifecycle: true
-  enable-admin-api: true
-  max-connections: 512
-  read-timeout: 30s

@@ -7,12 +7,12 @@ from typing import List, Dict, Any
 from datetime import datetime, timedelta
 import asyncio
 
-from ..celery_app import celery_app
-from ..collectors.stock_collector import StockCollector
-from ..utils.database import get_database_manager
-from ..utils.cache import get_cache_manager
-from ..utils.config import get_config
-from ..monitoring.prometheus_client import get_prometheus_client
+from src.celery_app import celery_app
+from src.collectors.stock_collector import StockCollector
+from src.utils.database import get_database_manager
+from src.utils.cache import get_cache_manager
+from src.utils.config import get_config
+from src.monitoring.prometheus_client import get_prometheus_client
 
 logger = logging.getLogger(__name__)
 

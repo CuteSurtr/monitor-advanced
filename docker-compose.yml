@@ -64,8 +64,6 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
       - '--storage.tsdb.retention.time=200h'
       - '--web.enable-lifecycle'
     volumes:
@@ -104,7 +102,7 @@ services:
     container_name: stock_monitor_app
     environment:
       - CONFIG_PATH=/app/config/config.yaml
-      - PYTHONPATH=/app
+      - PYTHONPATH=/app:/app/src
     volumes:
       - ./config:/app/config
       - ./data:/app/data
@@ -129,10 +127,10 @@ services:
       context: .
       dockerfile: docker/Dockerfile
     container_name: stock_monitor_celery
-    command: celery -A src.celery_app worker --loglevel=info
+    command: celery -A src.celery_app:app worker --loglevel=info
     environment:
       - CONFIG_PATH=/app/config/config.yaml
-      - PYTHONPATH=/app
+      - PYTHONPATH=/app:/app/src
     volumes:
       - ./config:/app/config
       - ./data:/app/data
@@ -148,10 +146,10 @@ services:
       context: .
       dockerfile: docker/Dockerfile
     container_name: stock_monitor_celery_beat
-    command: celery -A src.celery_app beat --loglevel=info
+    command: celery -A src.celery_app:app beat --loglevel=info
     environment:
       - CONFIG_PATH=/app/config/config.yaml
-      - PYTHONPATH=/app
+      - PYTHONPATH=/app:/app/src
     volumes:
       - ./config:/app/config
       - ./data:/app/data
@@ -166,17 +164,50 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile
-    container_name: stock_monitor_flower
-    command: celery -A src.celery_app flower --port=5555
+    container_name: stock_monitor_celery_flower
+    command: celery -A src.celery_app:app flower --port=5555
     environment:
       - CONFIG_PATH=/app/config/config.yaml
-      - PYTHONPATH=/app
+      - PYTHONPATH=/app:/app/src
     ports:
       - "5555:5555"
     restart: unless-stopped
     depends_on:
       - redis
       - celery_worker
+
+  # Redis Exporter for Prometheus metrics
+  redis_exporter:
+    image: oliver006/redis_exporter:latest
+    container_name: stock_monitor_redis_exporter
+    command: ["--redis.addr=redis://stock_monitor_redis:6379"]
+    ports:
+      - "9121:9121"
+    restart: unless-stopped
+    depends_on:
+      - redis
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.1'
+
+  # PostgreSQL Exporter for Prometheus metrics
+  postgres_exporter:
+    image: prometheuscommunity/postgres-exporter:latest
+    container_name: stock_monitor_postgres_exporter
+    environment:
+      DATA_SOURCE_NAME: "postgresql://stock_user:stock_password@stock_monitor_postgres:5432/stock_monitor?sslmode=disable"
+    ports:
+      - "9187:9187"
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.1'
 
   # Nginx Reverse Proxy (Optional)
   nginx:

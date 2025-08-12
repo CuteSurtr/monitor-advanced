@@ -1,10 +1,10 @@
 # Core dependencies
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
-flask==3.0.0
-flask-cors==4.0.0
-flask-limiter==3.5.0
-gunicorn==21.2.0
+# flask==3.0.0  # Removed - no longer needed for this project
+# flask-cors==4.0.0  # Removed - no longer needed for this project
+# flask-limiter==3.5.0  # Removed - no longer needed for this project
+# gunicorn==21.2.0  # Removed - no longer needed for this project
 pydantic==2.5.0
 sqlalchemy==2.0.23
 alembic==1.13.0
@@ -93,7 +93,4 @@ investpy==1.0.8
 cvxpy==1.4.1
 pyportfolioopt==1.5.5
 
-# Azure IoT Hub dependencies
-azure-iot-device==2.6.0
-azure-iot-hub==2.4.0
-azure-identity==1.15.0 
+# Azure dependencies removed - no longer needed for this project 

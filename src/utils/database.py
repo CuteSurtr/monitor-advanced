@@ -15,7 +15,7 @@ from sqlalchemy.pool import QueuePool
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import SYNCHRONOUS
 
-from .logger import get_logger
+from src.utils.logger import get_logger
 
 Base = declarative_base()
 

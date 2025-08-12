@@ -117,10 +117,9 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--storage.tsdb.retention.time=90d'  # Longer retention for desktop
+      - '--storage.tsdb.retention.time=90d'
       - '--storage.tsdb.retention.size=50GB'
+      - '--storage.tsdb.wal-compression'
       - '--web.enable-lifecycle'
       - '--web.enable-admin-api'
       - '--storage.tsdb.min-block-duration=2h'
@@ -190,7 +189,7 @@ services:
     container_name: stock_monitor_app_desktop
     environment:
       - CONFIG_PATH=/app/config/config.desktop.yaml
-      - PYTHONPATH=/app
+      - PYTHONPATH=/app:/app/src
       - PYTHONOPTIMIZE=1
       - PYTHONDONTWRITEBYTECODE=1
       # Desktop performance settings
@@ -234,7 +233,7 @@ services:
       dockerfile: docker/Dockerfile.desktop
     container_name: stock_monitor_celery_desktop
     command: >
-      celery -A src.celery_app worker
+      celery -A src.celery_app:app worker
       --loglevel=info
       --concurrency=8
       --prefetch-multiplier=4
@@ -242,7 +241,7 @@ services:
       --optimization=fair
     environment:
       - CONFIG_PATH=/app/config/config.desktop.yaml
-      - PYTHONPATH=/app
+      - PYTHONPATH=/app:/app/src
       - PYTHONOPTIMIZE=1
       - C_FORCE_ROOT=1
     volumes:
@@ -254,6 +253,7 @@ services:
     depends_on:
       - redis
       - postgres
+      - stock_monitor
     deploy:
       resources:
         limits:
@@ -270,12 +270,12 @@ services:
       dockerfile: docker/Dockerfile.desktop
     container_name: stock_monitor_celery_beat_desktop
     command: >
-      celery -A src.celery_app beat
+      celery -A src.celery_app:app beat
       --loglevel=info
       --schedule=/app/celerybeat-schedule.db
     environment:
       - CONFIG_PATH=/app/config/config.desktop.yaml
-      - PYTHONPATH=/app
+      - PYTHONPATH=/app:/app/src
       - PYTHONOPTIMIZE=1
     volumes:
       - ./config:/app/config
@@ -301,14 +301,14 @@ services:
       dockerfile: docker/Dockerfile.desktop
     container_name: stock_monitor_flower_desktop
     command: >
-      celery -A src.celery_app flower
+      celery -A src.celery_app:app flower
       --port=5555
       --persistent=True
       --db=/app/flower.db
       --max_tasks=10000
     environment:
       - CONFIG_PATH=/app/config/config.desktop.yaml
-      - PYTHONPATH=/app
+      - PYTHONPATH=/app:/app/src
       - FLOWER_BASIC_AUTH=admin:admin
     ports:
       - "5555:5555"
@@ -358,6 +358,23 @@ services:
           memory: 2G
           cpus: '1.0'
 
+  # PostgreSQL Exporter for Prometheus metrics
+  postgres_exporter:
+    image: prometheuscommunity/postgres-exporter:latest
+    container_name: stock_monitor_postgres_exporter
+    environment:
+      DATA_SOURCE_NAME: "postgresql://stock_user:stock_password@stock_monitor_postgres_desktop:5432/stock_monitor?sslmode=disable"
+    ports:
+      - "9187:9187"
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.1'
+
   # pgAdmin for Database Management (Desktop Exclusive)
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -379,6 +396,22 @@ services:
         limits:
           memory: 512M
           cpus: '0.2'
+
+  # Redis Exporter for Prometheus metrics
+  redis_exporter:
+    image: oliver006/redis_exporter:latest
+    container_name: stock_monitor_redis_exporter
+    command: ["--redis.addr=redis://stock_monitor_redis_desktop:6379"]
+    ports:
+      - "9121:9121"
+    restart: unless-stopped
+    depends_on:
+      - redis
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.1'
 
   # Redis Commander for Redis Management (Desktop Exclusive)
   redis_commander:
