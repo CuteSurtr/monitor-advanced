@@ -47,7 +47,7 @@ nltk==3.8.1
 beautifulsoup4==4.12.2
 
 # Database and caching
-redis==5.0.1
+redis==4.6.0
 celery==5.3.4
 flower==2.0.1
 

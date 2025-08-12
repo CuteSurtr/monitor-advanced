@@ -12,25 +12,18 @@ WORKDIR /app
 
 # Install system dependencies for Python packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential gcc g++ \
+    build-essential gcc g++ python3-dev \
     libffi-dev libssl-dev \
     libxml2-dev libxslt1-dev \
     libpq-dev git curl wget \
- && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/*
 
 # Copy requirement files first (better build caching)
 COPY requirements.txt requirements.desktop.txt ./
 
 # Upgrade pip & install both sets of requirements
-# Replace plotly-dash with dash + plotly here
 RUN python -m pip install --upgrade pip \
- && sed -i 's/plotly-dash/dash==2.17.1 plotly==5.24.1/' requirements.desktop.txt \
  && pip install --no-cache-dir -r requirements.txt -r requirements.desktop.txt
-
-# Optional: Install extra desktop/Jupyter tools
-RUN pip install --no-cache-dir \
-    jupyter jupyterlab nbconvert ipywidgets \
-    streamlit fastapi-users python-multipart
 
 # Copy the full project
 COPY . .
