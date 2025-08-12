@@ -1,0 +1,3 @@
+[console_scripts]
+stock-monitor = src.main:main
+stock-monitor-worker = src.celery_app:celery_app

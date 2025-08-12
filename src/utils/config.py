@@ -114,19 +114,24 @@ class PortfolioConfig(BaseModel):
 class MLConfig(BaseModel):
     class AnomalyDetectionConfig(BaseModel):
         enabled: bool = True
-        model_type: str = "isolation_forest"
+        algorithm: str = Field("isolation_forest", alias="model_type")
         contamination: float = 0.1
         update_frequency: str = "daily"
     
     class SentimentAnalysisConfig(BaseModel):
         enabled: bool = True
-        model_type: str = "vader"
+        algorithm: str = Field("vader", alias="model_type")
         update_frequency: str = "hourly"
     
     class CorrelationAnalysisConfig(BaseModel):
         enabled: bool = True
         lookback_period: int = 30
         update_frequency: str = "daily"
+    
+    model_config = {
+        "populate_by_name": True,
+        "protected_namespaces": (),   # silence "model_" warning
+    }
     
     anomaly_detection: AnomalyDetectionConfig = AnomalyDetectionConfig()
     sentiment_analysis: SentimentAnalysisConfig = SentimentAnalysisConfig()
@@ -250,7 +255,7 @@ class Config(BaseModel):
     def get_database_url(self) -> str:
         """Get database connection URL."""
         if self.database.type == "postgresql":
-            return f"postgresql://{self.database.user}:{self.database.password}@{self.database.host}:{self.database.port}/{self.database.name}"
+            return f"postgresql+asyncpg://{self.database.user}:{self.database.password}@{self.database.host}:{self.database.port}/{self.database.name}"
         else:
             return f"influxdb://{self.database.influxdb.url}"
     

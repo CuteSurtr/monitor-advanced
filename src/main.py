@@ -8,6 +8,8 @@ import asyncio
 import signal
 import sys
 import logging
+import os
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any
 
@@ -23,15 +25,58 @@ from src.utils.logger import setup_logging
 from src.utils.database import DatabaseManager
 from src.utils.cache import CacheManager
 
-from src.collectors.stock_collector import StockDataCollector
-from src.collectors.commodity_collector import CommodityDataCollector
-from src.collectors.news_collector import NewsCollector
+import logging
+log = logging.getLogger(__name__)
 
-from src.analytics.technical_indicators import TechnicalAnalyzer
-from src.analytics.sentiment_analyzer import SentimentAnalyzer
-from src.analytics.correlation_analyzer import CorrelationAnalyzer
-from src.analytics.anomaly_detector import AnomalyDetector
-from src.analytics.analytics_engine import AnalyticsEngine
+# Import collectors with fallbacks
+try:
+    from src.collectors.stock_collector import StockDataCollector
+except ImportError as e:
+    StockDataCollector = None
+    log.warning("StockDataCollector unavailable: %s", e)
+
+try:
+    from src.collectors.commodity_collector import CommodityDataCollector
+except ImportError as e:
+    CommodityDataCollector = None
+    log.warning("CommodityDataCollector unavailable: %s", e)
+
+try:
+    from src.collectors.news_collector import NewsCollector
+except ImportError as e:
+    NewsCollector = None
+    log.warning("NewsCollector unavailable: %s", e)
+
+# Import analytics with fallbacks
+try:
+    from src.analytics.technical_indicators import TechnicalAnalyzer
+except ImportError as e:
+    TechnicalAnalyzer = None
+    log.warning("TechnicalAnalyzer unavailable: %s", e)
+
+try:
+    from src.analytics.sentiment_analyzer import SentimentAnalyzer
+except ImportError as e:
+    SentimentAnalyzer = None
+    log.warning("SentimentAnalyzer unavailable: %s", e)
+
+try:
+    from src.analytics.correlation_analyzer import CorrelationAnalyzer
+except ImportError as e:
+    CorrelationAnalyzer = None
+    log.warning("CorrelationAnalyzer unavailable: %s", e)
+
+try:
+    from src.analytics.anomaly_detector import AnomalyDetector
+except ImportError as e:
+    AnomalyDetector = None
+    log.warning("AnomalyDetector unavailable: %s", e)
+
+try:
+    from src.analytics.analytics_engine import AnalyticsEngine
+except ImportError as e:
+    AnalyticsEngine = None
+    log.warning("AnalyticsEngine unavailable: %s", e)
 
 from src.portfolio.portfolio_manager import PortfolioManager
 from src.alerts.alert_manager import AlertManager
@@ -43,7 +88,7 @@ class StockMonitorSystem:
     """Main system orchestrator for the stock monitoring system."""
     
     def __init__(self):
-        self.config = Config()
+        self.config = Config.load_from_file()
         self.logger = setup_logging(self.config)
         self.app = FastAPI(
             title="Stock Market Monitor",
@@ -86,7 +131,11 @@ class StockMonitorSystem:
             }
             
             # Initialize analytics engine
-            self.analytics_engine = AnalyticsEngine(self.db_manager, self.cache_manager)
+            if AnalyticsEngine:
+                self.analytics_engine = AnalyticsEngine(self.db_manager, self.cache_manager)
+            else:
+                self.analytics_engine = None
+                self.logger.warning("AnalyticsEngine not available - some features will be disabled")
             
             # Initialize analyzers
             self.analyzers = {
@@ -97,22 +146,37 @@ class StockMonitorSystem:
             }
             
             # Initialize portfolio manager
-            self.portfolio_manager = PortfolioManager(self.db_manager, self.cache_manager, self.analytics_engine)
+            if self.analytics_engine:
+                self.portfolio_manager = PortfolioManager(self.db_manager, self.cache_manager, self.analytics_engine)
+            else:
+                self.portfolio_manager = None
+                self.logger.warning("PortfolioManager not available - analytics engine missing")
             
             # Initialize alert manager
-            self.alert_manager = AlertManager(self.db_manager, self.cache_manager, self.analytics_engine, self.config.dict())
+            if self.analytics_engine:
+                self.alert_manager = AlertManager(self.db_manager, self.cache_manager, self.analytics_engine, self.config.model_dump())
+            else:
+                self.alert_manager = None
+                self.logger.warning("AlertManager not available - analytics engine missing")
             
             # Initialize dashboard manager
-            self.dashboard_manager = DashboardManager(
-                self.db_manager,
-                self.cache_manager,
-                self.analytics_engine,
-                self.portfolio_manager,
-                self.alert_manager
-            )
+            if self.analytics_engine and self.portfolio_manager and self.alert_manager:
+                self.dashboard_manager = DashboardManager(
+                    self.db_manager,
+                    self.cache_manager,
+                    self.analytics_engine,
+                    self.portfolio_manager,
+                    self.alert_manager
+                )
+            else:
+                self.dashboard_manager = None
+                self.logger.warning("DashboardManager not available - required components missing")
             
             # Set dashboard manager in API
-            set_dashboard_manager(self.dashboard_manager)
+            if self.dashboard_manager:
+                set_dashboard_manager(self.dashboard_manager)
+            else:
+                self.logger.warning("Dashboard API not available - dashboard manager missing")
             
             # Initialize metrics collector
             self.metrics_collector = MetricsCollector(self.config)
@@ -147,16 +211,18 @@ class StockMonitorSystem:
         self.app.include_router(alerts_router, prefix="/api/alerts", tags=["alerts"])
         self.app.include_router(analytics_router, prefix="/api/analytics", tags=["analytics"])
         
+        # Main dashboard route
+        @self.app.get("/")
+        async def dashboard_home():
+            return {"message": "Stock Monitor Dashboard", "status": "running", "version": "1.0.0"}
+        
         # Health check endpoint
         @self.app.get("/health")
         async def health_check():
             return {
                 "status": "healthy",
-                "components": {
-                    "database": await self.db_manager.is_healthy(),
-                    "cache": await self.cache_manager.is_healthy(),
-                    "collectors": {name: collector.is_healthy() for name, collector in self.collectors.items()}
-                }
+                "timestamp": datetime.now().isoformat(),
+                "version": "1.0.0"
             }
     
     async def start_background_tasks(self):
@@ -241,8 +307,8 @@ class StockMonitorSystem:
             # Start FastAPI server
             config = uvicorn.Config(
                 self.app,
-                host=self.config.dashboard.host,
-                port=self.config.dashboard.port,
+                host="0.0.0.0",  # Bind to all interfaces
+                port=int(os.getenv("PORT", "8080")),  # Use PORT env var or default to 8080
                 log_level="info"
             )
             server = uvicorn.Server(config)

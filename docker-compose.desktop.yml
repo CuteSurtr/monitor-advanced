@@ -21,7 +21,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    # Desktop resource allocation (can handle more resources)
     deploy:
       resources:
         limits:
@@ -188,7 +187,7 @@ services:
       dockerfile: docker/Dockerfile.desktop
     container_name: stock_monitor_app_desktop
     environment:
-      - CONFIG_PATH=/app/config/config.desktop.yaml
+      - CONFIG_PATH=/app/config/config.yaml
       - PYTHONPATH=/app:/app/src
       - PYTHONOPTIMIZE=1
       - PYTHONDONTWRITEBYTECODE=1
@@ -235,14 +234,9 @@ services:
       dockerfile: docker/Dockerfile.desktop
     container_name: stock_monitor_celery_desktop
     command: >
-      celery -A src.celery_app:app worker
-      --loglevel=info
-      --concurrency=8
-      --prefetch-multiplier=4
-      --max-tasks-per-child=1000
-      --optimization=fair
+      celery -A src.celery_app:app worker --loglevel=info --concurrency=8 --prefetch-multiplier=4 --max-tasks-per-child=1000 --optimization=fair
     environment:
-      - CONFIG_PATH=/app/config/config.desktop.yaml
+      - CONFIG_PATH=/app/config/config.yaml
       - PYTHONPATH=/app:/app/src
       - PYTHONOPTIMIZE=1
       - C_FORCE_ROOT=1
@@ -277,11 +271,9 @@ services:
       dockerfile: docker/Dockerfile.desktop
     container_name: stock_monitor_celery_beat_desktop
     command: >
-      celery -A src.celery_app:app beat
-      --loglevel=info
-      --schedule=/app/celerybeat-schedule.db
+      celery -A src.celery_app:app beat --loglevel=info --schedule=/app/celerybeat-schedule.db
     environment:
-      - CONFIG_PATH=/app/config/config.desktop.yaml
+      - CONFIG_PATH=/app/config/config.yaml
       - PYTHONPATH=/app:/app/src
       - PYTHONOPTIMIZE=1
       - CELERY_BROKER_URL=redis://redis:6379/0
@@ -295,6 +287,8 @@ services:
       redis:
         condition: service_healthy
       postgres:
+        condition: service_healthy
+      stock_monitor:
         condition: service_healthy
     deploy:
       resources:
@@ -312,13 +306,9 @@ services:
       dockerfile: docker/Dockerfile.desktop
     container_name: stock_monitor_flower_desktop
     command: >
-      celery -A src.celery_app:app flower
-      --port=5555
-      --persistent=True
-      --db=/app/flower.db
-      --max_tasks=10000
+      celery -A src.celery_app:app flower --port=5555 --persistent=True --db=/app/flower.db --max_tasks=10000
     environment:
-      - CONFIG_PATH=/app/config/config.desktop.yaml
+      - CONFIG_PATH=/app/config/config.yaml
       - PYTHONPATH=/app:/app/src
       - FLOWER_BASIC_AUTH=admin:admin
       - CELERY_BROKER_URL=redis://redis:6379/0
@@ -332,6 +322,8 @@ services:
       redis:
         condition: service_healthy
       celery_worker:
+        condition: service_healthy
+      stock_monitor:
         condition: service_healthy
     deploy:
       resources:
@@ -528,4 +520,4 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.20.0.0/16
+        - subnet: "172.20.0.0/16"

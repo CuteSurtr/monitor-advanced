@@ -16,7 +16,7 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 from analytics.analytics_engine import AnalyticsEngine
-from analytics.technical_indicators import TechnicalIndicators
+from analytics.technical_indicators import TechnicalAnalyzer
 from analytics.correlation_analyzer import CorrelationAnalyzer
 from analytics.volatility_analyzer import VolatilityAnalyzer
 from analytics.anomaly_detector import AnomalyDetector
@@ -107,7 +107,7 @@ async def test_technical_indicators():
     data = generate_sample_data("AAPL", days=100)
     
     # Initialize technical indicators
-    ti = TechnicalIndicators()
+    ti = TechnicalAnalyzer()
     
     # Test individual indicators
     rsi_result = ti.calculate_rsi(data['close'])

@@ -365,8 +365,10 @@ class HealthChecker:
                         status = HealthStatus.DEGRADED
                         message = f"High disk usage: {percent_used:.1f}%"
                         
+                    # Fix the f-string syntax error by handling the replacement separately
+                    mountpoint_name = disk.mountpoint.replace('/', '_').replace('\\', '_')
                     checks.append(HealthCheck(
-                        name=f"disk_{disk.mountpoint.replace('/', '_').replace('\\', '_')}",
+                        name=f"disk_{mountpoint_name}",
                         status=status,
                         message=message,
                         response_time_ms=0,
