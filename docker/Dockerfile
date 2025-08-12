@@ -1,32 +1,38 @@
 # Use Python 3.11 slim image for smaller size
 FROM python:3.11-slim
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-ENV PYTHONPATH=/app
+# Environment settings
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app \
+    PIP_NO_CACHE_DIR=1
 
 # Set work directory
 WORKDIR /app
 
-# Install system dependencies
-WORKDIR /app
+# Install system dependencies for Python packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential gcc g++ \
+    libffi-dev libssl-dev \
+    libxml2-dev libxslt1-dev \
+    libpq-dev git curl wget \
+ && rm -rf /var/lib/apt/lists/*
 
+# Copy requirement files first (better build caching)
 COPY requirements.txt requirements.desktop.txt ./
-RUN apt-get update && apt-get install -y \
-    gcc \
-    g++ \
-    curl \
-    wget \
-    git \
-    && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+# Upgrade pip & install both sets of requirements
+# Replace plotly-dash with dash + plotly here
+RUN python -m pip install --upgrade pip \
+ && sed -i 's/plotly-dash/dash==2.17.1 plotly==5.24.1/' requirements.desktop.txt \
+ && pip install --no-cache-dir -r requirements.txt -r requirements.desktop.txt
 
-# Copy project
+# Optional: Install extra desktop/Jupyter tools
+RUN pip install --no-cache-dir \
+    jupyter jupyterlab nbconvert ipywidgets \
+    streamlit fastapi-users python-multipart
+
+# Copy the full project
 COPY . .
 
 # Create necessary directories
@@ -45,4 +51,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8080/health || exit 1
 
 # Default command
-CMD ["python", "src/main.py"] 
+CMD ["python", "src/main.py"]
