@@ -48,12 +48,20 @@ api_keys:
   quandl: "your_quandl_key"
   iex_cloud: "your_iex_cloud_key"
   fred: "your_fred_api_key"
+  # Additional API keys for multi-asset data
+  fixer: "your_fixer_api_key"
+  exchangerate: "your_exchangerate_api_key"
+  coinmarketcap: "your_cmc_api_key"
+  coingecko: "your_coingecko_api_key"
+  binance: "your_binance_api_key"
 
 # Data Collection Settings - Desktop Enhanced
 data_collection:
   # Update intervals (in seconds) - faster for desktop
   stock_data_interval: 30
   commodity_data_interval: 60
+  forex_data_interval: 30  # Fast updates for forex
+  crypto_data_interval: 15  # Very fast for crypto (24/7 markets)
   news_interval: 300
   sentiment_interval: 600
   economic_data_interval: 900

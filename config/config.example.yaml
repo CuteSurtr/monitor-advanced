@@ -30,12 +30,20 @@ api_keys:
   finnhub: "your_finnhub_key"
   news_api: "your_news_api_key"
   quandl: "your_quandl_key"
+  # Additional API keys for multi-asset data
+  fixer: "your_fixer_api_key"  # For forex data
+  exchangerate: "your_exchangerate_api_key"  # Alternative forex source
+  coinmarketcap: "your_cmc_api_key"  # For crypto data
+  coingecko: "your_coingecko_api_key"  # Alternative crypto source
+  binance: "your_binance_api_key"  # For crypto data
 
 # Data Collection Settings
 data_collection:
   # Update intervals (in seconds)
   stock_data_interval: 60
   commodity_data_interval: 300
+  forex_data_interval: 60  # Forex markets are very active
+  crypto_data_interval: 30  # Crypto markets are 24/7 and highly volatile
   news_interval: 900
   sentiment_interval: 1800
   

@@ -47,6 +47,18 @@ except ImportError as e:
     NewsCollector = None
     log.warning("NewsCollector unavailable: %s", e)
 
+try:
+    from src.collectors.forex_collector import ForexDataCollector
+except ImportError as e:
+    ForexDataCollector = None
+    log.warning("ForexDataCollector unavailable: %s", e)
+
+try:
+    from src.collectors.crypto_collector import CryptoDataCollector
+except ImportError as e:
+    CryptoDataCollector = None
+    log.warning("CryptoDataCollector unavailable: %s", e)
+
 # Import analytics with fallbacks
 try:
     from src.analytics.technical_indicators import TechnicalAnalyzer
@@ -77,6 +89,12 @@ try:
 except ImportError as e:
     AnalyticsEngine = None
     log.warning("AnalyticsEngine unavailable: %s", e)
+
+try:
+    from src.analytics.risk_monitor import RiskMonitor
+except ImportError as e:
+    RiskMonitor = None
+    log.warning("RiskMonitor unavailable: %s", e)
 
 from src.portfolio.portfolio_manager import PortfolioManager
 from src.alerts.alert_manager import AlertManager
@@ -125,9 +143,11 @@ class StockMonitorSystem:
             
             # Initialize data collectors
             self.collectors = {
-                'stock': StockDataCollector(self.config, self.db_manager, self.cache_manager),
-                'commodity': CommodityDataCollector(self.config, self.db_manager, self.cache_manager),
-                'news': NewsCollector(self.config, self.db_manager, self.cache_manager)
+                'stock': StockDataCollector(self.config, self.db_manager, self.cache_manager) if StockDataCollector else None,
+                'commodity': CommodityDataCollector(self.config, self.db_manager, self.cache_manager) if CommodityDataCollector else None,
+                'forex': ForexDataCollector(self.config, self.db_manager, self.cache_manager) if ForexDataCollector else None,
+                'crypto': CryptoDataCollector(self.config, self.db_manager, self.cache_manager) if CryptoDataCollector else None,
+                'news': NewsCollector(self.config, self.db_manager, self.cache_manager) if NewsCollector else None
             }
             
             # Initialize analytics engine
@@ -139,11 +159,18 @@ class StockMonitorSystem:
             
             # Initialize analyzers
             self.analyzers = {
-                'technical': TechnicalAnalyzer(self.config, self.db_manager),
-                'sentiment': SentimentAnalyzer(self.config, self.db_manager),
-                'correlation': CorrelationAnalyzer(self.config, self.db_manager),
-                'anomaly': AnomalyDetector(self.config, self.db_manager)
+                'technical': TechnicalAnalyzer(self.config, self.db_manager) if TechnicalAnalyzer else None,
+                'sentiment': SentimentAnalyzer(self.config, self.db_manager) if SentimentAnalyzer else None,
+                'correlation': CorrelationAnalyzer(self.config, self.db_manager) if CorrelationAnalyzer else None,
+                'anomaly': AnomalyDetector(self.config, self.db_manager) if AnomalyDetector else None
             }
+            
+            # Initialize risk monitor
+            if RiskMonitor:
+                self.risk_monitor = RiskMonitor(self.db_manager, self.cache_manager, self.config)
+            else:
+                self.risk_monitor = None
+                self.logger.warning("RiskMonitor not available - risk monitoring disabled")
             
             # Initialize portfolio manager
             if self.analytics_engine:
@@ -201,6 +228,13 @@ class StockMonitorSystem:
         from src.alerts.alert_api import alerts_router
         from src.analytics.api import router as analytics_router
         
+        try:
+            from src.analytics.risk_api import router as risk_router
+            self.app.include_router(risk_router)
+            self.logger.info("Risk API routes added")
+        except ImportError as e:
+            self.logger.warning(f"Risk API not available: {e}")
+        
         # Set portfolio manager for API
         from src.portfolio.portfolio_api import set_portfolio_manager
         set_portfolio_manager(self.portfolio_manager)
@@ -231,15 +265,27 @@ class StockMonitorSystem:
         
         # Start data collectors
         for name, collector in self.collectors.items():
-            task = asyncio.create_task(collector.start())
-            self.tasks.append(task)
-            self.logger.info(f"Started {name} collector")
+            if collector is not None:
+                task = asyncio.create_task(collector.start())
+                self.tasks.append(task)
+                self.logger.info(f"Started {name} collector")
+            else:
+                self.logger.warning(f"{name} collector not available")
         
         # Start analyzers
         for name, analyzer in self.analyzers.items():
-            task = asyncio.create_task(analyzer.start())
-            self.tasks.append(task)
-            self.logger.info(f"Started {name} analyzer")
+            if analyzer is not None:
+                task = asyncio.create_task(analyzer.start())
+                self.tasks.append(task)
+                self.logger.info(f"Started {name} analyzer")
+            else:
+                self.logger.warning(f"{name} analyzer not available")
+        
+        # Start risk monitor
+        if self.risk_monitor:
+            risk_monitor_task = asyncio.create_task(self.risk_monitor.start())
+            self.tasks.append(risk_monitor_task)
+            self.logger.info("Started risk monitor")
         
         # Portfolio manager doesn't need background task - it's stateless
         self.logger.info("Portfolio manager initialized")

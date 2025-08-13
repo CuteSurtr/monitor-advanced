@@ -1,0 +1,220 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Financial Monitoring Overview",
+    "tags": ["financial", "monitoring", "overview"],
+    "timezone": "browser",
+    "refresh": "5s",
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "Portfolio P&L",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "portfolio_total_pnl",
+            "legendFormat": "Total P&L"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "yellow", "value": 0},
+                {"color": "green", "value": 10000}
+              ]
+            },
+            "unit": "currencyUSD"
+          }
+        },
+        "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "Daily P&L",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "portfolio_daily_pnl",
+            "legendFormat": "Daily P&L"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "yellow", "value": 0},
+                {"color": "green", "value": 1000}
+              ]
+            },
+            "unit": "currencyUSD"
+          }
+        },
+        "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "Portfolio VaR (95%)",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "portfolio_var_95",
+            "legendFormat": "VaR 95%"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 0.02},
+                {"color": "red", "value": 0.05}
+              ]
+            },
+            "unit": "percentunit"
+          }
+        },
+        "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0}
+      },
+      {
+        "id": 4,
+        "title": "VIX Level",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "vix_current",
+            "legendFormat": "VIX"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 20},
+                {"color": "orange", "value": 30},
+                {"color": "red", "value": 40}
+              ]
+            },
+            "unit": "short"
+          }
+        },
+        "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0}
+      },
+      {
+        "id": 5,
+        "title": "P&L Trend",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "portfolio_total_pnl",
+            "legendFormat": "Total P&L"
+          },
+          {
+            "expr": "portfolio_daily_pnl",
+            "legendFormat": "Daily P&L"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "unit": "currencyUSD"
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4}
+      },
+      {
+        "id": 6,
+        "title": "Risk Metrics",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "portfolio_var_95",
+            "legendFormat": "VaR 95%"
+          },
+          {
+            "expr": "portfolio_var_99",
+            "legendFormat": "VaR 99%"
+          },
+          {
+            "expr": "portfolio_cvar_95",
+            "legendFormat": "CVaR 95%"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "unit": "percentunit"
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4}
+      },
+      {
+        "id": 7,
+        "title": "Top Positions by P&L",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "topk(10, position_unrealized_pnl)",
+            "format": "table",
+            "instant": true
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "displayMode": "table"
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12}
+      },
+      {
+        "id": 8,
+        "title": "Market Data Latency",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "data_processing_latency_seconds",
+            "legendFormat": "Processing Latency"
+          },
+          {
+            "expr": "market_data_latency_seconds",
+            "legendFormat": "Market Data Latency"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "unit": "s"
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12}
+      }
+    ]
+  }
+}

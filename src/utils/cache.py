@@ -348,6 +348,64 @@ class CacheManager:
         key = f"commodity:{symbol}:latest"
         return await self.get(key)
     
+    # Forex data specific methods
+    async def cache_forex_data(self, pair: str, data: Dict[str, Any], ttl: Optional[int] = None) -> bool:
+        """
+        Cache forex data for a currency pair.
+        
+        Args:
+            pair: Forex pair symbol
+            data: Forex data dictionary
+            ttl: Time to live in seconds
+            
+        Returns:
+            True if successful, False otherwise
+        """
+        key = f"forex:{pair}:latest"
+        return await self.set(key, data, ttl)
+    
+    async def get_cached_forex_data(self, pair: str) -> Optional[Dict[str, Any]]:
+        """
+        Get cached forex data for a currency pair.
+        
+        Args:
+            pair: Forex pair symbol
+            
+        Returns:
+            Cached forex data or None
+        """
+        key = f"forex:{pair}:latest"
+        return await self.get(key)
+    
+    # Crypto data specific methods
+    async def cache_crypto_data(self, symbol: str, data: Dict[str, Any], ttl: Optional[int] = None) -> bool:
+        """
+        Cache crypto data for a symbol.
+        
+        Args:
+            symbol: Crypto symbol
+            data: Crypto data dictionary
+            ttl: Time to live in seconds
+            
+        Returns:
+            True if successful, False otherwise
+        """
+        key = f"crypto:{symbol}:latest"
+        return await self.set(key, data, ttl)
+    
+    async def get_cached_crypto_data(self, symbol: str) -> Optional[Dict[str, Any]]:
+        """
+        Get cached crypto data for a symbol.
+        
+        Args:
+            symbol: Crypto symbol
+            
+        Returns:
+            Cached crypto data or None
+        """
+        key = f"crypto:{symbol}:latest"
+        return await self.get(key)
+    
     # News data specific methods
     async def cache_news_data(self, symbol: str, news_list: List[Dict[str, Any]], ttl: Optional[int] = None) -> bool:
         """

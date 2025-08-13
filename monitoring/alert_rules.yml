@@ -1,0 +1,222 @@
+# Prometheus Alert Rules for Financial Monitoring System
+groups:
+  - name: financial_alerts
+    interval: 30s
+    rules:
+      # VaR breach alerts
+      - alert: HighVaR
+        expr: portfolio_var_95 > 0.05
+        for: 1m
+        labels:
+          severity: critical
+          category: risk
+        annotations:
+          summary: "Portfolio VaR exceeded 5% threshold"
+          description: "Portfolio {{ $labels.portfolio_id }} VaR (95%) is {{ $value | humanizePercentage }} which exceeds the 5% limit"
+
+      - alert: ExtremeVaR
+        expr: portfolio_var_99 > 0.10
+        for: 30s
+        labels:
+          severity: critical
+          category: risk
+        annotations:
+          summary: "Extreme VaR breach - immediate attention required"
+          description: "Portfolio {{ $labels.portfolio_id }} VaR (99%) is {{ $value | humanizePercentage }} - EXTREME RISK"
+
+      # P&L alerts
+      - alert: LargeDailyLoss
+        expr: portfolio_daily_pnl < -100000
+        for: 1m
+        labels:
+          severity: warning
+          category: pnl
+        annotations:
+          summary: "Large daily P&L loss detected"
+          description: "Portfolio {{ $labels.portfolio_id }} daily P&L is ${{ $value | humanize }} (loss)"
+
+      - alert: MassiveDailyLoss
+        expr: portfolio_daily_pnl < -500000
+        for: 30s
+        labels:
+          severity: critical
+          category: pnl
+        annotations:
+          summary: "MASSIVE daily loss - risk limit breach"
+          description: "Portfolio {{ $labels.portfolio_id }} daily P&L is ${{ $value | humanize }} - IMMEDIATE ACTION REQUIRED"
+
+      # VIX alerts
+      - alert: VIXSpike
+        expr: vix_current > 30
+        for: 2m
+        labels:
+          severity: warning
+          category: volatility
+        annotations:
+          summary: "VIX spike detected - market stress"
+          description: "VIX is {{ $value }} indicating elevated market volatility"
+
+      - alert: VIXPanic
+        expr: vix_current > 40
+        for: 30s
+        labels:
+          severity: critical
+          category: volatility
+        annotations:
+          summary: "VIX panic level - extreme market fear"
+          description: "VIX is {{ $value }} indicating EXTREME market panic conditions"
+
+      # Data quality alerts
+      - alert: StaleDataFeed
+        expr: time() - last_data_update_timestamp > 300
+        for: 1m
+        labels:
+          severity: warning
+          category: data
+        annotations:
+          summary: "Stale data feed detected"
+          description: "No data updates received for {{ $labels.feed }} in over 5 minutes"
+
+      - alert: HighDataLatency
+        expr: data_processing_latency_seconds > 1.0
+        for: 2m
+        labels:
+          severity: warning
+          category: performance
+        annotations:
+          summary: "High data processing latency"
+          description: "Data processing latency is {{ $value }}s, exceeding 1s target"
+
+      # System performance alerts
+      - alert: HighCPUUsage
+        expr: cpu_usage_percent > 80
+        for: 5m
+        labels:
+          severity: warning
+          category: system
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is {{ $value }}% for over 5 minutes"
+
+      - alert: HighMemoryUsage
+        expr: memory_usage_percent > 85
+        for: 3m
+        labels:
+          severity: warning
+          category: system
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is {{ $value }}% for over 3 minutes"
+
+      - alert: RedisDown
+        expr: up{job="redis-exporter"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          category: system
+        annotations:
+          summary: "Redis is down"
+          description: "Redis cache server is not responding"
+
+      - alert: DatabaseDown
+        expr: up{job="postgres-exporter"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          category: system
+        annotations:
+          summary: "PostgreSQL database is down"
+          description: "Main PostgreSQL database is not responding"
+
+      # Options flow alerts
+      - alert: UnusualOptionsVolume
+        expr: options_volume_ratio > 3.0
+        for: 5m
+        labels:
+          severity: warning
+          category: options
+        annotations:
+          summary: "Unusual options volume detected"
+          description: "Options volume for {{ $labels.symbol }} is {{ $value }}x normal levels"
+
+      # Correlation alerts
+      - alert: HighCorrelationRisk
+        expr: portfolio_max_correlation > 0.8
+        for: 10m
+        labels:
+          severity: warning
+          category: risk
+        annotations:
+          summary: "High correlation risk in portfolio"
+          description: "Maximum pairwise correlation is {{ $value | humanizePercentage }} indicating concentration risk"
+
+  - name: system_health
+    interval: 60s
+    rules:
+      # Application health checks
+      - alert: ApplicationDown
+        expr: up{job="financial-monitor"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          category: system
+        annotations:
+          summary: "Financial monitoring application is down"
+          description: "Main application is not responding to health checks"
+
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+          category: system
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value | humanizePercentage }} over the last 5 minutes"
+
+      # Cache performance
+      - alert: LowCacheHitRate
+        expr: cache_hit_rate < 0.8
+        for: 5m
+        labels:
+          severity: warning
+          category: performance
+        annotations:
+          summary: "Low cache hit rate"
+          description: "Cache hit rate is {{ $value | humanizePercentage }} which may impact performance"
+
+  - name: business_logic
+    interval: 30s
+    rules:
+      # Risk limit monitoring
+      - alert: RiskLimitBreach
+        expr: position_size_usd > position_risk_limit_usd
+        for: 1m
+        labels:
+          severity: critical
+          category: risk
+        annotations:
+          summary: "Position size exceeds risk limit"
+          description: "Position in {{ $labels.symbol }} is ${{ $value | humanize }} exceeding limit of ${{ $labels.limit | humanize }}"
+
+      # Market hours monitoring
+      - alert: AfterHoursActivity
+        expr: trading_activity > 1000 and market_hours == 0
+        for: 2m
+        labels:
+          severity: info
+          category: trading
+        annotations:
+          summary: "Significant after-hours trading activity"
+          description: "{{ $value }} trades detected outside market hours"
+
+      # Volatility regime changes
+      - alert: VolatilityRegimeChange
+        expr: increase(volatility_regime_changes_total[1h]) > 0
+        for: 0s
+        labels:
+          severity: info
+          category: volatility
+        annotations:
+          summary: "Volatility regime change detected"
+          description: "Market volatility regime changed to {{ $labels.new_regime }} for {{ $labels.symbol }}"

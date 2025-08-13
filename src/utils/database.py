@@ -47,6 +47,47 @@ class CommodityData(Base):
     commodity_type = Column(String(20))  # metals, energy, agriculture
     created_at = Column(DateTime, default=datetime.utcnow)
 
+class ForexData(Base):
+    """SQLAlchemy model for forex data."""
+    __tablename__ = 'forex_data'
+    
+    id = Column(Integer, primary_key=True)
+    pair = Column(String(10), nullable=False, index=True)
+    symbol = Column(String(15), nullable=False, index=True)
+    timestamp = Column(DateTime, nullable=False, index=True)
+    rate = Column(Float)
+    bid = Column(Float)
+    ask = Column(Float)
+    open_rate = Column(Float)
+    high_rate = Column(Float)
+    low_rate = Column(Float)
+    volume = Column(Integer, default=0)
+    change_24h = Column(Float, default=0)
+    change_24h_percent = Column(Float, default=0)
+    source = Column(String(20))
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class CryptoData(Base):
+    """SQLAlchemy model for cryptocurrency data."""
+    __tablename__ = 'crypto_data'
+    
+    id = Column(Integer, primary_key=True)
+    symbol = Column(String(20), nullable=False, index=True)
+    crypto = Column(String(10), nullable=False, index=True)
+    timestamp = Column(DateTime, nullable=False, index=True)
+    price = Column(Float)
+    open_price = Column(Float)
+    high_price = Column(Float)
+    low_price = Column(Float)
+    volume = Column(Integer, default=0)
+    market_cap = Column(Integer, default=0)
+    currency = Column(String(3), default='USD')
+    change_24h = Column(Float, default=0)
+    change_24h_percent = Column(Float, default=0)
+    volume_24h = Column(Integer, default=0)
+    source = Column(String(20))
+    created_at = Column(DateTime, default=datetime.utcnow)
+
 class NewsData(Base):
     """SQLAlchemy model for news data."""
     __tablename__ = 'news_data'
@@ -343,6 +384,283 @@ class DatabaseManager:
             bucket=self.config.database.influxdb.bucket,
             record=point
         )
+    
+    # Forex data methods
+    async def save_forex_data(self, data: Dict[str, Any]):
+        """Save forex data to database."""
+        try:
+            if self.config.database.type == "postgresql":
+                await self._save_forex_data_postgresql(data)
+            else:
+                await self._save_forex_data_influxdb(data)
+        except Exception as e:
+            self.logger.error(f"Failed to save forex data: {e}")
+            raise
+    
+    async def _save_forex_data_postgresql(self, data: Dict[str, Any]):
+        """Save forex data to PostgreSQL."""
+        async with self.session_factory() as session:
+            forex_data = ForexData(
+                pair=data['pair'],
+                symbol=data['symbol'],
+                timestamp=data['timestamp'],
+                rate=data.get('rate'),
+                bid=data.get('bid'),
+                ask=data.get('ask'),
+                open_rate=data.get('open'),
+                high_rate=data.get('high'),
+                low_rate=data.get('low'),
+                volume=data.get('volume', 0),
+                change_24h=data.get('change', 0),
+                change_24h_percent=data.get('change_percent', 0),
+                source=data.get('source')
+            )
+            session.add(forex_data)
+            await session.commit()
+    
+    async def _save_forex_data_influxdb(self, data: Dict[str, Any]):
+        """Save forex data to InfluxDB."""
+        point = Point("forex_data") \
+            .tag("pair", data['pair']) \
+            .tag("symbol", data['symbol']) \
+            .tag("source", data.get('source', 'unknown')) \
+            .field("rate", data.get('rate', 0)) \
+            .field("bid", data.get('bid', 0)) \
+            .field("ask", data.get('ask', 0)) \
+            .field("open", data.get('open', 0)) \
+            .field("high", data.get('high', 0)) \
+            .field("low", data.get('low', 0)) \
+            .field("volume", data.get('volume', 0)) \
+            .field("change_24h", data.get('change', 0)) \
+            .field("change_24h_percent", data.get('change_percent', 0)) \
+            .time(data['timestamp'], WritePrecision.NS)
+        
+        self.write_api.write(
+            bucket=self.config.database.influxdb.bucket,
+            record=point
+        )
+    
+    # Crypto data methods
+    async def save_crypto_data(self, data: Dict[str, Any]):
+        """Save cryptocurrency data to database."""
+        try:
+            if self.config.database.type == "postgresql":
+                await self._save_crypto_data_postgresql(data)
+            else:
+                await self._save_crypto_data_influxdb(data)
+        except Exception as e:
+            self.logger.error(f"Failed to save crypto data: {e}")
+            raise
+    
+    async def _save_crypto_data_postgresql(self, data: Dict[str, Any]):
+        """Save crypto data to PostgreSQL."""
+        async with self.session_factory() as session:
+            crypto_data = CryptoData(
+                symbol=data['symbol'],
+                crypto=data['crypto'],
+                timestamp=data['timestamp'],
+                price=data.get('price'),
+                open_price=data.get('open'),
+                high_price=data.get('high'),
+                low_price=data.get('low'),
+                volume=data.get('volume', 0),
+                market_cap=data.get('market_cap', 0),
+                currency=data.get('currency', 'USD'),
+                change_24h=data.get('change_24h', 0),
+                change_24h_percent=data.get('change_24h_percent', 0),
+                volume_24h=data.get('volume_24h', 0),
+                source=data.get('source')
+            )
+            session.add(crypto_data)
+            await session.commit()
+    
+    async def _save_crypto_data_influxdb(self, data: Dict[str, Any]):
+        """Save crypto data to InfluxDB."""
+        point = Point("crypto_data") \
+            .tag("symbol", data['symbol']) \
+            .tag("crypto", data['crypto']) \
+            .tag("currency", data.get('currency', 'USD')) \
+            .tag("source", data.get('source', 'unknown')) \
+            .field("price", data.get('price', 0)) \
+            .field("open", data.get('open', 0)) \
+            .field("high", data.get('high', 0)) \
+            .field("low", data.get('low', 0)) \
+            .field("volume", data.get('volume', 0)) \
+            .field("market_cap", data.get('market_cap', 0)) \
+            .field("change_24h", data.get('change_24h', 0)) \
+            .field("change_24h_percent", data.get('change_24h_percent', 0)) \
+            .field("volume_24h", data.get('volume_24h', 0)) \
+            .time(data['timestamp'], WritePrecision.NS)
+        
+        self.write_api.write(
+            bucket=self.config.database.influxdb.bucket,
+            record=point
+        )
+    
+    async def get_forex_data(self, pair: str, start_time: datetime, end_time: datetime) -> List[Dict[str, Any]]:
+        """Get forex data for a pair within a time range."""
+        try:
+            if self.config.database.type == "postgresql":
+                return await self._get_forex_data_postgresql(pair, start_time, end_time)
+            else:
+                return await self._get_forex_data_influxdb(pair, start_time, end_time)
+        except Exception as e:
+            self.logger.error(f"Failed to get forex data: {e}")
+            return []
+    
+    async def _get_forex_data_postgresql(self, pair: str, start_time: datetime, end_time: datetime) -> List[Dict[str, Any]]:
+        """Get forex data from PostgreSQL."""
+        async with self.session_factory() as session:
+            result = await session.execute(
+                text("""
+                    SELECT pair, symbol, timestamp, rate, bid, ask, open_rate, high_rate, low_rate, volume, source
+                    FROM forex_data
+                    WHERE pair = :pair AND timestamp BETWEEN :start_time AND :end_time
+                    ORDER BY timestamp
+                """),
+                {"pair": pair, "start_time": start_time, "end_time": end_time}
+            )
+            
+            return [dict(row._mapping) for row in result.fetchall()]
+    
+    async def _get_forex_data_influxdb(self, pair: str, start_time: datetime, end_time: datetime) -> List[Dict[str, Any]]:
+        """Get forex data from InfluxDB."""
+        query = f'''
+            from(bucket: "{self.config.database.influxdb.bucket}")
+            |> range(start: {start_time.isoformat()}, stop: {end_time.isoformat()})
+            |> filter(fn: (r) => r["_measurement"] == "forex_data" and r["pair"] == "{pair}")
+            |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
+        '''
+        
+        result = self.query_api.query(query)
+        
+        data = []
+        for table in result:
+            for record in table.records:
+                data.append({
+                    'pair': record.values.get('pair'),
+                    'symbol': record.values.get('symbol'),
+                    'timestamp': record.get_time(),
+                    'rate': record.values.get('rate'),
+                    'bid': record.values.get('bid'),
+                    'ask': record.values.get('ask'),
+                    'open': record.values.get('open'),
+                    'high': record.values.get('high'),
+                    'low': record.values.get('low'),
+                    'volume': record.values.get('volume'),
+                    'source': record.values.get('source')
+                })
+        
+        return data
+    
+    async def get_crypto_data(self, symbol: str, start_time: datetime, end_time: datetime) -> List[Dict[str, Any]]:
+        """Get crypto data for a symbol within a time range."""
+        try:
+            if self.config.database.type == "postgresql":
+                return await self._get_crypto_data_postgresql(symbol, start_time, end_time)
+            else:
+                return await self._get_crypto_data_influxdb(symbol, start_time, end_time)
+        except Exception as e:
+            self.logger.error(f"Failed to get crypto data: {e}")
+            return []
+    
+    async def _get_crypto_data_postgresql(self, symbol: str, start_time: datetime, end_time: datetime) -> List[Dict[str, Any]]:
+        """Get crypto data from PostgreSQL."""
+        async with self.session_factory() as session:
+            result = await session.execute(
+                text("""
+                    SELECT symbol, crypto, timestamp, price, open_price, high_price, low_price, volume, 
+                           market_cap, change_24h, change_24h_percent, volume_24h, source
+                    FROM crypto_data
+                    WHERE symbol = :symbol AND timestamp BETWEEN :start_time AND :end_time
+                    ORDER BY timestamp
+                """),
+                {"symbol": symbol, "start_time": start_time, "end_time": end_time}
+            )
+            
+            return [dict(row._mapping) for row in result.fetchall()]
+    
+    async def _get_crypto_data_influxdb(self, symbol: str, start_time: datetime, end_time: datetime) -> List[Dict[str, Any]]:
+        """Get crypto data from InfluxDB."""
+        query = f'''
+            from(bucket: "{self.config.database.influxdb.bucket}")
+            |> range(start: {start_time.isoformat()}, stop: {end_time.isoformat()})
+            |> filter(fn: (r) => r["_measurement"] == "crypto_data" and r["symbol"] == "{symbol}")
+            |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
+        '''
+        
+        result = self.query_api.query(query)
+        
+        data = []
+        for table in result:
+            for record in table.records:
+                data.append({
+                    'symbol': record.values.get('symbol'),
+                    'crypto': record.values.get('crypto'),
+                    'timestamp': record.get_time(),
+                    'price': record.values.get('price'),
+                    'open': record.values.get('open'),
+                    'high': record.values.get('high'),
+                    'low': record.values.get('low'),
+                    'volume': record.values.get('volume'),
+                    'market_cap': record.values.get('market_cap'),
+                    'change_24h': record.values.get('change_24h'),
+                    'change_24h_percent': record.values.get('change_24h_percent'),
+                    'volume_24h': record.values.get('volume_24h'),
+                    'source': record.values.get('source')
+                })
+        
+        return data
+    
+    async def get_commodity_data(self, symbol: str, start_time: datetime, end_time: datetime) -> List[Dict[str, Any]]:
+        """Get commodity data for a symbol within a time range."""
+        try:
+            if self.config.database.type == "postgresql":
+                return await self._get_commodity_data_postgresql(symbol, start_time, end_time)
+            else:
+                return await self._get_commodity_data_influxdb(symbol, start_time, end_time)
+        except Exception as e:
+            self.logger.error(f"Failed to get commodity data: {e}")
+            return []
+    
+    async def _get_commodity_data_postgresql(self, symbol: str, start_time: datetime, end_time: datetime) -> List[Dict[str, Any]]:
+        """Get commodity data from PostgreSQL."""
+        async with self.session_factory() as session:
+            result = await session.execute(
+                text("""
+                    SELECT symbol, timestamp, price, volume, commodity_type
+                    FROM commodity_data
+                    WHERE symbol = :symbol AND timestamp BETWEEN :start_time AND :end_time
+                    ORDER BY timestamp
+                """),
+                {"symbol": symbol, "start_time": start_time, "end_time": end_time}
+            )
+            
+            return [dict(row._mapping) for row in result.fetchall()]
+    
+    async def _get_commodity_data_influxdb(self, symbol: str, start_time: datetime, end_time: datetime) -> List[Dict[str, Any]]:
+        """Get commodity data from InfluxDB."""
+        query = f'''
+            from(bucket: "{self.config.database.influxdb.bucket}")
+            |> range(start: {start_time.isoformat()}, stop: {end_time.isoformat()})
+            |> filter(fn: (r) => r["_measurement"] == "commodity_data" and r["symbol"] == "{symbol}")
+            |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
+        '''
+        
+        result = self.query_api.query(query)
+        
+        data = []
+        for table in result:
+            for record in table.records:
+                data.append({
+                    'symbol': record.values.get('symbol'),
+                    'timestamp': record.get_time(),
+                    'price': record.values.get('price'),
+                    'volume': record.values.get('volume'),
+                    'commodity_type': record.values.get('commodity_type')
+                })
+        
+        return data
     
     # News data methods
     async def save_news_data(self, data: Dict[str, Any]):
