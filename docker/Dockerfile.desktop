@@ -33,7 +33,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libfreetype6-dev \
     libblas-dev \
     liblapack-dev \
-    libatlas-base-dev \
+    libopenblas-dev \
     gfortran \
     # For better performance
     libomp-dev \
@@ -68,6 +68,10 @@ RUN pip install --no-cache-dir \
 
 # Copy project
 COPY . .
+
+# ---> THIS IS THE FIX <---
+# Install the project in editable mode so Python can find the 'src' module
+RUN pip install -e .
 
 # Create necessary directories with proper permissions
 RUN mkdir -p logs data backups temp cache exports notebooks static \

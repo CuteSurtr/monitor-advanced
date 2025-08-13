@@ -8,3 +8,7 @@ class TechnicalAnalyzer:
     
     def indicators(self, df):
         return df
+    
+    async def start(self):
+        """Start the technical analyzer."""
+        pass

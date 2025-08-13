@@ -139,7 +139,7 @@ class DatabaseManager:
         self.engine = create_async_engine(
             database_url,
             poolclass=QueuePool,
-            pool_size=self.config.performance.connection_pool_size,
+            pool_size=getattr(self.config.performance, 'connection_pool_size', 10),
             max_overflow=20,
             pool_pre_ping=True,
             echo=False
@@ -519,4 +519,93 @@ class DatabaseManager:
         self.write_api.write(
             bucket=self.config.database.influxdb.bucket,
             record=points
-        ) 
+        )
+
+
+class SyncDatabaseManager:
+    """Synchronous database manager for Celery tasks."""
+    
+    def __init__(self, config):
+        self.config = config
+        self.logger = get_logger(__name__)
+        self.engine = None
+        self.session_factory = None
+        
+    def initialize(self):
+        """Initialize synchronous database connection."""
+        try:
+            if self.config.database.type == "postgresql":
+                self._init_postgresql_sync()
+            
+            self.logger.info("Sync database initialized successfully")
+            
+        except Exception as e:
+            self.logger.error(f"Failed to initialize sync database: {e}")
+            raise
+    
+    def _init_postgresql_sync(self):
+        """Initialize synchronous PostgreSQL connection."""
+        # Use psycopg2 for synchronous connections in Celery tasks
+        database_url = self.config.get_sync_database_url()
+        self.engine = create_engine(
+            database_url,
+            poolclass=QueuePool,
+            pool_size=getattr(self.config.performance, 'connection_pool_size', 10),
+            max_overflow=20,
+            pool_pre_ping=True,
+            echo=False
+        )
+        
+        # Create session factory
+        self.session_factory = sessionmaker(
+            self.engine,
+            expire_on_commit=False
+        )
+        
+        # Create tables
+        try:
+            Base.metadata.create_all(self.engine)
+        except Exception as e:
+            self.logger.warning(f"Could not create tables: {e}")
+        
+        self.logger.info("Sync PostgreSQL connection established")
+    
+    def get_session(self):
+        """Get a database session."""
+        return self.session_factory()
+    
+    def close(self):
+        """Close database connections."""
+        try:
+            if self.engine:
+                self.engine.dispose()
+            self.logger.info("Sync database connections closed")
+        except Exception as e:
+            self.logger.error(f"Error closing sync database connections: {e}")
+
+
+# Global instances
+_db_manager = None
+_sync_db_manager = None
+
+def get_database_manager():
+    """Get global async database manager instance."""
+    global _db_manager
+    if _db_manager is None:
+        from src.utils.config import get_config
+        config = get_config()
+        _db_manager = DatabaseManager(config)
+    return _db_manager
+
+def get_sync_database_manager():
+    """Get global sync database manager instance for Celery tasks."""
+    global _sync_db_manager
+    if _sync_db_manager is None:
+        from src.utils.config import get_config
+        config = get_config()
+        _sync_db_manager = SyncDatabaseManager(config)
+        try:
+            _sync_db_manager.initialize()
+        except Exception as e:
+            print(f"Warning: Could not initialize sync database manager: {e}")
+    return _sync_db_manager 

@@ -239,7 +239,6 @@ services:
       - CONFIG_PATH=/app/config/config.yaml
       - PYTHONPATH=/app:/app/src
       - PYTHONOPTIMIZE=1
-      - C_FORCE_ROOT=1
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/1
     volumes:
@@ -255,6 +254,12 @@ services:
         condition: service_healthy
       stock_monitor:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A src.celery_app:app inspect ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
     deploy:
       resources:
         limits:

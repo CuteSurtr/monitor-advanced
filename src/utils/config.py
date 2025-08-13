@@ -259,6 +259,13 @@ class Config(BaseModel):
         else:
             return f"influxdb://{self.database.influxdb.url}"
     
+    def get_sync_database_url(self) -> str:
+        """Get synchronous database connection URL for Celery tasks."""
+        if self.database.type == "postgresql":
+            return f"postgresql://{self.database.user}:{self.database.password}@{self.database.host}:{self.database.port}/{self.database.name}"
+        else:
+            return f"influxdb://{self.database.influxdb.url}"
+    
     def get_redis_url(self) -> str:
         """Get Redis connection URL."""
         if self.redis.password:
