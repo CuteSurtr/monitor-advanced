@@ -1,0 +1,487 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none"
+          },
+          "unit": "currencyUSD"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "title": "📈 Top 30 Stocks - Price Movement",
+      "type": "timeseries",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  td.timestamp as time,\n  s.symbol,\n  td.last_price as value\nFROM market_data.tick_data td\nJOIN market_data.stocks s ON s.id = td.asset_id\nWHERE \n  td.asset_type = 'stock' AND\n  td.timestamp >= NOW() - INTERVAL '24 hours' AND\n  s.id IN (\n    SELECT s2.id \n    FROM market_data.stocks s2 \n    ORDER BY s2.market_cap DESC\n    LIMIT 30\n  )\nORDER BY td.timestamp",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none"
+          },
+          "unit": "currencyUSD"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 2,
+      "title": "₿ Top 30 Cryptocurrencies - Price Movement",
+      "type": "timeseries",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  td.timestamp as time,\n  c.symbol,\n  td.last_price as value\nFROM market_data.tick_data td\nJOIN market_data.cryptocurrencies c ON c.id = td.asset_id\nWHERE \n  td.asset_type = 'crypto' AND\n  td.timestamp >= NOW() - INTERVAL '24 hours' AND\n  c.id IN (\n    SELECT c2.id \n    FROM market_data.cryptocurrencies c2 \n    ORDER BY c2.market_cap DESC\n    LIMIT 30\n  )\nORDER BY td.timestamp",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none"
+          },
+          "unit": "short"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "id": 3,
+      "title": "💱 Top 30 Forex Pairs - Rate Movement",
+      "type": "timeseries",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  td.timestamp as time,\n  fp.symbol,\n  td.last_price as value\nFROM market_data.tick_data td\nJOIN market_data.forex_pairs fp ON fp.id = td.asset_id\nWHERE \n  td.asset_type = 'forex' AND\n  td.timestamp >= NOW() - INTERVAL '24 hours' AND\n  fp.id IN (\n    SELECT fp2.id \n    FROM market_data.forex_pairs fp2 \n    ORDER BY fp2.is_major DESC, fp2.id\n    LIMIT 30\n  )\nORDER BY td.timestamp",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none"
+          },
+          "unit": "currencyUSD"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "id": 4,
+      "title": "🥇 Top 30 Commodities - Price Movement",
+      "type": "timeseries",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  td.timestamp as time,\n  cm.symbol,\n  td.last_price as value\nFROM market_data.tick_data td\nJOIN market_data.commodities cm ON cm.id = td.asset_id\nWHERE \n  td.asset_type = 'commodity' AND\n  td.timestamp >= NOW() - INTERVAL '24 hours' AND\n  cm.id IN (\n    SELECT cm2.id \n    FROM market_data.commodities cm2 \n    ORDER BY cm2.id\n    LIMIT 30\n  )\nORDER BY td.timestamp",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "color-background"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 2
+              },
+              {
+                "color": "blue",
+                "value": 5
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "change_percent"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 16
+      },
+      "id": 5,
+      "title": "📈 Top 30 Stocks Table",
+      "type": "table",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH latest_stock_prices AS (\n  SELECT DISTINCT ON (td.asset_id)\n    td.asset_id,\n    td.last_price as current_price,\n    td.volume,\n    td.timestamp,\n    LAG(td.last_price, 1) OVER (PARTITION BY td.asset_id ORDER BY td.timestamp) as prev_price\n  FROM market_data.tick_data td\n  WHERE td.asset_type = 'stock' AND td.timestamp >= NOW() - INTERVAL '24 hours'\n  ORDER BY td.asset_id, td.timestamp DESC\n)\nSELECT \n  s.symbol,\n  s.company_name as name,\n  ROUND(lsp.current_price::numeric, 4) as current_price,\n  ROUND(lsp.volume::numeric, 0) as volume,\n  ROUND(COALESCE(((lsp.current_price - lsp.prev_price) / lsp.prev_price * 100), 0)::numeric, 2) as change_percent,\n  s.market_cap / 1000000000 as market_cap_billions\nFROM latest_stock_prices lsp\nJOIN market_data.stocks s ON s.id = lsp.asset_id\nORDER BY s.market_cap DESC\nLIMIT 30",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "color-background"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 2
+              },
+              {
+                "color": "blue",
+                "value": 5
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "change_percent"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 6,
+        "y": 16
+      },
+      "id": 6,
+      "title": "₿ Top 30 Crypto Table",
+      "type": "table",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH latest_crypto_prices AS (\n  SELECT DISTINCT ON (td.asset_id)\n    td.asset_id,\n    td.last_price as current_price,\n    td.volume,\n    td.timestamp,\n    LAG(td.last_price, 1) OVER (PARTITION BY td.asset_id ORDER BY td.timestamp) as prev_price\n  FROM market_data.tick_data td\n  WHERE td.asset_type = 'crypto' AND td.timestamp >= NOW() - INTERVAL '24 hours'\n  ORDER BY td.asset_id, td.timestamp DESC\n)\nSELECT \n  c.symbol,\n  c.name,\n  ROUND(lcp.current_price::numeric, 4) as current_price,\n  ROUND(lcp.volume::numeric, 0) as volume,\n  ROUND(COALESCE(((lcp.current_price - lcp.prev_price) / lcp.prev_price * 100), 0)::numeric, 2) as change_percent,\n  c.market_cap / 1000000000 as market_cap_billions\nFROM latest_crypto_prices lcp\nJOIN market_data.cryptocurrencies c ON c.id = lcp.asset_id\nORDER BY c.market_cap DESC\nLIMIT 30",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "color-background"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 0.1
+              },
+              {
+                "color": "blue",
+                "value": 0.5
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "change_percent"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 12,
+        "y": 16
+      },
+      "id": 7,
+      "title": "💱 Top 30 Forex Table",
+      "type": "table",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH latest_forex_prices AS (\n  SELECT DISTINCT ON (td.asset_id)\n    td.asset_id,\n    td.last_price as current_price,\n    td.volume,\n    td.timestamp,\n    LAG(td.last_price, 1) OVER (PARTITION BY td.asset_id ORDER BY td.timestamp) as prev_price\n  FROM market_data.tick_data td\n  WHERE td.asset_type = 'forex' AND td.timestamp >= NOW() - INTERVAL '24 hours'\n  ORDER BY td.asset_id, td.timestamp DESC\n)\nSELECT \n  fp.symbol,\n  CONCAT(fp.base_currency, '/', fp.quote_currency) as pair,\n  ROUND(lfp.current_price::numeric, 6) as current_rate,\n  ROUND(lfp.volume::numeric, 0) as volume,\n  ROUND(COALESCE(((lfp.current_price - lfp.prev_price) / lfp.prev_price * 100), 0)::numeric, 4) as change_percent,\n  CASE WHEN fp.is_major THEN 'Major' ELSE 'Minor' END as pair_type\nFROM latest_forex_prices lfp\nJOIN market_data.forex_pairs fp ON fp.id = lfp.asset_id\nORDER BY fp.is_major DESC, fp.id\nLIMIT 30",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "color-background"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 1
+              },
+              {
+                "color": "blue",
+                "value": 3
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "change_percent"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 18,
+        "y": 16
+      },
+      "id": 8,
+      "title": "🥇 Top 30 Commodities Table",
+      "type": "table",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH latest_commodity_prices AS (\n  SELECT DISTINCT ON (td.asset_id)\n    td.asset_id,\n    td.last_price as current_price,\n    td.volume,\n    td.timestamp,\n    LAG(td.last_price, 1) OVER (PARTITION BY td.asset_id ORDER BY td.timestamp) as prev_price\n  FROM market_data.tick_data td\n  WHERE td.asset_type = 'commodity' AND td.timestamp >= NOW() - INTERVAL '24 hours'\n  ORDER BY td.asset_id, td.timestamp DESC\n)\nSELECT \n  cm.symbol,\n  cm.name,\n  ROUND(lcp.current_price::numeric, 4) as current_price,\n  ROUND(lcp.volume::numeric, 0) as volume,\n  ROUND(COALESCE(((lcp.current_price - lcp.prev_price) / lcp.prev_price * 100), 0)::numeric, 2) as change_percent,\n  cm.asset_class\nFROM latest_commodity_prices lcp\nJOIN market_data.commodities cm ON cm.id = lcp.asset_id\nORDER BY cm.id\nLIMIT 30",
+          "refId": "A"
+        }
+      ]
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 36,
+  "style": "dark",
+  "tags": ["financial", "comprehensive", "multi-asset"],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "title": "🚀 Complete Financial Dashboard - All Requirements",
+  "uid": "complete-fin",
+  "version": 1
+}

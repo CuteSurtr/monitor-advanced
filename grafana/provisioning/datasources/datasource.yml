@@ -1,8 +1,38 @@
 apiVersion: 1
+
 datasources:
+  - name: PostgreSQL
+    type: postgres
+    uid: postgres-datasource
+    access: proxy
+    url: stock_monitor_postgres_desktop:5432
+    database: stock_monitor
+    user: stock_user
+    secureJsonData:
+      password: stock_password
+    jsonData:
+      sslmode: disable
+      maxOpenConns: 100
+      maxIdleConns: 100
+      connMaxLifetime: 14400
+      postgresVersion: 1500
+      timescaledb: true
+    editable: true
+
+  - name: InfluxDB
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    secureJsonData:
+      token: your_influxdb_token_here
+    jsonData:
+      version: Flux
+      organization: stock_monitor
+      defaultBucket: market_data
+    editable: true
+
   - name: Prometheus
     type: prometheus
     access: proxy
     url: http://prometheus:9090
-    isDefault: true
     editable: true

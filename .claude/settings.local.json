@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm:*)",
+      "Bash(python:*)",
+      "Bash(py --version)",
+      "Bash(py -m pip install:*)",
+      "Bash(py:*)",
+      "Bash(del \"comprehensive-multi-asset-dashboard.json\")",
+      "Bash(docker exec:*)",
+      "Bash(docker logs:*)",
+      "Bash(docker restart:*)",
+      "Bash(docker:*)",
+      "Bash(winpty docker exec -it stock_monitor_postgres_desktop psql -U stock_user -d stock_monitor -c \"SELECT column_name, data_type FROM information_schema.columns WHERE table_name = ''cryptocurrencies'' AND table_schema = ''market_data'';\")",
+      "Bash(cat:*)",
+      "Bash(cp:*)",
+      "Bash(where ngrok)",
+      "Bash(curl:*)",
+      "Bash(powershell:*)",
+      "Bash(./ngrok http 3000 --log stdout)",
+      "Bash(./cloudflared tunnel --url http://localhost:3000)",
+      "Bash(grafana/grafana:latest)"
+    ],
+    "defaultMode": "acceptEdits",
+    "additionalDirectories": [
+      "C:\\c\\Users\\nex88\\OneDrive\\Desktop\\monitor advanced\\grafana\\dashboards"
+    ]
+  }
+}

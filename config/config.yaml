@@ -3,7 +3,7 @@
 
 # Database Configuration
 database:
-  type: "postgresql"  # or "influxdb"
+  type: "dual"  # "postgresql", "influxdb", or "dual"
   host: "postgres"
   port: 5432
   name: "stock_monitor"
@@ -19,7 +19,7 @@ database:
   # InfluxDB specific settings
   influxdb:
     url: "http://influxdb:8086"
-    token: "your_influxdb_token"
+    token: "xEoh_d1wMmj_8sE2ipM1nht5Iq_iJiziHWVGvt9Haplv8QPDuR6oFTRIcX3rT8rG1M6H21tk0sSTv5ujfrPRDg=="
     org: "stock_monitor"
     bucket: "market_data"
     batch_size: 10000
@@ -44,15 +44,15 @@ api_keys:
   alpha_vantage: "0Q3WY1RIHG4NSFZB"
   polygon: "2PD7inBjSZ81cipjVWSpCxVdcHSgVAbv"
   finnhub: "d2dqt7pr01qjrul4lcbgd2dqt7pr01qjrul4lcc0"
-  news_api: "your_news_api_key"
+  news_api: "6110b4ffe90d400ca5121e54eab3b05b"
   quandl: "your_quandl_key"
   iex_cloud: "your_iex_cloud_key"
-  fred: "your_fred_api_key"
+  fred: "6a20a49705210da6ff7c97adb5167b11 "
   # Additional API keys for multi-asset data
-  fixer: "your_fixer_api_key"
+  fixer: "005fb80c7e0fb7e6379c8258325ca661"
   exchangerate: "your_exchangerate_api_key"
   coinmarketcap: "your_cmc_api_key"
-  coingecko: "your_coingecko_api_key"
+  coingecko: "CG-AxadtsveNS7hVb65ZH55qFsV"
   binance: "your_binance_api_key"
 
 # Data Collection Settings - Desktop Enhanced

@@ -163,8 +163,14 @@ class DatabaseManager:
         try:
             if self.config.database.type == "postgresql":
                 await self._init_postgresql()
-            else:
+            elif self.config.database.type == "influxdb":
                 await self._init_influxdb()
+            elif self.config.database.type == "dual":
+                # Initialize both databases
+                await self._init_postgresql()
+                await self._init_influxdb()
+            else:
+                raise ValueError(f"Unsupported database type: {self.config.database.type}")
             
             self.health_status = True
             self.logger.info(f"Database initialized successfully: {self.config.database.type}")
@@ -253,7 +259,11 @@ class DatabaseManager:
         try:
             if self.config.database.type == "postgresql":
                 await self._save_stock_data_postgresql(data)
-            else:
+            elif self.config.database.type == "influxdb":
+                await self._save_stock_data_influxdb(data)
+            elif self.config.database.type == "dual":
+                # Save to both databases
+                await self._save_stock_data_postgresql(data)
                 await self._save_stock_data_influxdb(data)
         except Exception as e:
             self.logger.error(f"Failed to save stock data: {e}")
@@ -352,7 +362,11 @@ class DatabaseManager:
         try:
             if self.config.database.type == "postgresql":
                 await self._save_commodity_data_postgresql(data)
-            else:
+            elif self.config.database.type == "influxdb":
+                await self._save_commodity_data_influxdb(data)
+            elif self.config.database.type == "dual":
+                # Save to both databases
+                await self._save_commodity_data_postgresql(data)
                 await self._save_commodity_data_influxdb(data)
         except Exception as e:
             self.logger.error(f"Failed to save commodity data: {e}")
@@ -391,7 +405,11 @@ class DatabaseManager:
         try:
             if self.config.database.type == "postgresql":
                 await self._save_forex_data_postgresql(data)
-            else:
+            elif self.config.database.type == "influxdb":
+                await self._save_forex_data_influxdb(data)
+            elif self.config.database.type == "dual":
+                # Save to both databases
+                await self._save_forex_data_postgresql(data)
                 await self._save_forex_data_influxdb(data)
         except Exception as e:
             self.logger.error(f"Failed to save forex data: {e}")
@@ -446,7 +464,11 @@ class DatabaseManager:
         try:
             if self.config.database.type == "postgresql":
                 await self._save_crypto_data_postgresql(data)
-            else:
+            elif self.config.database.type == "influxdb":
+                await self._save_crypto_data_influxdb(data)
+            elif self.config.database.type == "dual":
+                # Save to both databases
+                await self._save_crypto_data_postgresql(data)
                 await self._save_crypto_data_influxdb(data)
         except Exception as e:
             self.logger.error(f"Failed to save crypto data: {e}")
@@ -668,7 +690,11 @@ class DatabaseManager:
         try:
             if self.config.database.type == "postgresql":
                 await self._save_news_data_postgresql(data)
-            else:
+            elif self.config.database.type == "influxdb":
+                await self._save_news_data_influxdb(data)
+            elif self.config.database.type == "dual":
+                # Save to both databases
+                await self._save_news_data_postgresql(data)
                 await self._save_news_data_influxdb(data)
         except Exception as e:
             self.logger.error(f"Failed to save news data: {e}")
@@ -792,7 +818,11 @@ class DatabaseManager:
         try:
             if self.config.database.type == "postgresql":
                 await self._batch_save_stock_data_postgresql(data_list)
-            else:
+            elif self.config.database.type == "influxdb":
+                await self._batch_save_stock_data_influxdb(data_list)
+            elif self.config.database.type == "dual":
+                # Save to both databases
+                await self._batch_save_stock_data_postgresql(data_list)
                 await self._batch_save_stock_data_influxdb(data_list)
         except Exception as e:
             self.logger.error(f"Failed to batch save stock data: {e}")

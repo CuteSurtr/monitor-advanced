@@ -10,7 +10,7 @@ from dataclasses import dataclass, field
 from pydantic import BaseModel, Field
 
 class DatabaseConfig(BaseModel):
-    type: str = "postgresql"
+    type: str = "dual"  # "postgresql", "influxdb", or "dual"
     host: str = "localhost"
     port: int = 5432
     name: str = "stock_monitor"
@@ -254,17 +254,29 @@ class Config(BaseModel):
     
     def get_database_url(self) -> str:
         """Get database connection URL."""
-        if self.database.type == "postgresql":
+        if self.database.type in ["postgresql", "dual"]:
             return f"postgresql+asyncpg://{self.database.user}:{self.database.password}@{self.database.host}:{self.database.port}/{self.database.name}"
-        else:
+        elif self.database.type == "influxdb":
             return f"influxdb://{self.database.influxdb.url}"
+        else:
+            raise ValueError(f"Unsupported database type: {self.database.type}")
     
     def get_sync_database_url(self) -> str:
         """Get synchronous database connection URL for Celery tasks."""
-        if self.database.type == "postgresql":
+        if self.database.type in ["postgresql", "dual"]:
             return f"postgresql://{self.database.user}:{self.database.password}@{self.database.host}:{self.database.port}/{self.database.name}"
-        else:
+        elif self.database.type == "influxdb":
             return f"influxdb://{self.database.influxdb.url}"
+        else:
+            raise ValueError(f"Unsupported database type: {self.database.type}")
+
+    def use_postgresql(self) -> bool:
+        """Check if PostgreSQL should be used."""
+        return self.database.type in ["postgresql", "dual"]
+    
+    def use_influxdb(self) -> bool:
+        """Check if InfluxDB should be used."""
+        return self.database.type in ["influxdb", "dual"]
     
     def get_redis_url(self) -> str:
         """Get Redis connection URL."""
