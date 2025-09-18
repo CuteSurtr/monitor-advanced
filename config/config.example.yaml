@@ -1,0 +1,237 @@
+# Stock Market Monitoring System Configuration
+
+# Database Configuration
+database:
+  type: "postgresql"  # or "influxdb"
+  host: "localhost"
+  port: 5432
+  name: "stock_monitor"
+  user: "stock_user"
+  password: "your_password"
+  
+  # InfluxDB specific settings
+  influxdb:
+    url: "http://localhost:8086"
+    token: "your_influxdb_token"
+    org: "stock_monitor"
+    bucket: "market_data"
+
+# Redis Configuration
+redis:
+  host: "localhost"
+  port: 6379
+  password: ""
+  db: 0
+
+# API Keys (Get these from respective services)
+api_keys:
+  alpha_vantage: "your_alpha_vantage_key"
+  polygon: "your_polygon_key"
+  finnhub: "your_finnhub_key"
+  news_api: "your_news_api_key"
+  quandl: "your_quandl_key"
+  # Additional API keys for multi-asset data
+  fixer: "your_fixer_api_key"  # For forex data
+  exchangerate: "your_exchangerate_api_key"  # Alternative forex source
+  coinmarketcap: "your_cmc_api_key"  # For crypto data
+  coingecko: "your_coingecko_api_key"  # Alternative crypto source
+  binance: "your_binance_api_key"  # For crypto data
+
+# Data Collection Settings
+data_collection:
+  # Update intervals (in seconds)
+  stock_data_interval: 60
+  commodity_data_interval: 300
+  forex_data_interval: 60  # Forex markets are very active
+  crypto_data_interval: 30  # Crypto markets are 24/7 and highly volatile
+  news_interval: 900
+  sentiment_interval: 1800
+  
+  # Rate limiting
+  max_requests_per_minute: 60
+  max_requests_per_hour: 1000
+  
+  # Exchanges to monitor
+  exchanges:
+    us:
+      - "NYSE"
+      - "NASDAQ"
+      - "AMEX"
+    europe:
+      - "LSE"
+      - "FRA"
+      - "AMS"
+      - "SWX"
+    asia:
+      - "TSE"
+      - "HKG"
+      - "SSE"
+      - "SZSE"
+      - "NSE"
+      - "BSE"
+
+# Commodities to track
+commodities:
+  metals:
+    - "GC=F"  # Gold
+    - "SI=F"  # Silver
+    - "PL=F"  # Platinum
+    - "PA=F"  # Palladium
+    - "HG=F"  # Copper
+  energy:
+    - "CL=F"  # Crude Oil
+    - "NG=F"  # Natural Gas
+    - "BZ=F"  # Brent Oil
+  agriculture:
+    - "ZC=F"  # Corn
+    - "ZS=F"  # Soybeans
+    - "ZW=F"  # Wheat
+    - "KC=F"  # Coffee
+    - "CT=F"  # Cotton
+
+# Technical Indicators
+technical_indicators:
+  rsi:
+    period: 14
+    overbought: 70
+    oversold: 30
+  macd:
+    fast_period: 12
+    slow_period: 26
+    signal_period: 9
+  bollinger_bands:
+    period: 20
+    std_dev: 2
+  moving_averages:
+    - 10
+    - 20
+    - 50
+    - 200
+
+# Alert Settings
+alerts:
+  price_change_threshold: 5.0  # Percentage
+  volume_spike_threshold: 200.0  # Percentage
+  volatility_threshold: 3.0  # Standard deviations
+  correlation_threshold: 0.8
+  
+  # Notification methods
+  email:
+    enabled: false
+    smtp_server: "smtp.gmail.com"
+    smtp_port: 587
+    username: "your_email@gmail.com"
+    password: "your_app_password"
+  
+  telegram:
+    enabled: false
+    bot_token: "your_bot_token"
+    chat_id: "your_chat_id"
+  
+  webhook:
+    enabled: false
+    url: "https://your-webhook-url.com"
+
+# Portfolio Management
+portfolio:
+  default_currency: "USD"
+  rebalancing_frequency: "monthly"
+  risk_tolerance: "moderate"  # conservative, moderate, aggressive
+  max_position_size: 0.1  # 10% of portfolio
+  stop_loss_percentage: 0.05  # 5%
+
+# ML and Analytics
+ml:
+  anomaly_detection:
+    enabled: true
+    model_type: "isolation_forest"
+    contamination: 0.1
+    update_frequency: "daily"
+  
+  sentiment_analysis:
+    enabled: true
+    model_type: "vader"
+    update_frequency: "hourly"
+  
+  correlation_analysis:
+    enabled: true
+    lookback_period: 30  # days
+    update_frequency: "daily"
+
+# Web Dashboard
+dashboard:
+  host: "0.0.0.0"
+  port: 8080
+  debug: false
+  reload: false
+  
+  # Authentication
+  auth:
+    enabled: true
+    secret_key: "your_secret_key_here"
+    token_expire_minutes: 60
+
+# Prometheus Monitoring
+prometheus:
+  enabled: true
+  port: 9090
+  metrics_path: "/metrics"
+  
+  # Custom metrics
+  custom_metrics:
+    - "stock_price"
+    - "portfolio_value"
+    - "alert_count"
+    - "api_request_count"
+    - "data_collection_latency"
+
+# Grafana
+grafana:
+  enabled: true
+  port: 3000
+  admin_user: "admin"
+  admin_password: "admin"
+
+# Logging
+logging:
+  level: "INFO"
+  format: "json"
+  file: "logs/stock_monitor.log"
+  max_size: "100MB"
+  backup_count: 5
+
+# Performance Optimization (Raspberry Pi specific)
+performance:
+  max_workers: 4
+  memory_limit: "2GB"
+  cpu_limit: 0.8  # 80% of available CPU
+  
+  # Caching
+  cache_ttl: 300  # 5 minutes
+  max_cache_size: "500MB"
+  
+  # Database optimization
+  batch_size: 1000
+  connection_pool_size: 10
+
+# Timezone and Market Hours
+timezone:
+  default: "UTC"
+  markets:
+    us: "America/New_York"
+    europe: "Europe/London"
+    asia: "Asia/Tokyo"
+
+# Economic Calendar
+economic_calendar:
+  enabled: true
+  sources:
+    - "investing.com"
+    - "fxstreet.com"
+  update_frequency: "hourly"
+  event_types:
+    - "GDP"
+    - "CPI"
+    - "Employment"
+    - "Interest Rate"
+    - "Earnings" 

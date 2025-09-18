@@ -1,0 +1,65 @@
+MANUAL INFLUXDB BUCKET CREATION
+================================
+
+If the Python script isn't working, try these manual steps:
+
+OPTION 1: Using InfluxDB Web UI (Easiest)
+-----------------------------------------
+1. Open browser: http://localhost:8086
+2. Login with your credentials
+3. Go to "Data" → "Buckets" 
+4. Click "Create Bucket"
+5. Name: financial_data
+6. Retention: Never (or set as desired)
+7. Click "Create"
+
+OPTION 2: Using InfluxDB CLI
+----------------------------
+If you have influx CLI installed:
+
+influx bucket create \
+  --name financial_data \
+  --org stock_monitor \
+  --token "xEoh_d1wMmj_8sE2ipM1nht5Iq_iJiziHWVGvt9Haplv8QPDuR6oFTRIcX3rT8rG1M6H21tk0sSTv5ujfrPRDg==" \
+  --host http://localhost:8086
+
+OPTION 3: Test Basic Connection
+-------------------------------
+Run this Python script to test connection step by step:
+   python test_influxdb_connection.py
+
+This will:
+✓ Test connection
+✓ Create bucket  
+✓ Write test data
+✓ Read test data back
+✓ Add basic stock data
+
+TROUBLESHOOTING
+---------------
+If bucket creation fails:
+
+1. Check InfluxDB is running:
+   - Windows: Check services for "InfluxDB"
+   - Or check: http://localhost:8086/health
+
+2. Verify token permissions:
+   - Token needs "write" access to buckets
+   - Token needs "read" access for the organization
+
+3. Check organization name:
+   - Must match exactly: "stock_monitor"
+
+4. Network issues:
+   - Try: telnet localhost 8086
+   - Check firewall settings
+
+SIMPLE TEST QUERY
+-----------------
+Once bucket is created, test in InfluxDB UI with:
+
+from(bucket: "financial_data")
+  |> range(start: -1h)
+  |> limit(n: 10)
+
+This should return any data in the bucket.

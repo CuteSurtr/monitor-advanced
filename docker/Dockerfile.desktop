@@ -1,0 +1,92 @@
+# Desktop-optimized Dockerfile for Stock Market Monitor
+# Uses Python 3.11 with performance optimizations for desktop environments
+
+FROM python:3.11-slim
+
+# Set environment variables for performance
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONOPTIMIZE=1
+ENV PYTHONPATH=/app
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Set work directory
+WORKDIR /app
+
+# Install system dependencies optimized for desktop
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    g++ \
+    python3-dev \
+    libffi-dev \
+    libssl-dev \
+    libxml2-dev \
+    libxslt1-dev \
+    libpq-dev \
+    git \
+    curl \
+    wget \
+    pkg-config \
+    libjpeg-dev \
+    libpng-dev \
+    libfreetype6-dev \
+    libblas-dev \
+    liblapack-dev \
+    libopenblas-dev \
+    gfortran \
+    # For better performance
+    libomp-dev \
+    # For Jupyter
+    nodejs \
+    npm \
+    # For web scraping
+    chromium \
+    chromium-driver \
+    # Cleanup
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements files
+COPY requirements.txt requirements.desktop.txt ./
+
+# Upgrade pip and setuptools
+RUN python -m pip install --upgrade pip setuptools wheel
+
+# Install requirements with optimizations
+RUN pip install --no-cache-dir -r requirements.txt -r requirements.desktop.txt
+
+# Install additional desktop-specific packages
+RUN pip install --no-cache-dir \
+    jupyter \
+    jupyterlab \
+    nbconvert \
+    ipywidgets \
+    streamlit \
+    fastapi-users \
+    python-multipart
+
+# Copy project
+COPY . .
+
+# ---> THIS IS THE FIX <---
+# Install the project in editable mode so Python can find the 'src' module
+RUN pip install -e .
+
+# Create necessary directories with proper permissions
+RUN mkdir -p logs data backups temp cache exports notebooks static \
+    && useradd --create-home --shell /bin/bash app \
+    && chown -R app:app /app
+
+# Switch to non-root user
+USER app
+
+# Expose ports
+EXPOSE 8080 8000 8888
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# Default command
+CMD ["python", "src/main.py"]

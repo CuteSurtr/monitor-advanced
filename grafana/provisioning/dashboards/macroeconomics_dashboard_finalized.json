@@ -1,0 +1,1274 @@
+{
+  "id": null,
+  "title": "Macroeconomics Dashboard - Finalized",
+  "tags": [
+    "macro",
+    "economics",
+    "finalized",
+    "corrected"
+  ],
+  "style": "dark",
+  "timezone": "browser",
+  "refresh": "30s",
+  "time": {
+    "from": "now-90d",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "TREASURY & YIELD CURVES",
+      "type": "text",
+      "gridPos": {
+        "h": 2,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "options": {
+        "content": "## TREASURY & YIELD CURVES",
+        "mode": "markdown"
+      },
+      "transparent": true
+    },
+    {
+      "id": 2,
+      "title": "Treasury Yield Curve",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 0,
+        "y": 2
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-datasource"
+          },
+          "query": "\nfrom(bucket: \"macro_data\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"treasury_yield_curve\")\n  |> keep(columns: [\"_time\", \"_value\", \"maturity\"])\n",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "displayName": "${__field.labels.maturity}",
+          "unit": "percent"
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "10Y-2Y Yield Spread",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 12,
+        "y": 2
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-datasource"
+          },
+          "query": "\nfrom(bucket: \"macro_data\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"treasury_curve_metrics\")\n  |> filter(fn: (r) => r.metric == \"10y_2y_spread\")\n  |> keep(columns: [\"_time\", \"_value\"])\n",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "displayName": "10Y-2Y Spread",
+          "unit": "percent"
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "LABOR MARKET & INFLATION",
+      "type": "text",
+      "gridPos": {
+        "h": 2,
+        "w": 24,
+        "x": 0,
+        "y": 8
+      },
+      "options": {
+        "content": "## LABOR MARKET & INFLATION",
+        "mode": "markdown"
+      },
+      "transparent": true
+    },
+    {
+      "id": 5,
+      "title": "Labor Market",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 0,
+        "y": 10
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-datasource"
+          },
+          "query": "\nfrom(bucket: \"macro_data\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"bls_economic_data\")\n  |> filter(fn: (r) => r.indicator == \"unemployment_rate\" or r.indicator == \"nfp\" or r.indicator == \"jobless_claims\")\n  |> keep(columns: [\"_time\", \"_value\", \"indicator\"])\n",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "displayName": "${__field.labels.indicator}"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "unemployment_rate"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Unemployment %"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "nfp"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "NFP (000s)"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "jobless_claims"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Claims (000s)"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "Inflation",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 8,
+        "y": 10
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-datasource"
+          },
+          "query": "\nfrom(bucket: \"macro_data\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"bls_economic_data\")\n  |> filter(fn: (r) => r.indicator == \"cpi\" or r.indicator == \"core_cpi\" or r.indicator == \"ppi\")\n  |> keep(columns: [\"_time\", \"_value\", \"indicator\"])\n",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "displayName": "${__field.labels.indicator}",
+          "unit": "percent"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cpi"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "CPI"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "core_cpi"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Core CPI"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ppi"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "PPI"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 7,
+      "title": "Fed Funds Rate",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 16,
+        "y": 10
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-datasource"
+          },
+          "query": "\nfrom(bucket: \"macro_data\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"central_bank_rates\")\n  |> filter(fn: (r) => r.rate_type == \"fed_funds\")\n  |> keep(columns: [\"_time\", \"_value\"])\n",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "displayName": "Fed Funds Rate",
+          "unit": "percent"
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 8,
+      "title": "GDP & ECONOMIC ACTIVITY",
+      "type": "text",
+      "gridPos": {
+        "h": 2,
+        "w": 24,
+        "x": 0,
+        "y": 16
+      },
+      "options": {
+        "content": "## GDP & ECONOMIC ACTIVITY",
+        "mode": "markdown"
+      },
+      "transparent": true
+    },
+    {
+      "id": 9,
+      "title": "GDP Growth",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 0,
+        "y": 18
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-datasource"
+          },
+          "query": "\nfrom(bucket: \"macro_data\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"bea_economic_data\")\n  |> filter(fn: (r) => r.indicator == \"gdp_growth\")\n  |> keep(columns: [\"_time\", \"_value\"])\n",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "displayName": "GDP Growth %",
+          "unit": "percent"
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 10,
+      "title": "Industrial Production",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 8,
+        "y": 18
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-datasource"
+          },
+          "query": "\nfrom(bucket: \"macro_data\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"bea_economic_data\")\n  |> filter(fn: (r) => r.indicator == \"industrial_production\")\n  |> keep(columns: [\"_time\", \"_value\"])\n",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "displayName": "Industrial Production %",
+          "unit": "percent"
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 11,
+      "title": "Retail Sales",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 16,
+        "y": 18
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-datasource"
+          },
+          "query": "\nfrom(bucket: \"macro_data\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"census_economic_data\")\n  |> filter(fn: (r) => r.indicator == \"retail_sales\")\n  |> keep(columns: [\"_time\", \"_value\"])\n",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "displayName": "Retail Sales",
+          "unit": "percent"
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 12,
+      "title": "HOUSING & REAL ESTATE",
+      "type": "text",
+      "gridPos": {
+        "h": 2,
+        "w": 24,
+        "x": 0,
+        "y": 24
+      },
+      "options": {
+        "content": "## HOUSING & REAL ESTATE",
+        "mode": "markdown"
+      },
+      "transparent": true
+    },
+    {
+      "id": 13,
+      "title": "Housing Activity",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 0,
+        "y": 26
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-datasource"
+          },
+          "query": "\nfrom(bucket: \"macro_data\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"housing_real_estate\")\n  |> filter(fn: (r) => r.indicator == \"housing_starts\" or r.indicator == \"building_permits\")\n  |> keep(columns: [\"_time\", \"_value\", \"indicator\"])\n",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "displayName": "${__field.labels.indicator}"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "housing_starts"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Housing Starts"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "building_permits"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Building Permits"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 14,
+      "title": "Home Prices & Mortgage Rates",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 8,
+        "y": 26
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-datasource"
+          },
+          "query": "\nfrom(bucket: \"macro_data\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"housing_real_estate\")\n  |> filter(fn: (r) => r.indicator == \"case_shiller_index\" or r.indicator == \"mortgage_30y\")\n  |> keep(columns: [\"_time\", \"_value\", \"indicator\"])\n",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "displayName": "${__field.labels.indicator}"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "case_shiller_index"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Home Prices"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "mortgage_30y"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Mortgage Rates"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 15,
+      "title": "Home Sales",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 16,
+        "y": 26
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-datasource"
+          },
+          "query": "\nfrom(bucket: \"macro_data\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"housing_real_estate\")\n  |> filter(fn: (r) => r.indicator == \"existing_home_sales\")\n  |> keep(columns: [\"_time\", \"_value\"])\n",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "displayName": "Home Sales"
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 16,
+      "title": "ENERGY & COMMODITIES",
+      "type": "text",
+      "gridPos": {
+        "h": 2,
+        "w": 24,
+        "x": 0,
+        "y": 32
+      },
+      "options": {
+        "content": "## ENERGY & COMMODITIES",
+        "mode": "markdown"
+      },
+      "transparent": true
+    },
+    {
+      "id": 17,
+      "title": "Energy Fundamentals",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 0,
+        "y": 34
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-datasource"
+          },
+          "query": "\nfrom(bucket: \"macro_data\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"eia_energy_data\")\n  |> filter(fn: (r) => r.commodity == \"crude_oil\" or r.commodity == \"natural_gas\")\n  |> keep(columns: [\"_time\", \"_value\", \"commodity\"])\n",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-datasource"
+          },
+          "query": "\nfrom(bucket: \"macro_data\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"energy_commodities_extended\")\n  |> filter(fn: (r) => r.indicator == \"oil_inventories\" or r.indicator == \"gasoline_price\" or r.indicator == \"natgas_storage\")\n  |> keep(columns: [\"_time\", \"_value\", \"indicator\"])\n",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "displayName": "${__field.labels}"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*crude_oil.*"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Crude Oil"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*natural_gas.*"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Natural Gas"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*oil_inventories.*"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Oil Inventories"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*gasoline_price.*"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Gasoline"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*natgas_storage.*"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Gas Storage"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 18,
+      "title": "Commodity Index",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 12,
+        "y": 34
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-datasource"
+          },
+          "query": "\nfrom(bucket: \"macro_data\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"energy_commodities_extended\")\n  |> filter(fn: (r) => r.indicator == \"commodity_index\")\n  |> keep(columns: [\"_time\", \"_value\"])\n",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "displayName": "Commodity Index"
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 19,
+      "title": "FINANCIAL CONDITIONS & VOLATILITY",
+      "type": "text",
+      "gridPos": {
+        "h": 2,
+        "w": 24,
+        "x": 0,
+        "y": 40
+      },
+      "options": {
+        "content": "## FINANCIAL CONDITIONS & VOLATILITY",
+        "mode": "markdown"
+      },
+      "transparent": true
+    },
+    {
+      "id": 20,
+      "title": "Market Volatility",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 0,
+        "y": 42
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-datasource"
+          },
+          "query": "\nfrom(bucket: \"macro_data\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"advanced_financial\" and r.indicator == \"vix_surface\")\n  |> keep(columns: [\"_time\", \"_value\", \"term\"])\n",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "displayName": "VIX ${__field.labels.term}",
+          "unit": "percent"
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 21,
+      "title": "Credit Spreads",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 8,
+        "y": 42
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-datasource"
+          },
+          "query": "\nfrom(bucket: \"macro_data\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"advanced_financial\" and r.indicator == \"cds_spreads\")\n  |> keep(columns: [\"_time\", \"_value\", \"grade\"])\n",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "displayName": "CDS ${__field.labels.grade}",
+          "unit": "basis points"
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 22,
+      "title": "SOFR & Repo Markets",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 16,
+        "y": 42
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-datasource"
+          },
+          "query": "\nfrom(bucket: \"macro_data\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"banking_liquidity\")\n  |> filter(fn: (r) => r.indicator == \"sofr_rate\" or r.indicator == \"repo_spread\")\n  |> keep(columns: [\"_time\", \"_value\", \"indicator\"])\n",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "displayName": "${__field.labels.indicator}",
+          "unit": "percent"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "sofr_rate"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "SOFR"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "repo_spread"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Repo Spread"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 23,
+      "title": "BANKING & LIQUIDITY METRICS",
+      "type": "text",
+      "gridPos": {
+        "h": 2,
+        "w": 24,
+        "x": 0,
+        "y": 48
+      },
+      "options": {
+        "content": "## BANKING & LIQUIDITY METRICS",
+        "mode": "markdown"
+      },
+      "transparent": true
+    },
+    {
+      "id": 24,
+      "title": "Money Supply (M1/M2)",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 0,
+        "y": 50
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-datasource"
+          },
+          "query": "\nfrom(bucket: \"macro_data\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"banking_liquidity\")\n  |> filter(fn: (r) => r.indicator == \"m1_money_supply\" or r.indicator == \"m2_money_supply\")\n  |> keep(columns: [\"_time\", \"_value\", \"indicator\"])\n",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "displayName": "${__field.labels.indicator}"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "m1_money_supply"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "M1 Money Supply"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "m2_money_supply"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "M2 Money Supply"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 25,
+      "title": "Bank Assets",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 12,
+        "y": 50
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-datasource"
+          },
+          "query": "\nfrom(bucket: \"macro_data\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"banking_liquidity\")\n  |> filter(fn: (r) => r.indicator == \"commercial_bank_assets\")\n  |> keep(columns: [\"_time\", \"_value\"])\n",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "displayName": "Bank Assets"
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 26,
+      "title": "BUSINESS & CONSUMER CONFIDENCE",
+      "type": "text",
+      "gridPos": {
+        "h": 2,
+        "w": 24,
+        "x": 0,
+        "y": 56
+      },
+      "options": {
+        "content": "## BUSINESS & CONSUMER CONFIDENCE",
+        "mode": "markdown"
+      },
+      "transparent": true
+    },
+    {
+      "id": 27,
+      "title": "Business & Consumer Confidence",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 0,
+        "y": 58
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-datasource"
+          },
+          "query": "\nfrom(bucket: \"macro_data\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"business_confidence\")\n  |> filter(fn: (r) => r.indicator == \"ism_manufacturing\" or r.indicator == \"nfib_optimism\" or r.indicator == \"consumer_confidence\")\n  |> keep(columns: [\"_time\", \"_value\", \"indicator\"])\n",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "displayName": "${__field.labels.indicator}"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ism_manufacturing"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "ISM Manufacturing"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "nfib_optimism"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "NFIB Optimism"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "consumer_confidence"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Consumer Confidence"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 28,
+      "title": "Trade Balance & Current Account",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 12,
+        "y": 58
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-datasource"
+          },
+          "query": "\nfrom(bucket: \"macro_data\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"trade_global\")\n  |> filter(fn: (r) => r.indicator == \"trade_balance\" or r.indicator == \"current_account\")\n  |> keep(columns: [\"_time\", \"_value\", \"indicator\"])\n",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "displayName": "${__field.labels.indicator}"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "trade_balance"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Trade Balance"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "current_account"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Current Account"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    }
+  ],
+  "schemaVersion": 37,
+  "version": 1,
+  "annotations": {
+    "list": []
+  },
+  "templating": {
+    "list": []
+  }
+}

@@ -1,0 +1,212 @@
+{
+  "dashboard_optimization": {
+    "title": "ULTRA HIGH-FREQUENCY 500+ ASSET DASHBOARD OPTIMIZATION GUIDE",
+    "target_performance": {
+      "data_latency": "< 500ms",
+      "refresh_rate": "1 second",
+      "concurrent_streams": 500,
+      "dashboard_load_time": "< 2 seconds",
+      "query_response_time": "< 100ms"
+    },
+    "optimization_strategies": {
+      "query_optimization": {
+        "batch_queries": true,
+        "use_aggregation_windows": "1s for real-time, 5s for charts, 10s for tables",
+        "limit_results": "Use limit() and top() functions",
+        "streaming_queries": "Use range(-5m) for recent data only",
+        "field_selection": "Select only required fields with filter()"
+      },
+      "caching_strategy": {
+        "influxdb_cache": {
+          "query_cache_enabled": true,
+          "query_cache_size": "512MB",
+          "metadata_cache_enabled": true,
+          "metadata_cache_ttl": "300s"
+        },
+        "grafana_cache": {
+          "panel_cache_ttl": "30s",
+          "datasource_cache": true,
+          "browser_cache": "enabled"
+        }
+      },
+      "network_optimization": {
+        "compression": "gzip",
+        "connection_pooling": true,
+        "keep_alive": true,
+        "concurrent_queries": 10
+      },
+      "dashboard_settings": {
+        "refresh_intervals": ["1s", "2s", "5s", "10s"],
+        "default_refresh": "1s",
+        "time_range": "5m (default)",
+        "max_data_points": 1000,
+        "live_streaming": true
+      }
+    },
+    "panel_optimizations": [
+      {
+        "panel_type": "timeseries",
+        "optimization": {
+          "interval": "1s",
+          "max_data_points": 300,
+          "aggregation": "last",
+          "streaming": true
+        }
+      },
+      {
+        "panel_type": "stat",
+        "optimization": {
+          "interval": "1s",
+          "reduce_function": "lastNotNull",
+          "cache_timeout": "30s"
+        }
+      },
+      {
+        "panel_type": "table",
+        "optimization": {
+          "interval": "2s",
+          "page_size": 50,
+          "sort_on_server": true,
+          "virtual_scrolling": true
+        }
+      },
+      {
+        "panel_type": "heatmap",
+        "optimization": {
+          "interval": "5s",
+          "bucket_size": "auto",
+          "max_buckets": 50
+        }
+      }
+    ],
+    "flux_query_patterns": {
+      "real_time_prices": {
+        "pattern": "from(bucket: \"high_frequency_data\") |> range(start: -5m) |> filter(fn: (r) => r[\"_measurement\"] == \"market_data\") |> filter(fn: (r) => r[\"_field\"] == \"price\") |> group(columns: [\"asset\"]) |> aggregateWindow(every: 1s, fn: last, createEmpty: false)",
+        "performance_tips": "Use specific time ranges, filter early, aggregate appropriately"
+      },
+      "volume_analysis": {
+        "pattern": "from(bucket: \"high_frequency_data\") |> range(start: -1h) |> filter(fn: (r) => r[\"_field\"] == \"volume\") |> group(columns: [\"asset_type\"]) |> sum()",
+        "performance_tips": "Group by asset_type for faster aggregation"
+      },
+      "top_movers": {
+        "pattern": "data |> group(columns: [\"asset\"]) |> aggregateWindow(every: 1m, fn: last) |> difference() |> sort(desc: true) |> limit(n: 50)",
+        "performance_tips": "Use limit() to restrict results, aggregate before sorting"
+      }
+    }
+  },
+  "influxdb_optimization": {
+    "bucket_configuration": {
+      "high_frequency_data": {
+        "retention_policy": "7 days",
+        "shard_duration": "1h",
+        "replication_factor": 1,
+        "compression": "snappy"
+      }
+    },
+    "write_optimization": {
+      "batch_size": 5000,
+      "flush_interval": "1s",
+      "write_timeout": "10s",
+      "retry_interval": "5s",
+      "max_retries": 3
+    },
+    "read_optimization": {
+      "query_timeout": "30s",
+      "max_concurrent_queries": 25,
+      "max_select_point": 100000,
+      "max_select_series": 10000
+    }
+  },
+  "monitoring_metrics": {
+    "performance_kpis": [
+      {
+        "metric": "dashboard_load_time",
+        "target": "< 2 seconds",
+        "measurement": "Time to first paint"
+      },
+      {
+        "metric": "query_response_time",
+        "target": "< 100ms",
+        "measurement": "Average Flux query execution time"
+      },
+      {
+        "metric": "data_freshness",
+        "target": "< 500ms",
+        "measurement": "Time between data generation and display"
+      },
+      {
+        "metric": "concurrent_users",
+        "target": "50+ users",
+        "measurement": "Simultaneous dashboard viewers"
+      },
+      {
+        "metric": "data_throughput",
+        "target": "10,000+ points/second",
+        "measurement": "Data ingestion rate"
+      }
+    ],
+    "alerting_thresholds": {
+      "high_latency": "> 1 second",
+      "query_timeout": "> 5 seconds",
+      "memory_usage": "> 80%",
+      "cpu_usage": "> 90%",
+      "disk_io": "> 80%"
+    }
+  },
+  "deployment_checklist": [
+    "✓ InfluxDB 2.x installed and configured",
+    "✓ High-frequency data bucket created with retention policy",
+    "✓ Sample data generated and loaded (500,000+ points)",
+    "✓ Grafana configured with InfluxDB data source",
+    "✓ Dashboard imported with optimized queries",
+    "✓ Performance monitoring enabled",
+    "✓ Caching strategies implemented",
+    "✓ Network optimization configured",
+    "✓ Resource limits set appropriately",
+    "✓ Backup and recovery procedures established"
+  ],
+  "troubleshooting": {
+    "common_issues": {
+      "slow_queries": {
+        "symptoms": "Queries taking > 2 seconds",
+        "solutions": [
+          "Add more specific time range filters",
+          "Use aggregateWindow() instead of raw data",
+          "Increase query timeout settings",
+          "Check InfluxDB resource usage"
+        ]
+      },
+      "high_memory_usage": {
+        "symptoms": "Dashboard consuming > 1GB RAM",
+        "solutions": [
+          "Reduce time range to 5-15 minutes",
+          "Lower max data points per panel",
+          "Enable streaming instead of polling",
+          "Clear browser cache regularly"
+        ]
+      },
+      "connection_timeouts": {
+        "symptoms": "Intermittent connection failures",
+        "solutions": [
+          "Increase connection pool size",
+          "Enable keep-alive connections",
+          "Check network latency",
+          "Verify InfluxDB server resources"
+        ]
+      }
+    }
+  },
+  "scaling_recommendations": {
+    "horizontal_scaling": {
+      "influxdb_cluster": "Use InfluxDB Enterprise for clustering",
+      "load_balancing": "Implement HAProxy or NGINX for query distribution",
+      "data_sharding": "Partition data by asset type or time range"
+    },
+    "vertical_scaling": {
+      "memory": "Minimum 16GB RAM for 500+ assets",
+      "cpu": "Minimum 8 cores for concurrent processing",
+      "storage": "SSD recommended for sub-second queries",
+      "network": "Gigabit ethernet minimum"
+    }
+  }
+}

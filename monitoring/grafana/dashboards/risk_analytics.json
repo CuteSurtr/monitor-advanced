@@ -1,0 +1,150 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Risk Analytics Dashboard",
+    "tags": ["risk", "analytics", "var", "cvar"],
+    "timezone": "browser",
+    "refresh": "30s",
+    "time": {
+      "from": "now-6h",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "VaR Heatmap",
+        "type": "heatmap",
+        "targets": [
+          {
+            "expr": "portfolio_var_95",
+            "legendFormat": "VaR 95%"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "Risk Limit Utilization",
+        "type": "bargauge",
+        "targets": [
+          {
+            "expr": "position_size_usd / position_risk_limit_usd * 100",
+            "legendFormat": "{{symbol}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 70},
+                {"color": "red", "value": 90}
+              ]
+            },
+            "unit": "percent",
+            "max": 100
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "Portfolio Beta",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "portfolio_beta",
+            "legendFormat": "Portfolio Beta"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "unit": "short"
+          }
+        },
+        "gridPos": {"h": 6, "w": 8, "x": 0, "y": 8}
+      },
+      {
+        "id": 4,
+        "title": "Sharpe Ratio",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "portfolio_sharpe_ratio",
+            "legendFormat": "Sharpe Ratio"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "unit": "short"
+          }
+        },
+        "gridPos": {"h": 6, "w": 8, "x": 8, "y": 8}
+      },
+      {
+        "id": 5,
+        "title": "Max Drawdown",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "portfolio_max_drawdown",
+            "legendFormat": "Max Drawdown"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "unit": "percentunit"
+          }
+        },
+        "gridPos": {"h": 6, "w": 8, "x": 16, "y": 8}
+      },
+      {
+        "id": 6,
+        "title": "Correlation Matrix",
+        "type": "heatmap",
+        "targets": [
+          {
+            "expr": "asset_correlation",
+            "legendFormat": "{{asset1}} vs {{asset2}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 14}
+      },
+      {
+        "id": 7,
+        "title": "Component VaR",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "component_var",
+            "legendFormat": "{{symbol}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 14}
+      },
+      {
+        "id": 8,
+        "title": "Risk Alerts",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "ALERTS{alertname=~\".*VaR.*|.*Risk.*\"}"
+          }
+        ],
+        "gridPos": {"h": 6, "w": 24, "x": 0, "y": 22}
+      }
+    ]
+  }
+}

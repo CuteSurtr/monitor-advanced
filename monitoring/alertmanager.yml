@@ -1,0 +1,177 @@
+# Alertmanager Configuration for Financial Monitoring System
+global:
+  smtp_smarthost: 'localhost:587'
+  smtp_from: 'alerts@financialmonitor.com'
+  slack_api_url: 'YOUR_SLACK_WEBHOOK_URL_HERE'
+
+# The directory from which notification templates are read.
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'
+
+# The root route on which each incoming alert enters.
+route:
+  group_by: ['alertname', 'severity', 'category']
+  group_wait: 10s
+  group_interval: 5m
+  repeat_interval: 4h
+  receiver: 'default-receiver'
+  routes:
+    # Critical financial alerts - immediate notification
+    - match:
+        severity: critical
+      receiver: 'critical-alerts'
+      group_wait: 0s
+      repeat_interval: 5m
+      routes:
+        - match:
+            category: risk
+          receiver: 'risk-team'
+        - match:
+            category: pnl
+          receiver: 'trading-team'
+        - match:
+            category: volatility
+          receiver: 'risk-team'
+
+    # System alerts
+    - match:
+        category: system
+      receiver: 'ops-team'
+      group_interval: 2m
+
+    # Data quality alerts
+    - match:
+        category: data
+      receiver: 'data-team'
+
+    # Performance alerts
+    - match:
+        category: performance
+      receiver: 'ops-team'
+
+# Inhibition rules allow to mute a set of alerts given that another alert is firing.
+inhibit_rules:
+  # Mute VaR alerts if there's an extreme VaR alert
+  - source_match:
+      alertname: 'ExtremeVaR'
+    target_match:
+      alertname: 'HighVaR'
+    equal: ['portfolio_id']
+
+  # Mute daily loss alerts if there's a massive loss alert
+  - source_match:
+      alertname: 'MassiveDailyLoss'
+    target_match:
+      alertname: 'LargeDailyLoss'
+    equal: ['portfolio_id']
+
+receivers:
+  - name: 'default-receiver'
+    email_configs:
+      - to: 'admin@financialmonitor.com'
+        subject: 'Financial Monitor Alert'
+        body: |
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          {{ end }}
+
+  - name: 'critical-alerts'
+    email_configs:
+      - to: 'critical@financialmonitor.com'
+        subject: 'CRITICAL: Financial Monitor Alert'
+        body: |
+          {{ range .Alerts }}
+          🚨 CRITICAL ALERT 🚨
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Severity: {{ .Labels.severity }}
+          Time: {{ .StartsAt.Format "2006-01-02 15:04:05" }}
+          {{ end }}
+    slack_configs:
+      - channel: '#critical-alerts'
+        color: 'danger'
+        title: '🚨 Critical Financial Alert'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Severity:* {{ .Labels.severity }}
+          *Category:* {{ .Labels.category }}
+          {{ end }}
+
+  - name: 'risk-team'
+    email_configs:
+      - to: 'risk-team@financialmonitor.com'
+        subject: 'Risk Alert: {{ .GroupLabels.alertname }}'
+        body: |
+          Risk Management Alert
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Portfolio ID: {{ .Labels.portfolio_id }}
+          {{ end }}
+    slack_configs:
+      - channel: '#risk-alerts'
+        color: 'warning'
+        title: 'WARNING: Risk Management Alert'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Portfolio:* {{ .Labels.portfolio_id }}
+          {{ end }}
+
+  - name: 'trading-team'
+    email_configs:
+      - to: 'trading-team@financialmonitor.com'
+        subject: 'Trading Alert: {{ .GroupLabels.alertname }}'
+        body: |
+          Trading Desk Alert
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Portfolio ID: {{ .Labels.portfolio_id }}
+          {{ end }}
+    slack_configs:
+      - channel: '#trading-alerts'
+        color: 'danger'
+        title: '💰 Trading Alert'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Portfolio:* {{ .Labels.portfolio_id }}
+          {{ end }}
+
+  - name: 'ops-team'
+    email_configs:
+      - to: 'ops-team@financialmonitor.com'
+        subject: 'Operations Alert: {{ .GroupLabels.alertname }}'
+        body: |
+          Operations Team Alert
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          {{ end }}
+    slack_configs:
+      - channel: '#ops-alerts'
+        color: 'warning'
+        title: '🔧 Operations Alert'
+
+  - name: 'data-team'
+    email_configs:
+      - to: 'data-team@financialmonitor.com'
+        subject: 'Data Quality Alert: {{ .GroupLabels.alertname }}'
+        body: |
+          Data Quality Alert
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Feed: {{ .Labels.feed }}
+          Symbol: {{ .Labels.symbol }}
+          {{ end }}
+    slack_configs:
+      - channel: '#data-alerts'
+        color: 'warning'
+        title: '📊 Data Quality Alert'

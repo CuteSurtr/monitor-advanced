@@ -1,0 +1,132 @@
+# Prometheus recording rules for Stock Market Monitor
+
+groups:
+  - name: stock_monitor.rules
+    interval: 30s
+    rules:
+      # Portfolio value calculations
+      - record: portfolio:total_value:rate5m
+        expr: rate(portfolio_total_value_usd[5m])
+        labels:
+          metric_type: "portfolio"
+          
+      - record: portfolio:total_value:increase1h
+        expr: increase(portfolio_total_value_usd[1h])
+        labels:
+          metric_type: "portfolio"
+          
+      # Stock price volatility
+      - record: stock:price_volatility:5m
+        expr: stddev_over_time(stock_price_usd[5m])
+        labels:
+          metric_type: "volatility"
+          
+      - record: stock:price_change_percent:1m
+        expr: (rate(stock_price_usd[1m]) / stock_price_usd) * 100
+        labels:
+          metric_type: "price_change"
+          
+      # Alert rates
+      - record: alerts:rate_per_hour
+        expr: rate(alerts_triggered_total[1h]) * 3600
+        labels:
+          metric_type: "alert_rate"
+          
+      # API performance
+      - record: api:request_rate:5m
+        expr: rate(api_requests_total[5m])
+        labels:
+          metric_type: "api_performance"
+          
+      - record: api:error_rate:5m
+        expr: rate(api_requests_total{status=~"4..|5.."}[5m]) / rate(api_requests_total[5m])
+        labels:
+          metric_type: "api_performance"
+          
+      - record: api:latency_p95:5m
+        expr: histogram_quantile(0.95, rate(api_request_duration_seconds_bucket[5m]))
+        labels:
+          metric_type: "api_performance"
+          
+      # System performance
+      - record: system:cpu_utilization:5m
+        expr: avg_over_time(system_cpu_usage_percent[5m])
+        labels:
+          metric_type: "system"
+          
+      - record: system:memory_utilization:5m
+        expr: (system_memory_usage_bytes / (system_memory_usage_bytes + system_memory_available_bytes)) * 100
+        labels:
+          metric_type: "system"
+          
+      # Data collection performance
+      - record: data_collection:latency_p90:5m
+        expr: histogram_quantile(0.90, rate(data_collection_latency_seconds_bucket[5m]))
+        labels:
+          metric_type: "data_collection"
+          
+      # ML model performance
+      - record: ml:prediction_accuracy:avg_1h
+        expr: avg_over_time(ml_prediction_accuracy[1h])
+        labels:
+          metric_type: "ml_performance"
+          
+  - name: business_kpis
+    interval: 60s
+    rules:
+      # Daily portfolio performance
+      - record: business:portfolio_daily_return
+        expr: (portfolio_total_value_usd - portfolio_total_value_usd offset 24h) / portfolio_total_value_usd offset 24h * 100
+        labels:
+          metric_type: "business_kpi"
+          kpi: "daily_return"
+          
+      # Alert effectiveness (alerts that led to action)
+      - record: business:alert_effectiveness
+        expr: rate(alerts_triggered_total{severity="high"}[24h]) / rate(alerts_triggered_total[24h])
+        labels:
+          metric_type: "business_kpi"
+          kpi: "alert_effectiveness"
+          
+      # Data freshness (time since last data point)
+      - record: business:data_freshness
+        expr: time() - timestamp(stock_price_usd)
+        labels:
+          metric_type: "business_kpi"
+          kpi: "data_freshness"
+          
+      # Trading volume trends
+      - record: business:volume_trend_1h
+        expr: rate(stock_trading_volume[1h])
+        labels:
+          metric_type: "business_kpi"
+          kpi: "volume_trend"
+          
+  - name: infrastructure_health
+    interval: 30s
+    rules:
+      # Database health
+      - record: infra:database_connection_health
+        expr: up{job="postgres"} * database_connections_active
+        labels:
+          metric_type: "infrastructure"
+          component: "database"
+          
+      # Cache health
+      - record: infra:cache_health_score
+        expr: up{job="redis"} * cache_hit_rate
+        labels:
+          metric_type: "infrastructure"
+          component: "cache"
+          
+      # Overall system health score
+      - record: infra:system_health_score
+        expr: (
+          (100 - system_cpu_usage_percent) * 0.3 +
+          (100 - system:memory_utilization:5m) * 0.3 +
+          (api:error_rate:5m < 0.01) * 100 * 0.2 +
+          (up{job="stock-monitor"}) * 100 * 0.2
+        ) / 100
+        labels:
+          metric_type: "infrastructure"
+          component: "overall"

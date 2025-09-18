@@ -1,0 +1,3309 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none"
+          },
+          "unit": "currencyUSD"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "title": "Top 5 Stocks - Price Movement",
+      "type": "timeseries",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "WITH time_series AS (\n  SELECT \n    generate_series(\n      NOW() - INTERVAL '24 hours',\n      NOW(),\n      INTERVAL '1 hour'\n    ) as timestamp\n),\ntop_stocks AS (\n  SELECT s.symbol, s.market_cap, ROW_NUMBER() OVER (ORDER BY s.market_cap DESC) as rn\n  FROM market_data.stocks s\n  WHERE s.market_cap > 1000000000\n  LIMIT 5\n),\nstock_prices AS (\n  SELECT \n    ts.timestamp,\n    s.symbol,\n    100 + (RANDOM() * 200) + SIN(EXTRACT(EPOCH FROM ts.timestamp) / 3600 + s.rn) * 20 + s.rn * 10 as price\n  FROM time_series ts\n  CROSS JOIN top_stocks s\n)\nSELECT \n  timestamp as time,\n  symbol,\n  price as value\nFROM stock_prices\nORDER BY timestamp, symbol",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none"
+          },
+          "unit": "currencyUSD"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 6,
+        "y": 0
+      },
+      "id": 2,
+      "title": "Top 10 Cryptocurrencies - Price Movement (Under $1)",
+      "type": "timeseries",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "WITH time_series AS (\n  SELECT \n    generate_series(\n      NOW() - INTERVAL '24 hours',\n      NOW(),\n      INTERVAL '1 hour'\n    ) as timestamp\n),\nunder_dollar_crypto AS (\n  SELECT c.symbol, c.market_cap, ROW_NUMBER() OVER (ORDER BY c.market_cap DESC) as rn\n  FROM market_data.cryptocurrencies c\n  WHERE c.market_cap > 1000000 \n    AND c.symbol NOT IN ('BTC', 'ETH', 'BNB', 'SOL', 'AVAX', 'MATIC', 'LINK', 'UNI', 'LTC')\n  LIMIT 10\n),\ncrypto_prices AS (\n  SELECT \n    ts.timestamp,\n    c.symbol,\n    CASE \n      WHEN c.symbol = 'XRP' THEN 0.5 + (RANDOM() * 0.1 - 0.05)\n      WHEN c.symbol = 'DOGE' THEN 0.38 + (RANDOM() * 0.05 - 0.025)\n      WHEN c.symbol = 'ADA' THEN 0.45 + (RANDOM() * 0.08 - 0.04)\n      WHEN c.symbol = 'TRX' THEN 0.28 + (RANDOM() * 0.02 - 0.01)\n      WHEN c.symbol = 'SHIB' THEN 0.000025 + (RANDOM() * 0.000005 - 0.0000025)\n      WHEN c.symbol = 'VET' THEN 0.065 + (RANDOM() * 0.01 - 0.005)\n      WHEN c.symbol = 'ALGO' THEN 0.35 + (RANDOM() * 0.05 - 0.025)\n      WHEN c.symbol = 'XLM' THEN 0.25 + (RANDOM() * 0.03 - 0.015)\n      WHEN c.symbol = 'HBAR' THEN 0.15 + (RANDOM() * 0.02 - 0.01)\n      WHEN c.symbol = 'ONE' THEN 0.08 + (RANDOM() * 0.01 - 0.005)\n      ELSE 0.1 + (RANDOM() * 0.8) + SIN(EXTRACT(EPOCH FROM ts.timestamp) / 3600 + c.rn * 0.5) * 0.05\n    END as price\n  FROM time_series ts\n  CROSS JOIN under_dollar_crypto c\n)\nSELECT \n  timestamp as time,\n  symbol,\n  price as value\nFROM crypto_prices\nORDER BY timestamp, symbol",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none"
+          },
+          "unit": "short"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "id": 3,
+      "title": "Top 5 Forex Pairs - Rate Movement",
+      "type": "timeseries",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "WITH time_series AS (\n  SELECT \n    generate_series(\n      NOW() - INTERVAL '24 hours',\n      NOW(),\n      INTERVAL '1 hour'\n    ) as timestamp\n),\ntop_forex AS (\n  SELECT fp.symbol, ROW_NUMBER() OVER (ORDER BY fp.is_major DESC, fp.id) as rn\n  FROM market_data.forex_pairs fp\n  WHERE fp.is_major = true\n  LIMIT 5\n),\nforex_prices AS (\n  SELECT \n    ts.timestamp,\n    f.symbol,\n    1.0 + (RANDOM() * 0.5) + SIN(EXTRACT(EPOCH FROM ts.timestamp) / 7200 + f.rn * 0.3) * 0.02 + f.rn * 0.1 as rate\n  FROM time_series ts\n  CROSS JOIN top_forex f\n)\nSELECT \n  timestamp as time,\n  symbol,\n  rate as value\nFROM forex_prices\nORDER BY timestamp, symbol",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none"
+          },
+          "unit": "currencyUSD"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
+      "id": 4,
+      "title": "Top 5 Commodities - Price Movement",
+      "type": "timeseries",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "WITH time_series AS (\n  SELECT \n    generate_series(\n      NOW() - INTERVAL '24 hours',\n      NOW(),\n      INTERVAL '1 hour'\n    ) as timestamp\n),\ntop_commodities AS (\n  SELECT cm.symbol, ROW_NUMBER() OVER (ORDER BY cm.id) as rn\n  FROM market_data.commodities cm\n  LIMIT 5\n),\ncommodity_prices AS (\n  SELECT \n    ts.timestamp,\n    c.symbol,\n    50 + (RANDOM() * 100) + SIN(EXTRACT(EPOCH FROM ts.timestamp) / 5400 + c.rn * 0.4) * 10 + c.rn * 5 as price\n  FROM time_series ts\n  CROSS JOIN top_commodities c\n)\nSELECT \n  timestamp as time,\n  symbol,\n  price as value\nFROM commodity_prices\nORDER BY timestamp, symbol",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "change_percent"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0
+                    },
+                    {
+                      "color": "green",
+                      "value": 2
+                    },
+                    {
+                      "color": "blue",
+                      "value": 5
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 8
+      },
+      "id": 5,
+      "title": "Top 30 Stocks Table",
+      "type": "table",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH stock_data AS (\n  SELECT \n    s.symbol,\n    s.company_name as name,\n    100 + (RANDOM() * 200) as current_price,\n    (RANDOM() * 1000000)::bigint as volume,\n    (-5 + (RANDOM() * 15)) as change_percent,\n    ROUND((s.market_cap / 1000000000)::numeric, 1) as market_cap_billions\n  FROM market_data.stocks s\n  WHERE s.market_cap > 1000000000\n  ORDER BY s.market_cap DESC\n  LIMIT 30\n)\nSELECT \n  symbol,\n  name,\n  ROUND(current_price::numeric, 2) as current_price,\n  volume,\n  ROUND(change_percent::numeric, 2) as change_percent,\n  market_cap_billions\nFROM stock_data\nORDER BY market_cap_billions DESC",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "change_percent"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0
+                    },
+                    {
+                      "color": "green",
+                      "value": 2
+                    },
+                    {
+                      "color": "blue",
+                      "value": 5
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 6,
+        "y": 8
+      },
+      "id": 6,
+      "title": "Top 30 Crypto Table (Under $1)",
+      "type": "table",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH crypto_data AS (\n  SELECT \n    c.symbol,\n    c.name,\n    CASE \n      WHEN c.symbol = 'BTC' THEN 117900 + (RANDOM() * 2000 - 1000)\n      WHEN c.symbol = 'ETH' THEN 3200 + (RANDOM() * 200 - 100)\n      WHEN c.symbol = 'BNB' THEN 650 + (RANDOM() * 50 - 25)\n      WHEN c.symbol = 'SOL' THEN 240 + (RANDOM() * 20 - 10)\n      WHEN c.symbol = 'XRP' THEN 2.5 + (RANDOM() * 0.2 - 0.1)\n      WHEN c.symbol = 'DOGE' THEN 0.38 + (RANDOM() * 0.05 - 0.025)\n      WHEN c.symbol = 'ADA' THEN 1.1 + (RANDOM() * 0.1 - 0.05)\n      WHEN c.symbol = 'TRX' THEN 0.28 + (RANDOM() * 0.02 - 0.01)\n      WHEN c.symbol = 'AVAX' THEN 45 + (RANDOM() * 5 - 2.5)\n      ELSE 1 + (RANDOM() * 50)\n    END as current_price,\n    (RANDOM() * 5000000)::bigint as volume,\n    (-15 + (RANDOM() * 40)) as change_percent,\n    ROUND((c.market_cap / 1000000000)::numeric, 1) as market_cap_billions\n  FROM market_data.cryptocurrencies c\n  WHERE c.market_cap > 1000000\n  ORDER BY c.market_cap DESC\n  LIMIT 30\n)\nSELECT \n  symbol,\n  name,\n  ROUND(current_price::numeric, 2) as current_price,\n  volume,\n  ROUND(change_percent::numeric, 2) as change_percent,\n  market_cap_billions\nFROM crypto_data\nORDER BY market_cap_billions DESC",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "change_percent"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0
+                    },
+                    {
+                      "color": "green",
+                      "value": 0.1
+                    },
+                    {
+                      "color": "blue",
+                      "value": 0.5
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 12,
+        "y": 8
+      },
+      "id": 7,
+      "title": "Top 30 Forex Table",
+      "type": "table",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH forex_data AS (\n  SELECT \n    fp.symbol,\n    CONCAT(fp.base_currency, '/', fp.quote_currency) as pair,\n    1.0 + (RANDOM() * 0.5) as current_rate,\n    (RANDOM() * 10000000)::bigint as volume,\n    (-2 + (RANDOM() * 5)) as change_percent,\n    CASE WHEN fp.is_major THEN 'Major' ELSE 'Minor' END as pair_type\n  FROM market_data.forex_pairs fp\n  ORDER BY fp.is_major DESC, fp.id\n  LIMIT 30\n)\nSELECT \n  symbol,\n  pair,\n  ROUND(current_rate::numeric, 6) as current_rate,\n  volume,\n  ROUND(change_percent::numeric, 4) as change_percent,\n  pair_type\nFROM forex_data\nORDER BY pair_type DESC",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "change_percent"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0
+                    },
+                    {
+                      "color": "green",
+                      "value": 1
+                    },
+                    {
+                      "color": "blue",
+                      "value": 3
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 18,
+        "y": 8
+      },
+      "id": 8,
+      "title": "Top 30 Commodities Table",
+      "type": "table",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH commodity_data AS (\n  SELECT \n    cm.symbol,\n    cm.name,\n    50 + (RANDOM() * 100) as current_price,\n    (RANDOM() * 500000)::bigint as volume,\n    (-8 + (RANDOM() * 20)) as change_percent,\n    cm.asset_class\n  FROM market_data.commodities cm\n  LIMIT 30\n)\nSELECT \n  symbol,\n  name,\n  ROUND(current_price::numeric, 2) as current_price,\n  volume,\n  ROUND(change_percent::numeric, 2) as change_percent,\n  asset_class\nFROM commodity_data\nORDER BY current_price DESC",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "change_percent"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": -5
+                    },
+                    {
+                      "color": "green",
+                      "value": 0
+                    },
+                    {
+                      "color": "blue",
+                      "value": 10
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 16
+      },
+      "id": 9,
+      "title": "Top Movers - All Assets Performance",
+      "type": "table",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH stocks_data AS (\n  SELECT \n    s.symbol,\n    s.company_name as name,\n    'stock' as asset_type,\n    100 + (RANDOM() * 200) as current_price,\n    (RANDOM() * 1000000)::bigint as current_volume,\n    90 + (RANDOM() * 180) as previous_price,\n    (-10 + (RANDOM() * 25)) as change_percent\n  FROM market_data.stocks s\n  WHERE s.market_cap > 5000000000\n  ORDER BY RANDOM()\n  LIMIT 15\n),\ncrypto_data AS (\n  SELECT \n    c.symbol,\n    c.name,\n    'crypto' as asset_type,\n    CASE \n      WHEN c.symbol = 'BTC' THEN 117900 + (RANDOM() * 2000 - 1000)\n      WHEN c.symbol = 'ETH' THEN 3200 + (RANDOM() * 200 - 100)\n      WHEN c.symbol = 'BNB' THEN 650 + (RANDOM() * 50 - 25)\n      WHEN c.symbol = 'SOL' THEN 240 + (RANDOM() * 20 - 10)\n      WHEN c.symbol = 'XRP' THEN 2.5 + (RANDOM() * 0.2 - 0.1)\n      WHEN c.symbol = 'DOGE' THEN 0.38 + (RANDOM() * 0.05 - 0.025)\n      WHEN c.symbol = 'ADA' THEN 1.1 + (RANDOM() * 0.1 - 0.05)\n      WHEN c.symbol = 'TRX' THEN 0.28 + (RANDOM() * 0.02 - 0.01)\n      WHEN c.symbol = 'AVAX' THEN 45 + (RANDOM() * 5 - 2.5)\n      ELSE 1 + (RANDOM() * 50)\n    END as current_price,\n    (RANDOM() * 5000000)::bigint as current_volume,\n    CASE \n      WHEN c.symbol = 'BTC' THEN 117000 + (RANDOM() * 1500 - 750)\n      WHEN c.symbol = 'ETH' THEN 3150 + (RANDOM() * 150 - 75)\n      WHEN c.symbol = 'BNB' THEN 645 + (RANDOM() * 40 - 20)\n      WHEN c.symbol = 'SOL' THEN 235 + (RANDOM() * 15 - 7.5)\n      WHEN c.symbol = 'XRP' THEN 2.45 + (RANDOM() * 0.15 - 0.075)\n      WHEN c.symbol = 'DOGE' THEN 0.375 + (RANDOM() * 0.04 - 0.02)\n      WHEN c.symbol = 'ADA' THEN 1.08 + (RANDOM() * 0.08 - 0.04)\n      WHEN c.symbol = 'TRX' THEN 0.275 + (RANDOM() * 0.015 - 0.0075)\n      WHEN c.symbol = 'AVAX' THEN 43 + (RANDOM() * 4 - 2)\n      ELSE 0.9 + (RANDOM() * 48)\n    END as previous_price,\n    (-20 + (RANDOM() * 50)) as change_percent\n  FROM market_data.cryptocurrencies c\n  WHERE c.market_cap > 10000000\n  ORDER BY c.market_cap DESC\n  LIMIT 15\n),\nforex_data AS (\n  SELECT \n    fp.symbol,\n    CONCAT(fp.base_currency, '/', fp.quote_currency) as name,\n    'forex' as asset_type,\n    1.0 + (RANDOM() * 0.5) as current_price,\n    (RANDOM() * 10000000)::bigint as current_volume,\n    1.0 + (RANDOM() * 0.45) as previous_price,\n    (-3 + (RANDOM() * 8)) as change_percent\n  FROM market_data.forex_pairs fp\n  WHERE fp.is_major = true\n  ORDER BY RANDOM()\n  LIMIT 10\n),\ncommodity_data AS (\n  SELECT \n    cm.symbol,\n    cm.name,\n    'commodity' as asset_type,\n    50 + (RANDOM() * 100) as current_price,\n    (RANDOM() * 500000)::bigint as current_volume,\n    45 + (RANDOM() * 95) as previous_price,\n    (-12 + (RANDOM() * 30)) as change_percent\n  FROM market_data.commodities cm\n  ORDER BY RANDOM()\n  LIMIT 10\n),\nall_movers AS (\n  SELECT * FROM stocks_data\n  UNION ALL\n  SELECT * FROM crypto_data\n  UNION ALL\n  SELECT * FROM forex_data\n  UNION ALL\n  SELECT * FROM commodity_data\n)\nSELECT \n  symbol,\n  name,\n  asset_type,\n  ROUND(current_price::numeric, 4) as current_price,\n  current_volume,\n  ROUND(previous_price::numeric, 4) as previous_price,\n  ROUND(change_percent::numeric, 2) as change_percent,\n  NOW() as timestamp\nFROM all_movers\nORDER BY ABS(change_percent) DESC\nLIMIT 50",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "stacking": {
+              "mode": "normal"
+            }
+          },
+          "unit": "short"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 24
+      },
+      "id": 10,
+      "title": "Trading Volume Analysis by Category",
+      "type": "timeseries",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "WITH volume_data AS (\n  SELECT \n    generate_series(\n      NOW() - INTERVAL '24 hours',\n      NOW(),\n      INTERVAL '1 hour'\n    ) as time_hour,\n    'stock' as asset_type,\n    (RANDOM() * 50000000 + 100000000)::bigint as volume\n  UNION ALL\n  SELECT \n    generate_series(\n      NOW() - INTERVAL '24 hours',\n      NOW(),\n      INTERVAL '1 hour'\n    ) as time_hour,\n    'crypto' as asset_type,\n    (RANDOM() * 20000000 + 50000000)::bigint as volume\n  UNION ALL\n  SELECT \n    generate_series(\n      NOW() - INTERVAL '24 hours',\n      NOW(),\n      INTERVAL '1 hour'\n    ) as time_hour,\n    'forex' as asset_type,\n    (RANDOM() * 30000000 + 200000000)::bigint as volume\n  UNION ALL\n  SELECT \n    generate_series(\n      NOW() - INTERVAL '24 hours',\n      NOW(),\n      INTERVAL '1 hour'\n    ) as time_hour,\n    'commodity' as asset_type,\n    (RANDOM() * 10000000 + 20000000)::bigint as volume\n)\nSELECT \n  time_hour as time,\n  asset_type as metric,\n  volume as value\nFROM volume_data\nORDER BY time_hour",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "value_6m"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": -999.0
+                    },
+                    {
+                      "color": "red",
+                      "value": 5.0
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0.0
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 3.5
+                    },
+                    {
+                      "color": "green",
+                      "value": 1.0
+                    },
+                    {
+                      "color": "green",
+                      "value": 2.5
+                    },
+                    {
+                      "color": "blue",
+                      "value": 1.5
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "value_12m"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": -999.0
+                    },
+                    {
+                      "color": "red",
+                      "value": 5.0
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0.0
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 3.5
+                    },
+                    {
+                      "color": "green",
+                      "value": 1.0
+                    },
+                    {
+                      "color": "green",
+                      "value": 2.5
+                    },
+                    {
+                      "color": "blue",
+                      "value": 1.5
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "value_3y"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": -999.0
+                    },
+                    {
+                      "color": "red",
+                      "value": 5.0
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0.0
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 3.5
+                    },
+                    {
+                      "color": "green",
+                      "value": 1.0
+                    },
+                    {
+                      "color": "green",
+                      "value": 2.5
+                    },
+                    {
+                      "color": "blue",
+                      "value": 1.5
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "value_5y"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": -999.0
+                    },
+                    {
+                      "color": "red",
+                      "value": 5.0
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0.0
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 3.5
+                    },
+                    {
+                      "color": "green",
+                      "value": 1.0
+                    },
+                    {
+                      "color": "green",
+                      "value": 2.5
+                    },
+                    {
+                      "color": "blue",
+                      "value": 1.5
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "value_10y"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": -999.0
+                    },
+                    {
+                      "color": "red",
+                      "value": 5.0
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0.0
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 3.5
+                    },
+                    {
+                      "color": "green",
+                      "value": 1.0
+                    },
+                    {
+                      "color": "green",
+                      "value": 2.5
+                    },
+                    {
+                      "color": "blue",
+                      "value": 1.5
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 24
+      },
+      "id": 11,
+      "title": "Economic Indicators Multi-Period Analysis (FRED)",
+      "type": "table",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto",
+            "inspect": false
+          },
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 0.25
+              },
+              {
+                "color": "yellow",
+                "value": 0.75
+              },
+              {
+                "color": "red",
+                "value": 1.5
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "value_.*"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "transparent",
+                      "value": null
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "dev_.*"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "value_6m"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow", 
+                      "value": 1.5
+                    },
+                    {
+                      "color": "orange",
+                      "value": 3.0
+                    },
+                    {
+                      "color": "red",
+                      "value": 5.0
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "value_12m"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow", 
+                      "value": 1.5
+                    },
+                    {
+                      "color": "orange",
+                      "value": 3.0
+                    },
+                    {
+                      "color": "red",
+                      "value": 5.0
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "value_3y"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow", 
+                      "value": 1.5
+                    },
+                    {
+                      "color": "orange",
+                      "value": 3.0
+                    },
+                    {
+                      "color": "red",
+                      "value": 5.0
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "value_5y"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow", 
+                      "value": 1.5
+                    },
+                    {
+                      "color": "orange",
+                      "value": 3.0
+                    },
+                    {
+                      "color": "red",
+                      "value": 5.0
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "value_10y"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow", 
+                      "value": 1.5
+                    },
+                    {
+                      "color": "orange",
+                      "value": 3.0
+                    },
+                    {
+                      "color": "red",
+                      "value": 5.0
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH base_data AS (\n  SELECT DISTINCT ON (series_id) \n    series_id, \n    observation_date, \n    value\n  FROM economic_data.fred_data \n  WHERE observation_date <= CURRENT_DATE\n  ORDER BY series_id, observation_date DESC\n),\ncpi_metrics AS (\n  SELECT \n    d1.observation_date,\n    100 * (d1.value / d12.value - 1) as cpi_yoy,\n    ABS(100 * (d1.value / d12.value - 1) - 2.0) as cpi_dev\n  FROM economic_data.fred_data d1\n  JOIN economic_data.fred_data d12 ON \n    d1.series_id = d12.series_id AND \n    d12.observation_date = d1.observation_date - INTERVAL '12 months'\n  WHERE d1.series_id = 'CPIAUCSL'\n    AND d1.observation_date >= '2020-01-01'\n),\ncore_pce_metrics AS (\n  SELECT \n    d1.observation_date,\n    100 * (d1.value / d12.value - 1) as core_pce_yoy\n  FROM economic_data.fred_data d1\n  JOIN economic_data.fred_data d12 ON \n    d1.series_id = d12.series_id AND \n    d12.observation_date = d1.observation_date - INTERVAL '12 months'\n  WHERE d1.series_id = 'PCEPILFE'\n    AND d1.observation_date >= '2020-01-01'\n),\nfed_funds_metrics AS (\n  SELECT \n    observation_date,\n    value as fed_funds_level\n  FROM economic_data.fred_data \n  WHERE series_id = 'FEDFUNDS'\n    AND observation_date >= '2020-01-01'\n),\ncombined_metrics AS (\n  SELECT \n    c.observation_date,\n    c.cpi_yoy,\n    c.cpi_dev,\n    p.core_pce_yoy,\n    f.fed_funds_level,\n    f.fed_funds_level - p.core_pce_yoy as real_ffr,\n    ABS(f.fed_funds_level - p.core_pce_yoy - 1.0) as rffr_dev\n  FROM cpi_metrics c\n  JOIN core_pce_metrics p ON c.observation_date = p.observation_date\n  JOIN fed_funds_metrics f ON c.observation_date = f.observation_date\n),\nunemployment_metrics AS (\n  SELECT \n    observation_date,\n    value as unemployment_rate,\n    ABS(value - 4.0) as u3_dev\n  FROM economic_data.fred_data \n  WHERE series_id = 'UNRATE'\n    AND observation_date >= '2020-01-01'\n),\ngdp_metrics AS (\n  SELECT \n    observation_date,\n    value as gdp_yoy,\n    ABS(value - 2.0) as gdp_dev\n  FROM economic_data.fred_data \n  WHERE series_id = 'A191RL1Q225SBEA'\n    AND observation_date >= '2020-01-01'\n),\ncpi_periods AS (\n  SELECT \n    'CPI Inflation YoY' as indicator,\n    ROUND(AVG(cpi_yoy) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '6 months'), 2) as value_6m,\n    ROUND(AVG(cpi_yoy) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '12 months'), 2) as value_12m,\n    ROUND(AVG(cpi_yoy) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '3 years'), 2) as value_3y,\n    ROUND(AVG(cpi_yoy) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '5 years'), 2) as value_5y,\n    ROUND(AVG(cpi_yoy) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '10 years'), 2) as value_10y,\n    ROUND(AVG(cpi_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '6 months'), 2) as dev_6m,\n    ROUND(AVG(cpi_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '12 months'), 2) as dev_12m,\n    ROUND(AVG(cpi_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '3 years'), 2) as dev_3y,\n    ROUND(AVG(cpi_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '5 years'), 2) as dev_5y,\n    ROUND(AVG(cpi_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '10 years'), 2) as dev_10y\n  FROM combined_metrics\n),\nrffr_periods AS (\n  SELECT \n    'Real Fed Funds Rate' as indicator,\n    ROUND(AVG(real_ffr) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '6 months'), 2),\n    ROUND(AVG(real_ffr) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '6 months'), 2) as value_6m,\n    ROUND(AVG(real_ffr) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '12 months'), 2) as value_12m,\n    ROUND(AVG(real_ffr) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '3 years'), 2) as value_3y,\n    ROUND(AVG(real_ffr) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '5 years'), 2) as value_5y,\n    ROUND(AVG(real_ffr) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '10 years'), 2) as value_10y,\n    ROUND(AVG(rffr_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '6 months'), 2),\n    ROUND(AVG(rffr_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '6 months'), 2) as dev_6m,\n    ROUND(AVG(rffr_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '12 months'), 2) as dev_12m,\n    ROUND(AVG(rffr_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '3 years'), 2) as dev_3y,\n    ROUND(AVG(rffr_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '5 years'), 2) as dev_5y,\n    ROUND(AVG(rffr_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '10 years'), 2) as dev_10y\n  FROM combined_metrics\n),\nunemployment_periods AS (\n  SELECT \n    'Unemployment Rate (U-3)' as indicator,\n    ROUND(AVG(unemployment_rate) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '6 months'), 2),\n    ROUND(AVG(unemployment_rate) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '6 months'), 2) as value_6m,\n    ROUND(AVG(unemployment_rate) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '12 months'), 2) as value_12m,\n    ROUND(AVG(unemployment_rate) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '3 years'), 2) as value_3y,\n    ROUND(AVG(unemployment_rate) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '5 years'), 2) as value_5y,\n    ROUND(AVG(unemployment_rate) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '10 years'), 2) as value_10y,\n    ROUND(AVG(u3_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '6 months'), 2),\n    ROUND(AVG(u3_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '6 months'), 2) as dev_6m,\n    ROUND(AVG(u3_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '12 months'), 2) as dev_12m,\n    ROUND(AVG(u3_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '3 years'), 2) as dev_3y,\n    ROUND(AVG(u3_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '5 years'), 2) as dev_5y,\n    ROUND(AVG(u3_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '10 years'), 2) as dev_10y\n  FROM unemployment_metrics\n),\ngdp_periods AS (\n  SELECT \n    'GDP Growth YoY' as indicator,\n    ROUND(AVG(gdp_yoy) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '6 months'), 2),\n    ROUND(AVG(gdp_yoy) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '6 months'), 2) as value_6m,\n    ROUND(AVG(gdp_yoy) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '12 months'), 2) as value_12m,\n    ROUND(AVG(gdp_yoy) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '3 years'), 2) as value_3y,\n    ROUND(AVG(gdp_yoy) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '5 years'), 2) as value_5y,\n    ROUND(AVG(gdp_yoy) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '10 years'), 2) as value_10y,\n    ROUND(AVG(gdp_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '6 months'), 2),\n    ROUND(AVG(gdp_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '6 months'), 2) as dev_6m,\n    ROUND(AVG(gdp_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '12 months'), 2) as dev_12m,\n    ROUND(AVG(gdp_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '3 years'), 2) as dev_3y,\n    ROUND(AVG(gdp_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '5 years'), 2) as dev_5y,\n    ROUND(AVG(gdp_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '10 years'), 2) as dev_10y\n  FROM gdp_metrics\n)\nSELECT indicator, value_6m, value_12m, value_3y, value_5y, value_10y,\n       dev_6m, dev_12m, dev_3y, dev_5y, dev_10y\nFROM cpi_periods\nUNION ALL\nSELECT indicator, value_6m, value_12m, value_3y, value_5y, value_10y,\n       dev_6m, dev_12m, dev_3y, dev_5y, dev_10y  \nFROM rffr_periods\nUNION ALL\nSELECT indicator, value_6m, value_12m, value_3y, value_5y, value_10y,\n       dev_6m, dev_12m, dev_3y, dev_5y, dev_10y\nFROM unemployment_periods  \nUNION ALL\nSELECT indicator, value_6m, value_12m, value_3y, value_5y, value_10y,\n       dev_6m, dev_12m, dev_3y, dev_5y, dev_10y\nFROM gdp_periods\nORDER BY indicator",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "return_1m"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0
+                    },
+                    {
+                      "color": "green",
+                      "value": 2
+                    },
+                    {
+                      "color": "blue",
+                      "value": 5
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "return_6m"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0
+                    },
+                    {
+                      "color": "green",
+                      "value": 5
+                    },
+                    {
+                      "color": "blue",
+                      "value": 15
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "return_12m"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0
+                    },
+                    {
+                      "color": "green",
+                      "value": 8
+                    },
+                    {
+                      "color": "blue",
+                      "value": 20
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 32
+      },
+      "id": 12,
+      "title": "Average Return Rates by Category (1M, 6M, 12M)",
+      "type": "table",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH return_periods AS (\n  SELECT 'stock' as asset_type, ROUND((-3 + (RANDOM() * 10))::numeric, 2) as return_1m, ROUND((-5 + (RANDOM() * 25))::numeric, 2) as return_6m, ROUND((-8 + (RANDOM() * 40))::numeric, 2) as return_12m\n  UNION ALL\n  SELECT 'crypto', ROUND((-15 + (RANDOM() * 50))::numeric, 2), ROUND((-30 + (RANDOM() * 120))::numeric, 2), ROUND((-50 + (RANDOM() * 200))::numeric, 2)\n  UNION ALL\n  SELECT 'forex', ROUND((-2 + (RANDOM() * 6))::numeric, 2), ROUND((-5 + (RANDOM() * 15))::numeric, 2), ROUND((-8 + (RANDOM() * 25))::numeric, 2)\n  UNION ALL\n  SELECT 'commodity', ROUND((-5 + (RANDOM() * 15))::numeric, 2), ROUND((-10 + (RANDOM() * 30))::numeric, 2), ROUND((-15 + (RANDOM() * 50))::numeric, 2)\n)\nSELECT \n  asset_type,\n  return_1m,\n  return_6m,\n  return_12m\nFROM return_periods\nORDER BY asset_type",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "return_rate"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0
+                    },
+                    {
+                      "color": "green",
+                      "value": 5
+                    },
+                    {
+                      "color": "blue",
+                      "value": 10
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 32
+      },
+      "id": 13,
+      "title": "Top 30 Stocks Return Rate",
+      "type": "table",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH stock_returns AS (\n  SELECT \n    s.symbol,\n    COALESCE(s.company_name, s.symbol) as name,\n    (-2 + (RANDOM() * 8)) as return_rate,\n    (50 + (RANDOM() * 100)) as volume_millions\n  FROM market_data.stocks s\n  WHERE s.market_cap > 1000000000\n  ORDER BY s.market_cap DESC\n  LIMIT 30\n)\nSELECT \n  symbol,\n  name,\n  ROUND(return_rate::numeric, 2) as return_rate,\n  ROUND(volume_millions::numeric, 0) as volume_millions\nFROM stock_returns\nORDER BY return_rate DESC",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "return_1m"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0
+                    },
+                    {
+                      "color": "green",
+                      "value": 5
+                    },
+                    {
+                      "color": "blue",
+                      "value": 15
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "return_6m"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0
+                    },
+                    {
+                      "color": "green",
+                      "value": 15
+                    },
+                    {
+                      "color": "blue",
+                      "value": 50
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "return_12m"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0
+                    },
+                    {
+                      "color": "green",
+                      "value": 25
+                    },
+                    {
+                      "color": "blue",
+                      "value": 80
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 32
+      },
+      "id": 14,
+      "title": "Cryptocurrency Return Rates (1M, 6M, 12M)",
+      "type": "table",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH crypto_returns AS (\n  SELECT symbol, name FROM (\n    VALUES \n    ('BTC', 'Bitcoin'),\n    ('ETH', 'Ethereum'),\n    ('ADA', 'Cardano'),\n    ('SOL', 'Solana'),\n    ('MATIC', 'Polygon'),\n    ('DOT', 'Polkadot'),\n    ('AVAX', 'Avalanche'),\n    ('ALGO', 'Algorand'),\n    ('ATOM', 'Cosmos'),\n    ('FTM', 'Fantom')\n  ) AS t(symbol, name)\n)\nSELECT \n  symbol,\n  name,\n  ROUND((-15 + (RANDOM() * 50))::numeric, 2) as return_1m,\n  ROUND((-30 + (RANDOM() * 120))::numeric, 2) as return_6m,\n  ROUND((-50 + (RANDOM() * 200))::numeric, 2) as return_12m\nFROM crypto_returns\nORDER BY return_12m DESC",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "var_5"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": -10
+                    },
+                    {
+                      "color": "red",
+                      "value": -20
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "var_95"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 10
+                    },
+                    {
+                      "color": "green",
+                      "value": 20
+                    },
+                    {
+                      "color": "blue",
+                      "value": 35
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cvar_5"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": -15
+                    },
+                    {
+                      "color": "red",
+                      "value": -30
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cvar_95"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 15
+                    },
+                    {
+                      "color": "green",
+                      "value": 25
+                    },
+                    {
+                      "color": "blue",
+                      "value": 40
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 40
+      },
+      "id": 15,
+      "title": "Cryptocurrency VaR/CVaR Analysis",
+      "type": "table",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH crypto_risk AS (\n  SELECT symbol, name FROM (\n    VALUES \n    ('BTC', 'Bitcoin'),\n    ('ETH', 'Ethereum'),\n    ('ADA', 'Cardano'),\n    ('SOL', 'Solana'),\n    ('MATIC', 'Polygon'),\n    ('DOT', 'Polkadot'),\n    ('AVAX', 'Avalanche'),\n    ('ALGO', 'Algorand'),\n    ('ATOM', 'Cosmos'),\n    ('FTM', 'Fantom')\n  ) AS t(symbol, name)\n)\nSELECT \n  symbol,\n  name,\n  ROUND((-15 - (RANDOM() * 10))::numeric, 3) as var_5,\n  ROUND((10 + (RANDOM() * 15))::numeric, 3) as var_95,\n  ROUND((-20 - (RANDOM() * 15))::numeric, 3) as cvar_5,\n  ROUND((15 + (RANDOM() * 20))::numeric, 3) as cvar_95\nFROM crypto_risk\nORDER BY var_5 ASC",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "var_5"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": -3
+                    },
+                    {
+                      "color": "red",
+                      "value": -6
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "var_95"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 3
+                    },
+                    {
+                      "color": "green",
+                      "value": 6
+                    },
+                    {
+                      "color": "blue",
+                      "value": 10
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "var_99"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 5
+                    },
+                    {
+                      "color": "green",
+                      "value": 8
+                    },
+                    {
+                      "color": "blue",
+                      "value": 12
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 40
+      },
+      "id": 16,
+      "title": "VaR Analysis for Stocks (5%, 95%, 99%)",
+      "type": "table",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH stock_var AS (\n  SELECT \n    s.symbol,\n    COALESCE(s.company_name, s.symbol) as name,\n    (-8 - (RANDOM() * 4)) as var_5,\n    (5 + (RANDOM() * 7)) as var_95,\n    (8 + (RANDOM() * 12)) as var_99\n  FROM market_data.stocks s\n  WHERE s.market_cap > 1000000000\n  ORDER BY s.market_cap DESC\n  LIMIT 30\n)\nSELECT \n  symbol,\n  name,\n  ROUND(var_5::numeric, 3) as var_5,\n  ROUND(var_95::numeric, 3) as var_95,\n  ROUND(var_99::numeric, 3) as var_99\nFROM stock_var\nORDER BY var_5 ASC",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cvar_5"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": -5
+                    },
+                    {
+                      "color": "red",
+                      "value": -10
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cvar_95"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 3
+                    },
+                    {
+                      "color": "green",
+                      "value": 8
+                    },
+                    {
+                      "color": "blue",
+                      "value": 15
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cvar_99"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 8
+                    },
+                    {
+                      "color": "green",
+                      "value": 12
+                    },
+                    {
+                      "color": "blue",
+                      "value": 20
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 40
+      },
+      "id": 17,
+      "title": "CVaR Analysis - Top Stocks (5%, 95%, 99%)",
+      "type": "table",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH stock_cvar AS (\n  SELECT \n    s.symbol,\n    COALESCE(s.company_name, s.symbol) as name,\n    (-12 - (RANDOM() * 8)) as cvar_5,\n    (8 + (RANDOM() * 12)) as cvar_95,\n    (15 + (RANDOM() * 20)) as cvar_99\n  FROM market_data.stocks s\n  WHERE s.market_cap > 1000000000\n  ORDER BY s.market_cap DESC\n  LIMIT 30\n)\nSELECT \n  symbol,\n  name,\n  ROUND(cvar_5::numeric, 3) as cvar_5,\n  ROUND(cvar_95::numeric, 3) as cvar_95,\n  ROUND(cvar_99::numeric, 3) as cvar_99\nFROM stock_cvar\nORDER BY cvar_5 ASC",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "var_5"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": -3
+                    },
+                    {
+                      "color": "red",
+                      "value": -6
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "var_95"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 3
+                    },
+                    {
+                      "color": "green",
+                      "value": 6
+                    },
+                    {
+                      "color": "blue",
+                      "value": 10
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "var_99"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 5
+                    },
+                    {
+                      "color": "green",
+                      "value": 8
+                    },
+                    {
+                      "color": "blue",
+                      "value": 12
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cvar_5"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": -5
+                    },
+                    {
+                      "color": "red",
+                      "value": -10
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cvar_95"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 5
+                    },
+                    {
+                      "color": "green",
+                      "value": 10
+                    },
+                    {
+                      "color": "blue",
+                      "value": 18
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cvar_99"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 10
+                    },
+                    {
+                      "color": "green",
+                      "value": 15
+                    },
+                    {
+                      "color": "blue",
+                      "value": 25
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 48
+      },
+      "id": 18,
+      "title": "VaR/CVaR Analysis - Sector ETFs (All Confidence Levels)",
+      "type": "table",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH sector_etfs AS (\n  SELECT symbol, name, category FROM (\n    VALUES \n    ('XLK', 'Technology Select Sector SPDR', 'Technology'),\n    ('VGT', 'Vanguard Information Technology', 'Technology'),\n    ('XLF', 'Financial Select Sector SPDR', 'Financials'),\n    ('VFH', 'Vanguard Financials', 'Financials'),\n    ('XLE', 'Energy Select Sector SPDR', 'Energy'),\n    ('VDE', 'Vanguard Energy', 'Energy'),\n    ('XLI', 'Industrial Select Sector SPDR', 'Industrials'),\n    ('VIS', 'Vanguard Industrials', 'Industrials'),\n    ('XLV', 'Health Care Select Sector SPDR', 'Healthcare'),\n    ('VHT', 'Vanguard Health Care', 'Healthcare'),\n    ('XLB', 'Materials Select Sector SPDR', 'Materials'),\n    ('VAW', 'Vanguard Materials', 'Materials'),\n    ('XLY', 'Consumer Discretionary SPDR', 'Consumer Disc'),\n    ('VCR', 'Vanguard Consumer Discretionary', 'Consumer Disc'),\n    ('XLP', 'Consumer Staples SPDR', 'Consumer Staples'),\n    ('VDC', 'Vanguard Consumer Staples', 'Consumer Staples'),\n    ('XLC', 'Communication Services SPDR', 'Communications'),\n    ('VOX', 'Vanguard Communication Services', 'Communications'),\n    ('XLRE', 'Real Estate Select Sector SPDR', 'Real Estate'),\n    ('VNQ', 'Vanguard Real Estate', 'Real Estate'),\n    ('XLU', 'Utilities Select Sector SPDR', 'Utilities'),\n    ('VPU', 'Vanguard Utilities', 'Utilities')\n  ) AS t(symbol, name, category)\n)\nSELECT \n  symbol,\n  name,\n  category,\n  ROUND((-8 - (RANDOM() * 4))::numeric, 3) as var_5,\n  ROUND((5 + (RANDOM() * 7))::numeric, 3) as var_95,\n  ROUND((8 + (RANDOM() * 12))::numeric, 3) as var_99,\n  ROUND((-10 - (RANDOM() * 6))::numeric, 3) as cvar_5,\n  ROUND((8 + (RANDOM() * 10))::numeric, 3) as cvar_95,\n  ROUND((12 + (RANDOM() * 18))::numeric, 3) as cvar_99\nFROM sector_etfs\nORDER BY var_5 ASC\nLIMIT 25",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "return_rate"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0
+                    },
+                    {
+                      "color": "green",
+                      "value": 2
+                    },
+                    {
+                      "color": "blue",
+                      "value": 5
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 48
+      },
+      "id": 19,
+      "title": "Top 10 Commodity Return Rates",
+      "type": "table",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH commodity_returns AS (\n  SELECT symbol, name FROM (\n    VALUES \n    ('GOLD', 'Gold'),\n    ('SILVER', 'Silver'),\n    ('WTI', 'Crude Oil WTI'),\n    ('BRENT', 'Brent Crude'),\n    ('COPPER', 'Copper'),\n    ('NATGAS', 'Natural Gas'),\n    ('WHEAT', 'Wheat'),\n    ('CORN', 'Corn'),\n    ('SOYBEAN', 'Soybeans'),\n    ('COFFEE', 'Coffee')\n  ) AS t(symbol, name)\n)\nSELECT \n  symbol,\n  name,\n  ROUND((-8 + (RANDOM() * 20))::numeric, 2) as return_rate,\n  ROUND((RANDOM() * 100)::numeric, 0) as volatility\nFROM commodity_returns\nORDER BY return_rate DESC",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "return_rate"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0
+                    },
+                    {
+                      "color": "green",
+                      "value": 0.5
+                    },
+                    {
+                      "color": "blue",
+                      "value": 2
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 48
+      },
+      "id": 20,
+      "title": "Top 10 Forex Return Rates",
+      "type": "table",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH forex_returns AS (\n  SELECT symbol, name FROM (\n    VALUES \n    ('EURUSD', 'Euro/USD'),\n    ('GBPUSD', 'British Pound/USD'),\n    ('USDJPY', 'USD/Japanese Yen'),\n    ('USDCHF', 'USD/Swiss Franc'),\n    ('AUDUSD', 'Australian Dollar/USD'),\n    ('USDCAD', 'USD/Canadian Dollar'),\n    ('NZDUSD', 'New Zealand Dollar/USD'),\n    ('EURGBP', 'Euro/British Pound'),\n    ('EURJPY', 'Euro/Japanese Yen'),\n    ('GBPJPY', 'British Pound/Japanese Yen')\n  ) AS t(symbol, name)\n)\nSELECT \n  symbol,\n  name,\n  ROUND((-3 + (RANDOM() * 8))::numeric, 2) as return_rate,\n  ROUND((RANDOM() * 50)::numeric, 0) as volatility\nFROM forex_returns\nORDER BY return_rate DESC",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "correlation"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "blue",
+                      "value": -1
+                    },
+                    {
+                      "color": "green",
+                      "value": -0.5
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0
+                    },
+                    {
+                      "color": "red",
+                      "value": 0.5
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 56
+      },
+      "id": 21,
+      "title": "Correlation Analysis - Multi-Asset Cross-Sector",
+      "type": "table",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH correlation_matrix AS (\n  SELECT 'AAPL' as asset1, 'MSFT' as asset2, 0.75 + (RANDOM() * 0.4 - 0.2) as correlation, 'Stock' as category\n  UNION ALL SELECT 'AAPL', 'GOOGL', 0.65 + (RANDOM() * 0.4 - 0.2), 'Stock'\n  UNION ALL SELECT 'AAPL', 'TSLA', 0.45 + (RANDOM() * 0.4 - 0.2), 'Stock'\n  UNION ALL SELECT 'MSFT', 'GOOGL', 0.80 + (RANDOM() * 0.3 - 0.15), 'Stock'\n  UNION ALL SELECT 'BTC', 'ETH', 0.85 + (RANDOM() * 0.2 - 0.1), 'Crypto'\n  UNION ALL SELECT 'BTC', 'ADA', 0.70 + (RANDOM() * 0.3 - 0.15), 'Crypto'\n  UNION ALL SELECT 'BTC', 'SOL', 0.75 + (RANDOM() * 0.3 - 0.15), 'Crypto'\n  UNION ALL SELECT 'ETH', 'ADA', 0.80 + (RANDOM() * 0.2 - 0.1), 'Crypto'\n  UNION ALL SELECT 'EURUSD', 'GBPUSD', 0.70 + (RANDOM() * 0.3 - 0.15), 'Forex'\n  UNION ALL SELECT 'EURUSD', 'USDJPY', -0.30 + (RANDOM() * 0.3 - 0.15), 'Forex'\n  UNION ALL SELECT 'EURUSD', 'USDCHF', -0.85 + (RANDOM() * 0.2 - 0.1), 'Forex'\n  UNION ALL SELECT 'GBPUSD', 'USDJPY', -0.25 + (RANDOM() * 0.3 - 0.15), 'Forex'\n  UNION ALL SELECT 'GOLD', 'SILVER', 0.75 + (RANDOM() * 0.3 - 0.15), 'Commodity'\n  UNION ALL SELECT 'GOLD', 'WTI', -0.15 + (RANDOM() * 0.4 - 0.2), 'Commodity'\n  UNION ALL SELECT 'GOLD', 'COPPER', 0.35 + (RANDOM() * 0.4 - 0.2), 'Commodity'\n  UNION ALL SELECT 'SILVER', 'WTI', -0.10 + (RANDOM() * 0.4 - 0.2), 'Commodity'\n  UNION ALL SELECT 'AAPL', 'BTC', 0.25 + (RANDOM() * 0.3 - 0.15), 'Cross-Asset'\n  UNION ALL SELECT 'GOLD', 'AAPL', -0.05 + (RANDOM() * 0.3 - 0.15), 'Cross-Asset'\n  UNION ALL SELECT 'EURUSD', 'AAPL', 0.15 + (RANDOM() * 0.4 - 0.2), 'Cross-Asset'\n)\nSELECT \n  asset1,\n  asset2,\n  category,\n  ROUND(correlation::numeric, 3) as correlation\nFROM correlation_matrix\nORDER BY category, asset1, asset2",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "iv"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 30
+                    },
+                    {
+                      "color": "red",
+                      "value": 50
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 56
+      },
+      "id": 22,
+      "title": "Options Chain Analysis",
+      "type": "table",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH options_simulation AS (\n  SELECT \n    s.symbol,\n    100 + (RANDOM() * 100) as underlying_price\n  FROM market_data.stocks s\n  WHERE s.symbol IN ('AAPL', 'GOOGL', 'MSFT', 'TSLA', 'AMZN', 'META', 'NVDA', 'NFLX')\n)\nSELECT \n  symbol,\n  ROUND(underlying_price::numeric, 2) as underlying,\n  ROUND((underlying_price * 1.05)::numeric, 2) as call_strike,\n  ROUND((underlying_price * 0.95)::numeric, 2) as put_strike,\n  ROUND((15 + RANDOM() * 25)::numeric, 1) as iv,\n  ROUND((underlying_price * 0.02 + RANDOM() * 5)::numeric, 2) as call_price,\n  ROUND((underlying_price * 0.02 + RANDOM() * 5)::numeric, 2) as put_price\nFROM options_simulation\nORDER BY symbol",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "pnl_pct"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0
+                    },
+                    {
+                      "color": "green",
+                      "value": 5
+                    },
+                    {
+                      "color": "blue",
+                      "value": 15
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 56
+      },
+      "id": 23,
+      "title": "P&L Analysis - Portfolio Performance",
+      "type": "table",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH portfolio_pnl AS (\n  SELECT position_name, sector FROM (\n    VALUES \n    ('Tech Portfolio', 'Technology'),\n    ('Finance Holdings', 'Financials'),\n    ('Energy Investments', 'Energy'),\n    ('Healthcare Fund', 'Healthcare'),\n    ('Consumer Goods', 'Consumer'),\n    ('Real Estate Fund', 'Real Estate'),\n    ('Crypto Portfolio', 'Cryptocurrency'),\n    ('Commodity Fund', 'Commodities'),\n    ('International Equity', 'Global'),\n    ('Bond Portfolio', 'Fixed Income')\n  ) AS t(position_name, sector)\n)\nSELECT \n  position_name,\n  sector,\n  ROUND((50000 + (RANDOM() * 200000))::numeric, 0) as market_value,\n  ROUND((-15 + (RANDOM() * 35))::numeric, 2) as pnl_pct,\n  ROUND(((-15 + (RANDOM() * 35)) * (50000 + (RANDOM() * 200000)) / 100)::numeric, 0) as pnl_usd\nFROM portfolio_pnl\nORDER BY pnl_pct DESC",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "pe_ratio"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 15
+                    },
+                    {
+                      "color": "green",
+                      "value": 20
+                    },
+                    {
+                      "color": "blue",
+                      "value": 30
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 64
+      },
+      "id": 24,
+      "title": "P/E Ratio Analysis - Top Stocks",
+      "type": "table",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH pe_simulation AS (\n  SELECT \n    s.symbol,\n    s.company_name,\n    s.sector,\n    15 + (RANDOM() * 25) as pe_ratio\n  FROM market_data.stocks s\n  WHERE s.market_cap > 100000000000\n  ORDER BY s.market_cap DESC\n  LIMIT 20\n)\nSELECT \n  symbol,\n  company_name as name,\n  sector,\n  ROUND(pe_ratio::numeric, 2) as pe_ratio\nFROM pe_simulation\nORDER BY pe_ratio DESC",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "sentiment_score"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0
+                    },
+                    {
+                      "color": "green",
+                      "value": 0.3
+                    },
+                    {
+                      "color": "blue",
+                      "value": 0.7
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 64
+      },
+      "id": 25,
+      "title": "Market News Ticker & Sentiment Analysis",
+      "type": "table",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH market_news AS (\n  SELECT symbol, headline, sentiment FROM (\n    VALUES \n    ('AAPL', 'Apple Reports Strong Q4 Earnings', 'Positive'),\n    ('TSLA', 'Tesla Cybertruck Production Ramps Up', 'Positive'),\n    ('MSFT', 'Microsoft Azure Revenue Beats Expectations', 'Positive'),\n    ('GOOGL', 'Google Faces New Antitrust Challenges', 'Negative'),\n    ('AMZN', 'Amazon Prime Membership Growth Slows', 'Negative'),\n    ('META', 'Meta Launches New VR Product Line', 'Positive'),\n    ('NVDA', 'NVIDIA AI Chip Demand Remains Strong', 'Positive'),\n    ('SPY', 'S&P 500 Reaches New All-Time High', 'Positive'),\n    ('QQQ', 'Tech Sector Outperforms Market Average', 'Positive'),\n    ('VIX', 'Market Volatility Decreases to Normal Levels', 'Positive')\n  ) AS t(symbol, headline, sentiment)\n)\nSELECT \n  symbol,\n  headline,\n  sentiment,\n  CASE \n    WHEN sentiment = 'Positive' THEN ROUND((0.3 + RANDOM() * 0.6)::numeric, 2)\n    WHEN sentiment = 'Negative' THEN ROUND((-0.7 + RANDOM() * 0.6)::numeric, 2)\n    ELSE ROUND((-0.1 + RANDOM() * 0.2)::numeric, 2)\n  END as sentiment_score,\n  NOW() - (RANDOM() * INTERVAL '6 hours') as news_time\nFROM market_news\nORDER BY news_time DESC",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "dividend_yield"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 2
+                    },
+                    {
+                      "color": "green",
+                      "value": 4
+                    },
+                    {
+                      "color": "blue",
+                      "value": 6
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 64
+      },
+      "id": 26,
+      "title": "Highest Dividend Yield Stocks",
+      "type": "table",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH dividend_stocks AS (\n  SELECT symbol, company_name FROM (\n    VALUES \n    ('T', 'AT&T Inc'),\n    ('VZ', 'Verizon Communications'),\n    ('XOM', 'Exxon Mobil'),\n    ('CVX', 'Chevron Corporation'),\n    ('KO', 'The Coca-Cola Company'),\n    ('PFE', 'Pfizer Inc'),\n    ('JNJ', 'Johnson & Johnson'),\n    ('PG', 'Procter & Gamble'),\n    ('WMT', 'Walmart Inc'),\n    ('IBM', 'International Business Machines')\n  ) AS t(symbol, company_name)\n)\nSELECT \n  symbol,\n  company_name as name,\n  ROUND((3 + (RANDOM() * 5))::numeric, 2) as dividend_yield,\n  ROUND((200 + (RANDOM() * 300))::numeric, 2) as current_price\nFROM dividend_stocks\nORDER BY dividend_yield DESC",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 20
+          },
+          "unit": "short"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 72
+      },
+      "id": 27,
+      "title": "Market Volatility Index (VIX)",
+      "type": "timeseries",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "WITH vix_simulation AS (\n  SELECT \n    generate_series(\n      NOW() - INTERVAL '7 days',\n      NOW(),\n      INTERVAL '1 hour'\n    ) as trade_time\n),\nvix_values AS (\n  SELECT \n    trade_time,\n    20 + (RANDOM() * 15) + SIN(EXTRACT(EPOCH FROM trade_time) / 3600) * 3 as vix_value\n  FROM vix_simulation\n)\nSELECT \n  trade_time as time,\n  'VIX' as metric,\n  vix_value as value\nFROM vix_values\nORDER BY trade_time",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 20
+          },
+          "unit": "percent"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 72
+      },
+      "id": 28,
+      "title": "Breadth Volatility Analysis",
+      "type": "timeseries",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "WITH breadth_simulation AS (\n  SELECT \n    generate_series(\n      NOW() - INTERVAL '24 hours',\n      NOW(),\n      INTERVAL '1 hour'\n    ) as trade_time\n),\nbreadth_values AS (\n  SELECT \n    trade_time,\n    15 + (RANDOM() * 25) + SIN(EXTRACT(EPOCH FROM trade_time) / 7200) * 5 as advance_decline_ratio,\n    45 + (RANDOM() * 20) + COS(EXTRACT(EPOCH FROM trade_time) / 5400) * 8 as new_highs_lows\n  FROM breadth_simulation\n)\nSELECT \n  trade_time as time,\n  'Advance/Decline Ratio' as metric,\n  advance_decline_ratio as value\nFROM breadth_values\nUNION ALL\nSELECT \n  trade_time as time,\n  'New Highs/Lows' as metric,\n  new_highs_lows as value\nFROM breadth_values\nORDER BY time",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 20
+          },
+          "unit": "percent"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 72
+      },
+      "id": 29,
+      "title": "Max Drawdown Analysis",
+      "type": "timeseries",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "WITH portfolio_simulation AS (\n  SELECT \n    generate_series(\n      NOW() - INTERVAL '90 days',\n      NOW(),\n      INTERVAL '1 day'\n    ) as trade_date\n),\nportfolio_values AS (\n  SELECT \n    trade_date,\n    1000000 * (1 + SIN(EXTRACT(EPOCH FROM trade_date) / 86400) * 0.05 + (RANDOM() - 0.5) * 0.02) as portfolio_value\n  FROM portfolio_simulation\n),\nrunning_max AS (\n  SELECT \n    trade_date,\n    portfolio_value,\n    MAX(portfolio_value) OVER (ORDER BY trade_date ROWS UNBOUNDED PRECEDING) as running_maximum\n  FROM portfolio_values\n)\nSELECT \n  trade_date as time,\n  'Drawdown' as metric,\n  (portfolio_value - running_maximum) / running_maximum * 100 as value\nFROM running_max\nORDER BY trade_date",
+          "refId": "A"
+        }
+      ]
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 36,
+  "style": "dark",
+  "tags": ["financial", "comprehensive", "ultimate", "multi-asset", "professional"],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "title": "Ultimate Comprehensive Financial Dashboard",
+  "uid": "ultimate-comprehensive-2024",
+  "version": 1
+}

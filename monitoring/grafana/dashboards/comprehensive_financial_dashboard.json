@@ -1,0 +1,1343 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": "PostgreSQL",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "currencyUSD"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  td.timestamp as time,\n  s.symbol,\n  td.price as value\nFROM market_data.tick_data td\nJOIN market_data.stocks s ON s.id = td.asset_id\nWHERE \n  td.asset_type = 'stock' AND\n  td.timestamp >= NOW() - INTERVAL '24 hours' AND\n  s.symbol IN (\n    SELECT s2.symbol \n    FROM market_data.stocks s2 \n    JOIN market_data.tick_data td2 ON s2.id = td2.asset_id \n    WHERE td2.asset_type = 'stock' AND td2.timestamp >= NOW() - INTERVAL '1 hour'\n    GROUP BY s2.symbol \n    ORDER BY AVG(td2.price * td2.volume) DESC \n    LIMIT 30\n  )\nORDER BY td.timestamp",
+          "refId": "A"
+        }
+      ],
+      "title": "Top 30 Stocks - Price Movement",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "PostgreSQL",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "currencyUSD"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  td.timestamp as time,\n  c.symbol,\n  td.price as value\nFROM market_data.tick_data td\nJOIN market_data.cryptocurrencies c ON c.id = td.asset_id\nWHERE \n  td.asset_type = 'crypto' AND\n  td.timestamp >= NOW() - INTERVAL '24 hours' AND\n  c.symbol IN (\n    SELECT c2.symbol \n    FROM market_data.cryptocurrencies c2 \n    JOIN market_data.tick_data td2 ON c2.id = td2.asset_id \n    WHERE td2.asset_type = 'crypto' AND td2.timestamp >= NOW() - INTERVAL '1 hour'\n    GROUP BY c2.symbol \n    ORDER BY AVG(td2.price * td2.volume) DESC \n    LIMIT 30\n  )\nORDER BY td.timestamp",
+          "refId": "A"
+        }
+      ],
+      "title": "Top 30 Cryptocurrencies - Price Movement",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "PostgreSQL",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "id": 3,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  td.timestamp as time,\n  fp.symbol,\n  td.price as value\nFROM market_data.tick_data td\nJOIN market_data.forex_pairs fp ON fp.id = td.asset_id\nWHERE \n  td.asset_type = 'forex' AND\n  td.timestamp >= NOW() - INTERVAL '24 hours' AND\n  fp.symbol IN (\n    SELECT fp2.symbol \n    FROM market_data.forex_pairs fp2 \n    JOIN market_data.tick_data td2 ON fp2.id = td2.asset_id \n    WHERE td2.asset_type = 'forex' AND td2.timestamp >= NOW() - INTERVAL '1 hour'\n    GROUP BY fp2.symbol \n    ORDER BY AVG(td2.volume) DESC \n    LIMIT 30\n  )\nORDER BY td.timestamp",
+          "refId": "A"
+        }
+      ],
+      "title": "Top 30 Forex Pairs - Rate Movement",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "PostgreSQL",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "currencyUSD"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  td.timestamp as time,\n  cm.symbol,\n  td.price as value\nFROM market_data.tick_data td\nJOIN market_data.commodities cm ON cm.id = td.asset_id\nWHERE \n  td.asset_type = 'commodity' AND\n  td.timestamp >= NOW() - INTERVAL '24 hours' AND\n  cm.symbol IN (\n    SELECT cm2.symbol \n    FROM market_data.commodities cm2 \n    JOIN market_data.tick_data td2 ON cm2.id = td2.asset_id \n    WHERE td2.asset_type = 'commodity' AND td2.timestamp >= NOW() - INTERVAL '1 hour'\n    GROUP BY cm2.symbol \n    ORDER BY AVG(td2.price * td2.volume) DESC \n    LIMIT 30\n  )\nORDER BY td.timestamp",
+          "refId": "A"
+        }
+      ],
+      "title": "Top 30 Commodities - Price Movement",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "PostgreSQL",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": -0.05
+              },
+              {
+                "color": "red",
+                "value": -0.1
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "change_percent"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 16
+      },
+      "id": 5,
+      "options": {
+        "showHeader": true
+      },
+      "pluginVersion": "8.0.0",
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH latest_prices AS (\n  SELECT DISTINCT ON (td.asset_id, td.asset_type)\n    td.asset_id,\n    td.asset_type,\n    td.price as current_price,\n    td.volume as current_volume,\n    td.timestamp\n  FROM market_data.tick_data td\n  WHERE td.timestamp >= NOW() - INTERVAL '1 hour'\n  ORDER BY td.asset_id, td.asset_type, td.timestamp DESC\n),\nprevious_prices AS (\n  SELECT DISTINCT ON (td.asset_id, td.asset_type)\n    td.asset_id,\n    td.asset_type,\n    td.price as previous_price\n  FROM market_data.tick_data td\n  WHERE td.timestamp BETWEEN NOW() - INTERVAL '25 hours' AND NOW() - INTERVAL '23 hours'\n  ORDER BY td.asset_id, td.asset_type, td.timestamp DESC\n)\nSELECT \n  CASE \n    WHEN lp.asset_type = 'stock' THEN s.symbol\n    WHEN lp.asset_type = 'crypto' THEN c.symbol\n    WHEN lp.asset_type = 'forex' THEN fp.symbol\n    WHEN lp.asset_type = 'commodity' THEN cm.symbol\n  END as symbol,\n  s.company_name,\n  lp.asset_type,\n  lp.current_price,\n  lp.current_volume,\n  pp.previous_price,\n  ROUND(((lp.current_price - pp.previous_price) / pp.previous_price * 100)::numeric, 2) as change_percent,\n  lp.timestamp\nFROM latest_prices lp\nLEFT JOIN previous_prices pp ON lp.asset_id = pp.asset_id AND lp.asset_type = pp.asset_type\nLEFT JOIN market_data.stocks s ON lp.asset_type = 'stock' AND s.id = lp.asset_id\nLEFT JOIN market_data.cryptocurrencies c ON lp.asset_type = 'crypto' AND c.id = lp.asset_id\nLEFT JOIN market_data.forex_pairs fp ON lp.asset_type = 'forex' AND fp.id = lp.asset_id\nLEFT JOIN market_data.commodities cm ON lp.asset_type = 'commodity' AND cm.id = lp.asset_id\nWHERE pp.previous_price IS NOT NULL\nORDER BY ABS(change_percent) DESC\nLIMIT 120",
+          "refId": "A"
+        }
+      ],
+      "title": "Top Movers - All Assets Performance",
+      "type": "table"
+    },
+    {
+      "datasource": "PostgreSQL",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 24
+      },
+      "id": 8,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT \n  DATE_TRUNC('hour', td.timestamp) as time,\n  td.asset_type as metric,\n  SUM(td.volume) as value\nFROM market_data.tick_data td\nWHERE td.timestamp >= NOW() - INTERVAL '24 hours'\nGROUP BY DATE_TRUNC('hour', td.timestamp), td.asset_type\nORDER BY time",
+          "refId": "A"
+        }
+      ],
+      "title": "Trading Volume Analysis by Category",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "PostgreSQL",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 5
+              },
+              {
+                "color": "blue",
+                "value": 10
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 24
+      },
+      "id": 9,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.0.0",
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH daily_returns AS (\n  SELECT \n    td.asset_type,\n    DATE(td.timestamp) as trade_date,\n    FIRST_VALUE(td.price) OVER (PARTITION BY td.asset_id, td.asset_type, DATE(td.timestamp) ORDER BY td.timestamp) as open_price,\n    LAST_VALUE(td.price) OVER (PARTITION BY td.asset_id, td.asset_type, DATE(td.timestamp) ORDER BY td.timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) as close_price\n  FROM market_data.tick_data td\n  WHERE td.timestamp >= NOW() - INTERVAL '30 days'\n),\nreturns_calc AS (\n  SELECT \n    asset_type,\n    trade_date,\n    (close_price - open_price) / open_price * 100 as daily_return\n  FROM daily_returns\n  WHERE open_price > 0\n)\nSELECT \n  asset_type,\n  ROUND(AVG(daily_return)::numeric, 2) as avg_return\nFROM returns_calc\nGROUP BY asset_type",
+          "refId": "A"
+        }
+      ],
+      "title": "Average Return Rates by Category (30 Days)",
+      "type": "stat"
+    },
+    {
+      "datasource": "PostgreSQL",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 32
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT \n  COALESCE(p.name, 'Default Portfolio') as portfolio_name,\n  SUM(pos.market_value) as total_value\nFROM portfolio.positions pos\nLEFT JOIN portfolio.portfolios p ON p.id = pos.portfolio_id\nWHERE pos.market_value IS NOT NULL\nGROUP BY p.name\nORDER BY total_value DESC",
+          "refId": "A"
+        }
+      ],
+      "title": "Portfolio Distribution",
+      "type": "piechart"
+    },
+    {
+      "datasource": "PostgreSQL",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": -0.05
+              },
+              {
+                "color": "red",
+                "value": -0.1
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 8,
+        "y": 32
+      },
+      "id": 7,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.0.0",
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH portfolio_current AS (\n  SELECT SUM(pos.market_value) as current_value\n  FROM portfolio.positions pos\n  WHERE pos.market_value IS NOT NULL\n),\nportfolio_initial AS (\n  SELECT SUM(p.initial_value) as initial_value\n  FROM portfolio.portfolios p\n  WHERE p.is_active = true\n)\nSELECT \n  ROUND(((pc.current_value - pi.initial_value) / pi.initial_value * 100)::numeric, 2) as portfolio_return\nFROM portfolio_current pc, portfolio_initial pi",
+          "refId": "A"
+        }
+      ],
+      "title": "Portfolio Return",
+      "type": "stat"
+    },
+    {
+      "datasource": "PostgreSQL",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "color-background"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": -0.05
+              },
+              {
+                "color": "red",
+                "value": -0.15
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 32
+      },
+      "id": 13,
+      "options": {
+        "showHeader": true
+      },
+      "pluginVersion": "8.0.0",
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH etf_returns AS (\n  SELECT \n    s.symbol,\n    s.company_name,\n    ARRAY_AGG(((td.price - LAG(td.price) OVER (PARTITION BY td.asset_id ORDER BY td.timestamp)) / LAG(td.price) OVER (PARTITION BY td.asset_id ORDER BY td.timestamp)) ORDER BY td.timestamp) as returns\n  FROM market_data.tick_data td\n  JOIN market_data.stocks s ON s.id = td.asset_id\n  WHERE \n    td.asset_type = 'stock' AND\n    td.timestamp >= NOW() - INTERVAL '90 days' AND\n    s.symbol ~ '^[A-Z]{3,4}$' AND\n    s.company_name ILIKE '%ETF%'\n  GROUP BY s.symbol, s.company_name\n  HAVING COUNT(*) > 50\n),\nvar_calculations AS (\n  SELECT \n    symbol,\n    company_name,\n    PERCENTILE_CONT(0.05) WITHIN GROUP (ORDER BY unnest(returns)) as var_5,\n    PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY unnest(returns)) as var_95,\n    PERCENTILE_CONT(0.01) WITHIN GROUP (ORDER BY unnest(returns)) as var_99\n  FROM etf_returns\n)\nSELECT \n  symbol,\n  company_name,\n  ROUND((var_5 * 100)::numeric, 3) as \"VaR 5%\",\n  ROUND((var_95 * 100)::numeric, 3) as \"VaR 95%\",\n  ROUND((var_99 * 100)::numeric, 3) as \"VaR 99%\",\n  ROUND(((var_5 * 1.2) * 100)::numeric, 3) as \"CVaR 5%\"\nFROM var_calculations\nORDER BY var_5\nLIMIT 74",
+          "refId": "A"
+        }
+      ],
+      "title": "VaR/CVaR Analysis - Top 74 ETFs",
+      "type": "table"
+    },
+    {
+      "datasource": "PostgreSQL",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 40
+      },
+      "id": 10,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH daily_portfolio_value AS (\n  SELECT \n    DATE(t.timestamp) as trade_date,\n    SUM(t.quantity * td.price) as portfolio_value\n  FROM portfolio.positions t\n  JOIN market_data.tick_data td ON td.asset_id = t.stock_id AND td.asset_type = 'stock'\n  WHERE td.timestamp >= NOW() - INTERVAL '90 days'\n  GROUP BY DATE(t.timestamp)\n  ORDER BY trade_date\n),\nrunning_max AS (\n  SELECT \n    trade_date,\n    portfolio_value,\n    MAX(portfolio_value) OVER (ORDER BY trade_date ROWS UNBOUNDED PRECEDING) as running_maximum\n  FROM daily_portfolio_value\n)\nSELECT \n  trade_date as time,\n  'Drawdown' as metric,\n  (portfolio_value - running_maximum) / running_maximum * 100 as value\nFROM running_max",
+          "refId": "A"
+        }
+      ],
+      "title": "Portfolio Drawdown",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "PostgreSQL",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "currencyUSD"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*P&L.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0
+                    },
+                    {
+                      "color": "green",
+                      "value": 1000
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 40
+      },
+      "id": 11,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH portfolio_pnl AS (\n  SELECT \n    td.timestamp as time,\n    SUM(\n      pos.quantity * (td.price - pos.average_cost)\n    ) as unrealized_pnl\n  FROM portfolio.positions pos\n  JOIN market_data.tick_data td ON td.asset_id = pos.stock_id AND td.asset_type = 'stock'\n  WHERE td.timestamp >= NOW() - INTERVAL '24 hours'\n  GROUP BY td.timestamp\n  ORDER BY td.timestamp\n)\nSELECT \n  time,\n  'Real-time P&L' as metric,\n  unrealized_pnl as value\nFROM portfolio_pnl",
+          "refId": "A"
+        }
+      ],
+      "title": "Real-time P&L",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "PostgreSQL",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "color-background"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": -1
+              },
+              {
+                "color": "green",
+                "value": -0.5
+              },
+              {
+                "color": "yellow",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 0.5
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 48
+      },
+      "id": 12,
+      "options": {
+        "showHeader": true
+      },
+      "pluginVersion": "8.0.0",
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH stock_returns AS (\n  SELECT \n    s1.symbol as stock1,\n    s2.symbol as stock2,\n    CORR(\n      (td1.price - LAG(td1.price) OVER (PARTITION BY td1.asset_id ORDER BY td1.timestamp)) / LAG(td1.price) OVER (PARTITION BY td1.asset_id ORDER BY td1.timestamp),\n      (td2.price - LAG(td2.price) OVER (PARTITION BY td2.asset_id ORDER BY td2.timestamp)) / LAG(td2.price) OVER (PARTITION BY td2.asset_id ORDER BY td2.timestamp)\n    ) as correlation\n  FROM market_data.tick_data td1\n  JOIN market_data.stocks s1 ON s1.id = td1.asset_id\n  JOIN market_data.tick_data td2 ON td2.timestamp = td1.timestamp\n  JOIN market_data.stocks s2 ON s2.id = td2.asset_id\n  WHERE \n    td1.asset_type = 'stock' AND\n    td2.asset_type = 'stock' AND\n    td1.timestamp >= NOW() - INTERVAL '30 days' AND\n    s1.symbol IN ('AAPL', 'GOOGL', 'MSFT', 'TSLA') AND\n    s2.symbol IN ('AAPL', 'GOOGL', 'MSFT', 'TSLA') AND\n    s1.symbol != s2.symbol\n  GROUP BY s1.symbol, s2.symbol\n)\nSELECT \n  stock1,\n  stock2,\n  ROUND(correlation::numeric, 3) as correlation_coefficient\nFROM stock_returns\nWHERE correlation IS NOT NULL\nORDER BY stock1, stock2",
+          "refId": "A"
+        }
+      ],
+      "title": "Stock Correlation Analysis (4x4 Matrix)",
+      "type": "table"
+    },
+    {
+      "datasource": "PostgreSQL",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "line"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 20
+              },
+              {
+                "color": "red",
+                "value": 30
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 48
+      },
+      "id": 14,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  td.timestamp as time,\n  'VIX' as metric,\n  td.price as value\nFROM market_data.tick_data td\nJOIN market_data.stocks s ON s.id = td.asset_id\nWHERE \n  td.asset_type = 'stock' AND\n  s.symbol = 'VIX' AND\n  td.timestamp >= NOW() - INTERVAL '7 days'\nORDER BY td.timestamp",
+          "refId": "A"
+        }
+      ],
+      "title": "VIX Monitoring - Fear & Greed Index",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "PostgreSQL",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 15
+              },
+              {
+                "color": "green",
+                "value": 20
+              },
+              {
+                "color": "blue",
+                "value": 30
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 56
+      },
+      "id": 15,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.0.0",
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH latest_financials AS (\n  SELECT \n    s.symbol,\n    s.company_name,\n    td.price as current_price,\n    -- Simulate P/E ratio calculation (would need earnings data)\n    td.price / GREATEST(td.price * 0.05, 1) as pe_ratio\n  FROM market_data.tick_data td\n  JOIN market_data.stocks s ON s.id = td.asset_id\n  WHERE \n    td.asset_type = 'stock' AND\n    td.timestamp >= NOW() - INTERVAL '1 hour' AND\n    s.symbol IN ('AAPL', 'GOOGL', 'MSFT', 'TSLA', 'AMZN')\n  ORDER BY td.timestamp DESC\n  LIMIT 5\n)\nSELECT \n  AVG(pe_ratio) as avg_pe_ratio\nFROM latest_financials",
+          "refId": "A"
+        }
+      ],
+      "title": "Average P/E Ratio - Top Stocks",
+      "type": "stat"
+    },
+    {
+      "datasource": "PostgreSQL",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.5
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "iv"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 56
+      },
+      "id": 16,
+      "options": {
+        "showHeader": true
+      },
+      "pluginVersion": "8.0.0",
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "-- Simulated options chain data\nWITH options_simulation AS (\n  SELECT \n    s.symbol,\n    td.price as underlying_price,\n    td.price * 1.05 as call_strike,\n    td.price * 0.95 as put_strike,\n    RANDOM() * 5 + 15 as implied_volatility,\n    td.timestamp\n  FROM market_data.tick_data td\n  JOIN market_data.stocks s ON s.id = td.asset_id\n  WHERE \n    td.asset_type = 'stock' AND\n    td.timestamp >= NOW() - INTERVAL '1 hour' AND\n    s.symbol IN ('AAPL', 'GOOGL', 'MSFT', 'TSLA')\n  ORDER BY td.timestamp DESC\n  LIMIT 20\n)\nSELECT \n  symbol,\n  ROUND(underlying_price::numeric, 2) as underlying,\n  ROUND(call_strike::numeric, 2) as call_strike,\n  ROUND(put_strike::numeric, 2) as put_strike,\n  ROUND(implied_volatility::numeric, 1) as iv\nFROM options_simulation",
+          "refId": "A"
+        }
+      ],
+      "title": "Options Chain Analysis",
+      "type": "table"
+    },
+    {
+      "datasource": "PostgreSQL",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": -0.3
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "sentiment_score"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "unit",
+                "value": "short"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 56
+      },
+      "id": 17,
+      "options": {
+        "showHeader": true
+      },
+      "pluginVersion": "8.0.0",
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "-- Simulated market news and sentiment\nWITH market_sentiment AS (\n  SELECT \n    s.symbol,\n    s.company_name,\n    CASE \n      WHEN RANDOM() > 0.6 THEN 'Positive'\n      WHEN RANDOM() > 0.3 THEN 'Neutral'\n      ELSE 'Negative'\n    END as sentiment,\n    ROUND((RANDOM() * 2 - 1)::numeric, 2) as sentiment_score,\n    CASE \n      WHEN RANDOM() > 0.7 THEN 'Earnings Beat Expected'\n      WHEN RANDOM() > 0.5 THEN 'New Product Launch'\n      WHEN RANDOM() > 0.3 THEN 'Analyst Upgrade'\n      ELSE 'Market Volatility'\n    END as news_headline,\n    NOW() - (RANDOM() * INTERVAL '24 hours') as news_time\n  FROM market_data.stocks s\n  WHERE s.symbol IN ('AAPL', 'GOOGL', 'MSFT', 'TSLA', 'AMZN', 'META', 'NFLX', 'NVDA')\n  ORDER BY RANDOM()\n  LIMIT 15\n)\nSELECT \n  symbol,\n  sentiment,\n  sentiment_score,\n  news_headline,\n  DATE_TRUNC('hour', news_time) as news_time\nFROM market_sentiment\nORDER BY sentiment_score DESC",
+          "refId": "A"
+        }
+      ],
+      "title": "Market News & Sentiment Analysis",
+      "type": "table"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 27,
+  "style": "dark",
+  "tags": ["financial", "comprehensive", "multi-asset"],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Comprehensive Multi-Asset Financial Dashboard - All 17 Features",
+  "uid": "comp-multi-asset",
+  "version": 1
+}

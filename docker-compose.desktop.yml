@@ -1,0 +1,510 @@
+services:
+  # PostgreSQL Database - Desktop Optimized
+  postgres:
+    image: timescale/timescaledb:latest-pg15
+    container_name: stock_monitor_postgres_desktop
+    command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
+    environment:
+      POSTGRES_DB: stock_monitor
+      POSTGRES_USER: stock_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-your_postgres_password}
+      # Desktop optimizations
+      POSTGRES_INITDB_ARGS: "--data-checksums"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./docker/postgres/postgresql.desktop.conf:/etc/postgresql/postgresql.conf
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U stock_user -d stock_monitor"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+
+
+  # Redis Cache - Desktop Optimized
+  redis:
+    image: redis:7-alpine
+    container_name: stock_monitor_redis_desktop
+    command: >
+      redis-server
+      --appendonly yes
+      --maxmemory 1gb
+      --maxmemory-policy allkeys-lru
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+    volumes:
+      - redis_data:/data
+      - ./docker/redis/redis.desktop.conf:/usr/local/etc/redis/redis.conf
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.1'
+
+  # InfluxDB - Desktop Optimized
+  influxdb:
+    image: influxdb:2.7-alpine
+    container_name: stock_monitor_influxdb_desktop
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUXDB_PASSWORD:-your_influxdb_password}
+      DOCKER_INFLUXDB_INIT_ORG: stock_monitor
+      DOCKER_INFLUXDB_INIT_BUCKET: market_data
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_TOKEN:-your_influxdb_token}
+      # Desktop optimizations
+      INFLUXD_ENGINE_PATH: /var/lib/influxdb2/engine
+      INFLUXD_BOLT_PATH: /var/lib/influxdb2/influxd.bolt
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+      - ./docker/influxdb/config.desktop.yml:/etc/influxdb2/config.yml
+    ports:
+      - "8086:8086"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "influx", "ping"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.2'
+
+  # Prometheus Monitoring - Desktop Optimized
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: stock_monitor_prometheus_desktop
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=90d'
+      - '--storage.tsdb.retention.size=50GB'
+      - '--storage.tsdb.wal-compression'
+      - '--web.enable-lifecycle'
+      - '--web.enable-admin-api'
+      - '--storage.tsdb.min-block-duration=2h'
+      - '--storage.tsdb.max-block-duration=25h'
+    volumes:
+      - ./prometheus/prometheus.desktop.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+    depends_on:
+      - stock_monitor
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.1'
+
+  # Grafana Dashboards - Desktop Optimized
+  grafana:
+    image: grafana/grafana:latest
+    container_name: stock_monitor_grafana_desktop
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: false
+      GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-simple-json-datasource,grafana-worldmap-panel
+      # Desktop optimizations
+      GF_SERVER_ENABLE_GZIP: true
+      GF_ANALYTICS_REPORTING_ENABLED: false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/dashboards:/etc/grafana/dashboards
+    ports:
+      - "3005:3000"
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+      - influxdb
+      - postgres
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.1'
+
+  # Main Stock Monitor Application - Desktop Optimized
+  stock_monitor:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.desktop
+    container_name: stock_monitor_app_desktop
+    environment:
+      - CONFIG_PATH=/app/config/config.yaml
+      - PYTHONPATH=/app:/app/src
+      - PYTHONOPTIMIZE=1
+      - PYTHONDONTWRITEBYTECODE=1
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      # Desktop performance settings
+      - MAX_WORKERS=8
+      - MEMORY_LIMIT=4GB
+      - CACHE_SIZE=1GB
+      - ENABLE_GPU=false
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./cache:/app/cache
+      - ./exports:/app/exports
+    ports:
+      - "8080:8080"
+      - "8000:8000"  # Additional port for API
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: '2.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+
+  # Celery Worker for Background Tasks - Desktop Optimized
+  celery_worker:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.desktop
+    container_name: stock_monitor_celery_desktop
+    command: >
+      celery -A src.celery_app:app worker --loglevel=info --concurrency=8 --prefetch-multiplier=4 --max-tasks-per-child=1000 --optimization=fair
+    environment:
+      - CONFIG_PATH=/app/config/config.yaml
+      - PYTHONPATH=/app:/app/src
+      - PYTHONOPTIMIZE=1
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./cache:/app/cache
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      stock_monitor:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A src.celery_app:app inspect ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.2'
+
+  # Celery Beat for Scheduled Tasks - Desktop Optimized
+  celery_beat:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.desktop
+    container_name: stock_monitor_celery_beat_desktop
+    command: >
+      celery -A src.celery_app:app beat --loglevel=info --schedule=/app/celerybeat-schedule.db
+    environment:
+      - CONFIG_PATH=/app/config/config.yaml
+      - PYTHONPATH=/app:/app/src
+      - PYTHONOPTIMIZE=1
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+      - ./logs:/app/logs
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      stock_monitor:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.2'
+        reservations:
+          memory: 128M
+          cpus: '0.1'
+
+  # Flower for Celery Monitoring - Desktop Enhanced
+  flower:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.desktop
+    container_name: stock_monitor_flower_desktop
+    command: >
+      celery -A src.celery_app:app flower --port=5555 --persistent=True --db=/app/flower.db --max_tasks=10000
+    environment:
+      - CONFIG_PATH=/app/config/config.yaml
+      - PYTHONPATH=/app:/app/src
+      - FLOWER_BASIC_AUTH=admin:admin
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+    ports:
+      - "5555:5555"
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+      celery_worker:
+        condition: service_healthy
+      stock_monitor:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.2'
+
+  # Jupyter Notebook for Analysis (Desktop Exclusive)
+  jupyter:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.desktop
+    container_name: stock_monitor_jupyter
+    command: >
+      jupyter lab
+      --ip=0.0.0.0
+      --port=8888
+      --no-browser
+      --allow-root
+      --NotebookApp.token=''
+      --NotebookApp.password=''
+    environment:
+      - PYTHONPATH=/app
+      - JUPYTER_ENABLE_LAB=yes
+    volumes:
+      - ./notebooks:/app/notebooks
+      - ./data:/app/data
+      - ./config:/app/config
+      - ./src:/app/src
+    ports:
+      - "8888:8888"
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+
+  # PostgreSQL Exporter for Prometheus metrics
+  postgres_exporter:
+    image: prometheuscommunity/postgres-exporter:latest
+    container_name: stock_monitor_postgres_exporter
+    environment:
+      DATA_SOURCE_NAME: "postgresql://stock_user:stock_password@postgres:5432/stock_monitor?sslmode=disable"
+    ports:
+      - "9187:9187"
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.1'
+
+  # pgAdmin for Database Management (Desktop Exclusive)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: stock_monitor_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@stockmonitor.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./docker/pgadmin/servers.json:/pgadmin4/servers.json
+    ports:
+      - "5050:80"
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.2'
+
+  # Redis Exporter for Prometheus metrics
+  redis_exporter:
+    image: oliver006/redis_exporter:latest
+    container_name: stock_monitor_redis_exporter
+    command: ["--redis.addr=redis://redis:6379"]
+    ports:
+      - "9121:9121"
+    restart: unless-stopped
+    depends_on:
+      - redis
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.1'
+
+  # Redis Commander for Redis Management (Desktop Exclusive)
+  redis_commander:
+    image: rediscommander/redis-commander:latest
+    container_name: stock_monitor_redis_commander
+    environment:
+      REDIS_HOSTS: local:redis:6379
+      HTTP_USER: admin
+      HTTP_PASSWORD: admin
+    ports:
+      - "8081:8081"
+    restart: unless-stopped
+    depends_on:
+      - redis
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.1'
+
+  # Nginx Reverse Proxy - Desktop Enhanced
+  nginx:
+    image: nginx:alpine
+    container_name: stock_monitor_nginx_desktop
+    volumes:
+      - ./docker/nginx/nginx.desktop.conf:/etc/nginx/nginx.conf
+      - ./docker/nginx/ssl:/etc/nginx/ssl
+      - ./static:/var/www/html/static
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: unless-stopped
+    depends_on:
+      - stock_monitor
+      - grafana
+      - jupyter
+      - pgadmin
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.2'
+
+  # Elasticsearch for Log Analysis (Desktop Exclusive)
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: stock_monitor_elasticsearch
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - xpack.security.enabled=false
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+
+  # Kibana for Log Visualization (Desktop Exclusive)
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    container_name: stock_monitor_kibana
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    restart: unless-stopped
+    depends_on:
+      - elasticsearch
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  influxdb_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+  elasticsearch_data:
+    driver: local
+
+networks:
+  default:
+    name: stock_monitor_desktop_network
+    driver: bridge
+    ipam:
+      config:
+        - subnet: "172.20.0.0/16"

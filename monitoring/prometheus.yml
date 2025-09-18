@@ -1,0 +1,90 @@
+# Prometheus Configuration for Financial Monitoring System
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'financial-monitoring'
+    environment: 'production'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'
+rule_files:
+  - "alert_rules.yml"
+
+# Scrape configuration
+scrape_configs:
+  # Financial monitoring application
+  - job_name: 'financial-monitor'
+    static_configs:
+      - targets: ['localhost:8000']
+    scrape_interval: 5s
+    metrics_path: /metrics
+    scrape_timeout: 4s
+
+  # System metrics
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['localhost:9100']
+    scrape_interval: 10s
+
+  # Redis metrics
+  - job_name: 'redis-exporter'
+    static_configs:
+      - targets: ['localhost:9121']
+    scrape_interval: 10s
+
+  # PostgreSQL metrics
+  - job_name: 'postgres-exporter'
+    static_configs:
+      - targets: ['localhost:9187']
+    scrape_interval: 15s
+
+  # InfluxDB metrics
+  - job_name: 'influxdb'
+    static_configs:
+      - targets: ['localhost:8086']
+    scrape_interval: 15s
+    metrics_path: /metrics
+
+  # Custom financial metrics
+  - job_name: 'financial-metrics'
+    static_configs:
+      - targets: ['localhost:8001']
+    scrape_interval: 1s  # High frequency for financial data
+    metrics_path: /financial-metrics
+    scrape_timeout: 500ms
+
+  # Risk analytics metrics
+  - job_name: 'risk-metrics'
+    static_configs:
+      - targets: ['localhost:8002']
+    scrape_interval: 30s
+    metrics_path: /risk-metrics
+
+  # P&L engine metrics
+  - job_name: 'pnl-metrics'
+    static_configs:
+      - targets: ['localhost:8003']
+    scrape_interval: 10s
+    metrics_path: /pnl-metrics
+
+# Remote write configuration for long-term storage
+remote_write:
+  - url: "http://localhost:8086/api/v1/prom/write?db=financial_metrics"
+    queue_config:
+      max_samples_per_send: 1000
+      max_shards: 200
+      capacity: 2500
+
+# Storage configuration
+storage:
+  tsdb:
+    retention.time: 30d
+    retention.size: 50GB
+    wal-compression: true

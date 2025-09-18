@@ -1,0 +1,235 @@
+{
+  "datasource": {
+    "type": "postgres",
+    "uid": "postgres-datasource"
+  },
+  "fieldConfig": {
+    "defaults": {
+      "color": {
+        "mode": "thresholds"
+      },
+      "custom": {
+        "align": "auto",
+        "displayMode": "color-background",
+        "inspect": false,
+        "minWidth": 50
+      },
+      "decimals": 2,
+      "mappings": [],
+      "thresholds": {
+        "mode": "absolute",
+        "steps": [
+          {
+            "color": "blue",
+            "value": null
+          },
+          {
+            "color": "green", 
+            "value": 0.25
+          },
+          {
+            "color": "yellow",
+            "value": 0.75
+          },
+          {
+            "color": "red",
+            "value": 1.5
+          }
+        ]
+      },
+      "unit": "percent"
+    },
+    "overrides": [
+      {
+        "matcher": {
+          "id": "byRegexp",
+          "options": "value_.*"
+        },
+        "properties": [
+          {
+            "id": "custom.displayMode",
+            "value": "basic"
+          },
+          {
+            "id": "thresholds",
+            "value": {
+              "mode": "absolute", 
+              "steps": [
+                {
+                  "color": "transparent",
+                  "value": null
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "matcher": {
+          "id": "byName",
+          "options": "value_1m"
+        },
+        "properties": [
+          {
+            "id": "custom.displayMode",
+            "value": "color-background"
+          },
+          {
+            "id": "color",
+            "value": {
+              "mode": "value",
+              "field": "dev_1m"
+            }
+          }
+        ]
+      },
+      {
+        "matcher": {
+          "id": "byName",
+          "options": "value_6m"
+        },
+        "properties": [
+          {
+            "id": "custom.displayMode",
+            "value": "color-background"
+          },
+          {
+            "id": "color",
+            "value": {
+              "mode": "value",
+              "field": "dev_6m"
+            }
+          }
+        ]
+      },
+      {
+        "matcher": {
+          "id": "byName",
+          "options": "value_12m"
+        },
+        "properties": [
+          {
+            "id": "custom.displayMode",
+            "value": "color-background"
+          },
+          {
+            "id": "color",
+            "value": {
+              "mode": "value",
+              "field": "dev_12m"
+            }
+          }
+        ]
+      },
+      {
+        "matcher": {
+          "id": "byName",
+          "options": "value_3y"
+        },
+        "properties": [
+          {
+            "id": "custom.displayMode",
+            "value": "color-background"
+          },
+          {
+            "id": "color",
+            "value": {
+              "mode": "value",
+              "field": "dev_3y"
+            }
+          }
+        ]
+      },
+      {
+        "matcher": {
+          "id": "byName",
+          "options": "value_5y"
+        },
+        "properties": [
+          {
+            "id": "custom.displayMode",
+            "value": "color-background"
+          },
+          {
+            "id": "color",
+            "value": {
+              "mode": "value",
+              "field": "dev_5y"
+            }
+          }
+        ]
+      },
+      {
+        "matcher": {
+          "id": "byName",
+          "options": "value_10y"
+        },
+        "properties": [
+          {
+            "id": "custom.displayMode",
+            "value": "color-background"
+          },
+          {
+            "id": "color",
+            "value": {
+              "mode": "value",
+              "field": "dev_10y"
+            }
+          }
+        ]
+      },
+      {
+        "matcher": {
+          "id": "byRegexp",
+          "options": "dev_.*"
+        },
+        "properties": [
+          {
+            "id": "custom.hidden",
+            "value": true
+          }
+        ]
+      }
+    ]
+  },
+  "gridPos": {
+    "h": 8,
+    "w": 12,
+    "x": 12,
+    "y": 24
+  },
+  "id": 11,
+  "options": {
+    "cellHeight": "sm",
+    "footer": {
+      "countRows": false,
+      "fields": "",
+      "reducer": [
+        "sum"
+      ],
+      "show": false
+    },
+    "showHeader": true,
+    "sortBy": [
+      {
+        "desc": false,
+        "displayName": "indicator"
+      }
+    ]
+  },
+  "pluginVersion": "10.2.0",
+  "title": "Economic Indicators Multi-Period Analysis (FRED)",
+  "type": "table",
+  "targets": [
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "format": "table",
+      "rawQuery": true,
+      "rawSql": "-- Economic Indicators Multi-Period Analysis with Distance-to-Target\n-- Following the FRED specification with proper deviation calculations\n\nWITH base_data AS (\n  -- Get latest data for each series\n  SELECT DISTINCT ON (series_id) \n    series_id, \n    observation_date, \n    value\n  FROM economic_data.fred_data \n  WHERE observation_date <= CURRENT_DATE\n  ORDER BY series_id, observation_date DESC\n),\n\n-- Calculate YoY metrics and deviations\ncpi_metrics AS (\n  SELECT \n    d1.observation_date,\n    -- CPI YoY calculation\n    100 * (d1.value / d12.value - 1) as cpi_yoy,\n    -- CPI deviation from 2.0% target\n    ABS(100 * (d1.value / d12.value - 1) - 2.0) as cpi_dev\n  FROM economic_data.fred_data d1\n  JOIN economic_data.fred_data d12 ON \n    d1.series_id = d12.series_id AND \n    d12.observation_date = d1.observation_date - INTERVAL '12 months'\n  WHERE d1.series_id = 'CPIAUCSL'\n    AND d1.observation_date >= '2020-01-01'\n),\n\ncore_pce_metrics AS (\n  SELECT \n    d1.observation_date,\n    100 * (d1.value / d12.value - 1) as core_pce_yoy\n  FROM economic_data.fred_data d1\n  JOIN economic_data.fred_data d12 ON \n    d1.series_id = d12.series_id AND \n    d12.observation_date = d1.observation_date - INTERVAL '12 months'\n  WHERE d1.series_id = 'PCEPILFE'\n    AND d1.observation_date >= '2020-01-01'\n),\n\nfed_funds_metrics AS (\n  SELECT \n    observation_date,\n    value as fed_funds_level\n  FROM economic_data.fred_data \n  WHERE series_id = 'FEDFUNDS'\n    AND observation_date >= '2020-01-01'\n),\n\ncombined_metrics AS (\n  SELECT \n    c.observation_date,\n    c.cpi_yoy,\n    c.cpi_dev,\n    p.core_pce_yoy,\n    f.fed_funds_level,\n    -- Real Fed Funds Rate = Nominal - Core PCE\n    f.fed_funds_level - p.core_pce_yoy as real_ffr,\n    -- Real FFR deviation from 1.0% target\n    ABS(f.fed_funds_level - p.core_pce_yoy - 1.0) as rffr_dev\n  FROM cpi_metrics c\n  JOIN core_pce_metrics p ON c.observation_date = p.observation_date\n  JOIN fed_funds_metrics f ON c.observation_date = f.observation_date\n),\n\nunemployment_metrics AS (\n  SELECT \n    observation_date,\n    value as unemployment_rate,\n    -- Unemployment deviation from 4.0% target\n    ABS(value - 4.0) as u3_dev\n  FROM economic_data.fred_data \n  WHERE series_id = 'UNRATE'\n    AND observation_date >= '2020-01-01'\n),\n\ngdp_metrics AS (\n  SELECT \n    observation_date,\n    value as gdp_yoy,\n    -- GDP deviation from 2.0% target\n    ABS(value - 2.0) as gdp_dev\n  FROM economic_data.fred_data \n  WHERE series_id = 'A191RL1Q225SBEA'\n    AND observation_date >= '2020-01-01'\n),\n\n-- Calculate trailing averages for each metric\ncpi_periods AS (\n  SELECT \n    'CPI Inflation YoY' as indicator,\n    ROUND(AVG(cpi_yoy) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '1 month'), 2) as value_1m,\n    ROUND(AVG(cpi_yoy) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '6 months'), 2) as value_6m,\n    ROUND(AVG(cpi_yoy) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '12 months'), 2) as value_12m,\n    ROUND(AVG(cpi_yoy) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '3 years'), 2) as value_3y,\n    ROUND(AVG(cpi_yoy) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '5 years'), 2) as value_5y,\n    ROUND(AVG(cpi_yoy) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '10 years'), 2) as value_10y,\n    -- Deviation averages\n    ROUND(AVG(cpi_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '1 month'), 2) as dev_1m,\n    ROUND(AVG(cpi_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '6 months'), 2) as dev_6m,\n    ROUND(AVG(cpi_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '12 months'), 2) as dev_12m,\n    ROUND(AVG(cpi_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '3 years'), 2) as dev_3y,\n    ROUND(AVG(cpi_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '5 years'), 2) as dev_5y,\n    ROUND(AVG(cpi_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '10 years'), 2) as dev_10y\n  FROM combined_metrics\n),\n\nrffr_periods AS (\n  SELECT \n    'Real Fed Funds Rate' as indicator,\n    ROUND(AVG(real_ffr) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '1 month'), 2) as value_1m,\n    ROUND(AVG(real_ffr) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '6 months'), 2) as value_6m,\n    ROUND(AVG(real_ffr) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '12 months'), 2) as value_12m,\n    ROUND(AVG(real_ffr) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '3 years'), 2) as value_3y,\n    ROUND(AVG(real_ffr) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '5 years'), 2) as value_5y,\n    ROUND(AVG(real_ffr) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '10 years'), 2) as value_10y,\n    -- Deviation averages  \n    ROUND(AVG(rffr_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '1 month'), 2) as dev_1m,\n    ROUND(AVG(rffr_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '6 months'), 2) as dev_6m,\n    ROUND(AVG(rffr_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '12 months'), 2) as dev_12m,\n    ROUND(AVG(rffr_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '3 years'), 2) as dev_3y,\n    ROUND(AVG(rffr_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '5 years'), 2) as dev_5y,\n    ROUND(AVG(rffr_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '10 years'), 2) as dev_10y\n  FROM combined_metrics\n),\n\nunemployment_periods AS (\n  SELECT \n    'Unemployment Rate (U-3)' as indicator,\n    ROUND(AVG(unemployment_rate) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '1 month'), 2) as value_1m,\n    ROUND(AVG(unemployment_rate) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '6 months'), 2) as value_6m,\n    ROUND(AVG(unemployment_rate) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '12 months'), 2) as value_12m,\n    ROUND(AVG(unemployment_rate) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '3 years'), 2) as value_3y,\n    ROUND(AVG(unemployment_rate) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '5 years'), 2) as value_5y,\n    ROUND(AVG(unemployment_rate) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '10 years'), 2) as value_10y,\n    -- Deviation averages\n    ROUND(AVG(u3_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '1 month'), 2) as dev_1m,\n    ROUND(AVG(u3_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '6 months'), 2) as dev_6m,\n    ROUND(AVG(u3_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '12 months'), 2) as dev_12m,\n    ROUND(AVG(u3_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '3 years'), 2) as dev_3y,\n    ROUND(AVG(u3_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '5 years'), 2) as dev_5y,\n    ROUND(AVG(u3_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '10 years'), 2) as dev_10y\n  FROM unemployment_metrics\n),\n\ngdp_periods AS (\n  SELECT \n    'GDP Growth YoY' as indicator,\n    ROUND(AVG(gdp_yoy) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '3 months'), 2) as value_1m,  -- 1q\n    ROUND(AVG(gdp_yoy) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '6 months'), 2) as value_6m,  -- 2q\n    ROUND(AVG(gdp_yoy) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '12 months'), 2) as value_12m, -- 4q\n    ROUND(AVG(gdp_yoy) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '3 years'), 2) as value_3y,   -- 12q\n    ROUND(AVG(gdp_yoy) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '5 years'), 2) as value_5y,   -- 20q\n    ROUND(AVG(gdp_yoy) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '10 years'), 2) as value_10y, -- 40q\n    -- Deviation averages\n    ROUND(AVG(gdp_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '3 months'), 2) as dev_1m,\n    ROUND(AVG(gdp_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '6 months'), 2) as dev_6m,\n    ROUND(AVG(gdp_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '12 months'), 2) as dev_12m,\n    ROUND(AVG(gdp_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '3 years'), 2) as dev_3y,\n    ROUND(AVG(gdp_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '5 years'), 2) as dev_5y,\n    ROUND(AVG(gdp_dev) FILTER (WHERE observation_date >= CURRENT_DATE - INTERVAL '10 years'), 2) as dev_10y\n  FROM gdp_metrics\n)\n\n-- Combine all indicators\nSELECT indicator, value_1m, value_6m, value_12m, value_3y, value_5y, value_10y,\n       dev_1m, dev_6m, dev_12m, dev_3y, dev_5y, dev_10y\nFROM cpi_periods\nUNION ALL\nSELECT indicator, value_1m, value_6m, value_12m, value_3y, value_5y, value_10y,\n       dev_1m, dev_6m, dev_12m, dev_3y, dev_5y, dev_10y  \nFROM rffr_periods\nUNION ALL\nSELECT indicator, value_1m, value_6m, value_12m, value_3y, value_5y, value_10y,\n       dev_1m, dev_6m, dev_12m, dev_3y, dev_5y, dev_10y\nFROM unemployment_periods  \nUNION ALL\nSELECT indicator, value_1m, value_6m, value_12m, value_3y, value_5y, value_10y,\n       dev_1m, dev_6m, dev_12m, dev_3y, dev_5y, dev_10y\nFROM gdp_periods\nORDER BY indicator",
+      "refId": "A"
+    }
+  ]
+}

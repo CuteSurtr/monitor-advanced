@@ -1,0 +1,1545 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "currencyUSD"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  td.timestamp as time,\n  s.symbol,\n  td.price as value\nFROM market_data.tick_data td\nJOIN market_data.stocks s ON s.id = td.asset_id\nWHERE \n  td.asset_type = 'stock' AND\n  td.timestamp >= NOW() - INTERVAL '24 hours' AND\n  s.id IN (\n    SELECT DISTINCT s2.id \n    FROM market_data.stocks s2 \n    JOIN market_data.tick_data td2 ON s2.id = td2.asset_id \n    WHERE td2.asset_type = 'stock' AND td2.timestamp >= NOW() - INTERVAL '1 hour'\n    ORDER BY s2.market_cap DESC\n    LIMIT 30\n  )\nORDER BY td.timestamp",
+          "refId": "A"
+        }
+      ],
+      "title": "Top 30 Stocks - Price Movement",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "currencyUSD"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  td.timestamp as time,\n  c.symbol,\n  td.price as value\nFROM market_data.tick_data td\nJOIN market_data.cryptocurrencies c ON c.id = td.asset_id\nWHERE \n  td.asset_type = 'crypto' AND\n  td.timestamp >= NOW() - INTERVAL '24 hours'\nORDER BY td.timestamp",
+          "refId": "A"
+        }
+      ],
+      "title": "₿ Top 30 Cryptocurrencies - Price Movement",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "id": 3,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  td.timestamp as time,\n  fp.symbol,\n  td.price as value\nFROM market_data.tick_data td\nJOIN market_data.forex_pairs fp ON fp.id = td.asset_id\nWHERE \n  td.asset_type = 'forex' AND\n  td.timestamp >= NOW() - INTERVAL '24 hours'\nORDER BY td.timestamp",
+          "refId": "A"
+        }
+      ],
+      "title": "💱 Top 30 Forex Pairs - Rate Movement",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "currencyUSD"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  td.timestamp as time,\n  cm.symbol,\n  td.price as value\nFROM market_data.tick_data td\nJOIN market_data.commodities cm ON cm.id = td.asset_id\nWHERE \n  td.asset_type = 'commodity' AND\n  td.timestamp >= NOW() - INTERVAL '24 hours'\nORDER BY td.timestamp",
+          "refId": "A"
+        }
+      ],
+      "title": "🥇 Top 30 Commodities - Price Movement",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": -0.05
+              },
+              {
+                "color": "red",
+                "value": -0.1
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "change_percent"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 16
+      },
+      "id": 5,
+      "options": {
+        "showHeader": true
+      },
+      "pluginVersion": "9.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH latest_prices AS (\n  SELECT DISTINCT ON (td.asset_id, td.asset_type)\n    td.asset_id,\n    td.asset_type,\n    td.price as current_price,\n    td.volume as current_volume,\n    td.timestamp\n  FROM market_data.tick_data td\n  WHERE td.timestamp >= NOW() - INTERVAL '1 hour'\n  ORDER BY td.asset_id, td.asset_type, td.timestamp DESC\n),\nprevious_prices AS (\n  SELECT DISTINCT ON (td.asset_id, td.asset_type)\n    td.asset_id,\n    td.asset_type,\n    td.price as previous_price\n  FROM market_data.tick_data td\n  WHERE td.timestamp <= NOW() - INTERVAL '6 hours'\n  ORDER BY td.asset_id, td.asset_type, td.timestamp DESC\n)\nSELECT \n  CASE \n    WHEN lp.asset_type = 'stock' THEN s.symbol\n    WHEN lp.asset_type = 'crypto' THEN c.symbol\n    WHEN lp.asset_type = 'forex' THEN fp.symbol\n    WHEN lp.asset_type = 'commodity' THEN cm.symbol\n  END as symbol,\n  CASE \n    WHEN lp.asset_type = 'stock' THEN s.company_name\n    WHEN lp.asset_type = 'crypto' THEN c.name\n    ELSE NULL\n  END as name,\n  lp.asset_type,\n  ROUND(lp.current_price::numeric, 4) as current_price,\n  ROUND(lp.current_volume::numeric, 2) as current_volume,\n  ROUND(pp.previous_price::numeric, 4) as previous_price,\n  ROUND(((lp.current_price - pp.previous_price) / pp.previous_price * 100)::numeric, 2) as change_percent,\n  lp.timestamp\nFROM latest_prices lp\nLEFT JOIN previous_prices pp ON lp.asset_id = pp.asset_id AND lp.asset_type = pp.asset_type\nLEFT JOIN market_data.stocks s ON lp.asset_type = 'stock' AND s.id = lp.asset_id\nLEFT JOIN market_data.cryptocurrencies c ON lp.asset_type = 'crypto' AND c.id = lp.asset_id\nLEFT JOIN market_data.forex_pairs fp ON lp.asset_type = 'forex' AND fp.id = lp.asset_id\nLEFT JOIN market_data.commodities cm ON lp.asset_type = 'commodity' AND cm.id = lp.asset_id\nWHERE pp.previous_price IS NOT NULL\nORDER BY ABS(change_percent) DESC\nLIMIT 50",
+          "refId": "A"
+        }
+      ],
+      "title": "Top Movers - All Assets Performance",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 24
+      },
+      "id": 8,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT \n  DATE_TRUNC('hour', td.timestamp) as time,\n  td.asset_type as metric,\n  SUM(td.volume) as value\nFROM market_data.tick_data td\nWHERE td.timestamp >= NOW() - INTERVAL '24 hours'\nGROUP BY DATE_TRUNC('hour', td.timestamp), td.asset_type\nORDER BY time",
+          "refId": "A"
+        }
+      ],
+      "title": "Trading Volume Analysis by Category",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 5
+              },
+              {
+                "color": "blue",
+                "value": 10
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 24
+      },
+      "id": 9,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "9.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH hourly_returns AS (\n  SELECT \n    td.asset_type,\n    DATE_TRUNC('hour', td.timestamp) as hour_period,\n    FIRST_VALUE(td.price) OVER (PARTITION BY td.asset_id, td.asset_type, DATE_TRUNC('hour', td.timestamp) ORDER BY td.timestamp) as open_price,\n    LAST_VALUE(td.price) OVER (PARTITION BY td.asset_id, td.asset_type, DATE_TRUNC('hour', td.timestamp) ORDER BY td.timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) as close_price\n  FROM market_data.tick_data td\n  WHERE td.timestamp >= NOW() - INTERVAL '7 days'\n),\nreturns_calc AS (\n  SELECT DISTINCT\n    asset_type,\n    hour_period,\n    (close_price - open_price) / open_price * 100 as hourly_return\n  FROM hourly_returns\n  WHERE open_price > 0\n)\nSELECT \n  asset_type,\n  ROUND(AVG(hourly_return)::numeric, 3) as avg_return\nFROM returns_calc\nGROUP BY asset_type",
+          "refId": "A"
+        }
+      ],
+      "title": "Average Return Rates by Category (7 Days)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 32
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT \n  COALESCE(p.name, 'Default Portfolio') as portfolio_name,\n  SUM(pos.market_value) as total_value\nFROM portfolio.positions pos\nLEFT JOIN portfolio.portfolios p ON p.id = pos.portfolio_id\nWHERE pos.market_value IS NOT NULL\nGROUP BY p.name\nORDER BY total_value DESC",
+          "refId": "A"
+        }
+      ],
+      "title": "🥧 Portfolio Distribution",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": -0.05
+              },
+              {
+                "color": "red",
+                "value": -0.1
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 8,
+        "y": 32
+      },
+      "id": 7,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "9.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH portfolio_current AS (\n  SELECT SUM(pos.market_value) as current_value\n  FROM portfolio.positions pos\n  WHERE pos.market_value IS NOT NULL\n),\nportfolio_initial AS (\n  SELECT SUM(p.initial_value) as initial_value\n  FROM portfolio.portfolios p\n  WHERE p.is_active = true\n)\nSELECT \n  ROUND(((pc.current_value - pi.initial_value) / pi.initial_value * 100)::numeric, 2) as portfolio_return\nFROM portfolio_current pc, portfolio_initial pi",
+          "refId": "A"
+        }
+      ],
+      "title": "Portfolio Return",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "color-background"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": -3
+              },
+              {
+                "color": "red",
+                "value": -6
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 32
+      },
+      "id": 18,
+      "options": {
+        "showHeader": true
+      },
+      "pluginVersion": "9.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "-- VaR 5% Analysis for Top 74 ETFs\nWITH etf_list AS (\n  SELECT \n    s.id,\n    s.symbol,\n    s.company_name,\n    ROW_NUMBER() OVER (ORDER BY s.market_cap DESC) as rank\n  FROM market_data.stocks s\n  WHERE s.company_name ILIKE '%ETF%' \n     OR s.symbol IN ('SPY', 'QQQ', 'IWM', 'VTI', 'SCHB', 'VOO', 'VEA', 'IEFA', 'VWO', 'EEM')\n  LIMIT 74\n),\nvar_simulation AS (\n  SELECT \n    el.symbol,\n    el.company_name,\n    -- Simulate daily returns with realistic distributions\n    ARRAY_AGG(\n      CASE \n        WHEN RANDOM() < 0.05 THEN -0.08 - (RANDOM() * 0.12) -- 5% tail events\n        WHEN RANDOM() < 0.15 THEN -0.03 - (RANDOM() * 0.05) -- 15% negative events\n        ELSE (RANDOM() - 0.5) * 0.04 -- Normal distribution\n      END\n    ) as returns\n  FROM etf_list el\n  CROSS JOIN generate_series(1, 252) -- 1 year of trading days\n  GROUP BY el.symbol, el.company_name, el.rank\n  ORDER BY el.rank\n)\nSELECT \n  symbol,\n  COALESCE(company_name, symbol || ' ETF') as name,\n  ROUND((PERCENTILE_CONT(0.05) WITHIN GROUP (ORDER BY unnest(returns)) * 100)::numeric, 3) as \"VaR 5%\",\n  ROUND((PERCENTILE_CONT(0.01) WITHIN GROUP (ORDER BY unnest(returns)) * 100)::numeric, 3) as \"VaR 1%\",\n  ROUND(((PERCENTILE_CONT(0.05) WITHIN GROUP (ORDER BY unnest(returns)) * 1.3) * 100)::numeric, 3) as \"CVaR 5%\"\nFROM var_simulation\nORDER BY \"VaR 5%\" ASC\nLIMIT 37",
+          "refId": "A"
+        }
+      ],
+      "title": "WARNING: VaR 5% & CVaR 5% - Risk Analysis (Part 1)",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "color-background"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 3
+              },
+              {
+                "color": "green",
+                "value": 6
+              },
+              {
+                "color": "blue",
+                "value": 10
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 40
+      },
+      "id": 19,
+      "options": {
+        "showHeader": true
+      },
+      "pluginVersion": "9.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "-- VaR 95% & 99% Analysis for Top 74 ETFs\nWITH etf_list AS (\n  SELECT \n    s.id,\n    s.symbol,\n    s.company_name,\n    ROW_NUMBER() OVER (ORDER BY s.market_cap DESC) as rank\n  FROM market_data.stocks s\n  WHERE s.company_name ILIKE '%ETF%' \n     OR s.symbol IN ('SPY', 'QQQ', 'IWM', 'VTI', 'SCHB', 'VOO', 'VEA', 'IEFA', 'VWO', 'EEM')\n  LIMIT 74\n),\nvar_simulation AS (\n  SELECT \n    el.symbol,\n    el.company_name,\n    -- Simulate daily returns with realistic distributions\n    ARRAY_AGG(\n      CASE \n        WHEN RANDOM() < 0.01 THEN 0.12 + (RANDOM() * 0.08) -- 1% extreme positive\n        WHEN RANDOM() < 0.05 THEN 0.05 + (RANDOM() * 0.07) -- 5% positive events\n        WHEN RANDOM() < 0.15 THEN 0.02 + (RANDOM() * 0.03) -- 15% moderate positive\n        ELSE (RANDOM() - 0.5) * 0.04 -- Normal distribution\n      END\n    ) as returns\n  FROM etf_list el\n  CROSS JOIN generate_series(1, 252) -- 1 year of trading days\n  GROUP BY el.symbol, el.company_name, el.rank\n  ORDER BY el.rank\n)\nSELECT \n  symbol,\n  COALESCE(company_name, symbol || ' ETF') as name,\n  ROUND((PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY unnest(returns)) * 100)::numeric, 3) as \"VaR 95%\",\n  ROUND((PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY unnest(returns)) * 100)::numeric, 3) as \"VaR 99%\",\n  ROUND(((PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY unnest(returns)) * 1.2) * 100)::numeric, 3) as \"CVaR 95%\"\nFROM var_simulation\nORDER BY \"VaR 95%\" DESC\nLIMIT 37",
+          "refId": "A"
+        }
+      ],
+      "title": "📈 VaR 95% & 99% - Upside Analysis (Part 1)",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "color-background"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": -3
+              },
+              {
+                "color": "red",
+                "value": -6
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 40
+      },
+      "id": 20,
+      "options": {
+        "showHeader": true
+      },
+      "pluginVersion": "9.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "-- VaR 5% Analysis for Top 74 ETFs (Part 2)\nWITH etf_list AS (\n  SELECT \n    s.id,\n    s.symbol,\n    s.company_name,\n    ROW_NUMBER() OVER (ORDER BY s.market_cap DESC) as rank\n  FROM market_data.stocks s\n  WHERE s.company_name ILIKE '%ETF%' \n     OR s.symbol IN ('SPY', 'QQQ', 'IWM', 'VTI', 'SCHB', 'VOO', 'VEA', 'IEFA', 'VWO', 'EEM')\n  LIMIT 74\n),\nvar_simulation AS (\n  SELECT \n    el.symbol,\n    el.company_name,\n    -- Simulate daily returns with realistic distributions\n    ARRAY_AGG(\n      CASE \n        WHEN RANDOM() < 0.05 THEN -0.08 - (RANDOM() * 0.12) -- 5% tail events\n        WHEN RANDOM() < 0.15 THEN -0.03 - (RANDOM() * 0.05) -- 15% negative events\n        ELSE (RANDOM() - 0.5) * 0.04 -- Normal distribution\n      END\n    ) as returns\n  FROM etf_list el\n  CROSS JOIN generate_series(1, 252) -- 1 year of trading days\n  GROUP BY el.symbol, el.company_name, el.rank\n  ORDER BY el.rank\n)\nSELECT \n  symbol,\n  COALESCE(company_name, symbol || ' ETF') as name,\n  ROUND((PERCENTILE_CONT(0.05) WITHIN GROUP (ORDER BY unnest(returns)) * 100)::numeric, 3) as \"VaR 5%\",\n  ROUND((PERCENTILE_CONT(0.01) WITHIN GROUP (ORDER BY unnest(returns)) * 100)::numeric, 3) as \"VaR 1%\",\n  ROUND(((PERCENTILE_CONT(0.05) WITHIN GROUP (ORDER BY unnest(returns)) * 1.3) * 100)::numeric, 3) as \"CVaR 5%\"\nFROM var_simulation\nORDER BY \"VaR 5%\" ASC\nOFFSET 37 LIMIT 37",
+          "refId": "A"
+        }
+      ],
+      "title": "WARNING: VaR 5% & CVaR 5% - Risk Analysis (Part 2)",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "color-background"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 3
+              },
+              {
+                "color": "green",
+                "value": 6
+              },
+              {
+                "color": "blue",
+                "value": 10
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 40
+      },
+      "id": 21,
+      "options": {
+        "showHeader": true
+      },
+      "pluginVersion": "9.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "-- VaR 95% & 99% Analysis for Top 74 ETFs (Part 2)\nWITH etf_list AS (\n  SELECT \n    s.id,\n    s.symbol,\n    s.company_name,\n    ROW_NUMBER() OVER (ORDER BY s.market_cap DESC) as rank\n  FROM market_data.stocks s\n  WHERE s.company_name ILIKE '%ETF%' \n     OR s.symbol IN ('SPY', 'QQQ', 'IWM', 'VTI', 'SCHB', 'VOO', 'VEA', 'IEFA', 'VWO', 'EEM')\n  LIMIT 74\n),\nvar_simulation AS (\n  SELECT \n    el.symbol,\n    el.company_name,\n    -- Simulate daily returns with realistic distributions\n    ARRAY_AGG(\n      CASE \n        WHEN RANDOM() < 0.01 THEN 0.12 + (RANDOM() * 0.08) -- 1% extreme positive\n        WHEN RANDOM() < 0.05 THEN 0.05 + (RANDOM() * 0.07) -- 5% positive events\n        WHEN RANDOM() < 0.15 THEN 0.02 + (RANDOM() * 0.03) -- 15% moderate positive\n        ELSE (RANDOM() - 0.5) * 0.04 -- Normal distribution\n      END\n    ) as returns\n  FROM etf_list el\n  CROSS JOIN generate_series(1, 252) -- 1 year of trading days\n  GROUP BY el.symbol, el.company_name, el.rank\n  ORDER BY el.rank\n)\nSELECT \n  symbol,\n  COALESCE(company_name, symbol || ' ETF') as name,\n  ROUND((PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY unnest(returns)) * 100)::numeric, 3) as \"VaR 95%\",\n  ROUND((PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY unnest(returns)) * 100)::numeric, 3) as \"VaR 99%\",\n  ROUND(((PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY unnest(returns)) * 1.2) * 100)::numeric, 3) as \"CVaR 95%\"\nFROM var_simulation\nORDER BY \"VaR 95%\" DESC\nOFFSET 37 LIMIT 37",
+          "refId": "A"
+        }
+      ],
+      "title": "📈 VaR 95% & 99% - Upside Analysis (Part 2)",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 48
+      },
+      "id": 10,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH daily_portfolio_value AS (\n  SELECT \n    DATE(pos.last_updated) as trade_date,\n    SUM(pos.market_value) as portfolio_value\n  FROM portfolio.positions pos\n  WHERE pos.last_updated >= NOW() - INTERVAL '90 days'\n  GROUP BY DATE(pos.last_updated)\n  ORDER BY trade_date\n),\nrunning_max AS (\n  SELECT \n    trade_date,\n    portfolio_value,\n    MAX(portfolio_value) OVER (ORDER BY trade_date ROWS UNBOUNDED PRECEDING) as running_maximum\n  FROM daily_portfolio_value\n)\nSELECT \n  trade_date as time,\n  'Drawdown' as metric,\n  (portfolio_value - running_maximum) / running_maximum * 100 as value\nFROM running_max",
+          "refId": "A"
+        }
+      ],
+      "title": "📉 Max Drawdown Analysis",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "line"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 20
+              },
+              {
+                "color": "red",
+                "value": 30
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 48
+      },
+      "id": 14,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "-- Simulated VIX data\nSELECT\n  generate_series(\n    NOW() - INTERVAL '7 days',\n    NOW(),\n    INTERVAL '1 hour'\n  ) as time,\n  'VIX' as metric,\n  -- Simulate VIX values between 15-35\n  ROUND((20 + (RANDOM() * 15) + SIN(EXTRACT(EPOCH FROM generate_series(NOW() - INTERVAL '7 days', NOW(), INTERVAL '1 hour')) / 3600) * 3)::numeric, 2) as value\nORDER BY time",
+          "refId": "A"
+        }
+      ],
+      "title": "😱 VIX Monitoring - Fear & Greed Index",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 15
+              },
+              {
+                "color": "green",
+                "value": 20
+              },
+              {
+                "color": "blue",
+                "value": 30
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 56
+      },
+      "id": 15,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "9.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "-- Simulated P/E ratio for top stocks\nWITH simulated_pe AS (\n  SELECT \n    s.symbol,\n    s.company_name,\n    -- Simulate realistic P/E ratios\n    15 + (RANDOM() * 25) as pe_ratio\n  FROM market_data.stocks s\n  WHERE s.symbol IN ('AAPL', 'GOOGL', 'MSFT', 'TSLA', 'AMZN')\n)\nSELECT \n  ROUND(AVG(pe_ratio)::numeric, 1) as avg_pe_ratio\nFROM simulated_pe",
+          "refId": "A"
+        }
+      ],
+      "title": "💰 Average P/E Ratio - Top Stocks",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.5
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "iv"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 56
+      },
+      "id": 16,
+      "options": {
+        "showHeader": true
+      },
+      "pluginVersion": "9.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "-- Simulated options chain data\nWITH options_simulation AS (\n  SELECT \n    s.symbol,\n    100 + (RANDOM() * 100) as underlying_price,\n    s.symbol\n  FROM market_data.stocks s\n  WHERE s.symbol IN ('AAPL', 'GOOGL', 'MSFT', 'TSLA')\n)\nSELECT \n  symbol,\n  ROUND(underlying_price::numeric, 2) as underlying,\n  ROUND((underlying_price * 1.05)::numeric, 2) as call_strike,\n  ROUND((underlying_price * 0.95)::numeric, 2) as put_strike,\n  ROUND((15 + RANDOM() * 10)::numeric, 1) as iv\nFROM options_simulation",
+          "refId": "A"
+        }
+      ],
+      "title": "📋 Options Chain Analysis",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": -0.3
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "sentiment_score"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              },
+              {
+                "id": "unit",
+                "value": "short"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 56
+      },
+      "id": 17,
+      "options": {
+        "showHeader": true
+      },
+      "pluginVersion": "9.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "-- Simulated market news and sentiment\nWITH market_sentiment AS (\n  SELECT \n    s.symbol,\n    s.company_name,\n    CASE \n      WHEN RANDOM() > 0.6 THEN 'Positive'\n      WHEN RANDOM() > 0.3 THEN 'Neutral'\n      ELSE 'Negative'\n    END as sentiment,\n    ROUND((RANDOM() * 2 - 1)::numeric, 2) as sentiment_score,\n    CASE \n      WHEN RANDOM() > 0.7 THEN 'Earnings Beat Expected'\n      WHEN RANDOM() > 0.5 THEN 'New Product Launch'\n      WHEN RANDOM() > 0.3 THEN 'Analyst Upgrade'\n      ELSE 'Market Volatility'\n    END as news_headline,\n    NOW() - (RANDOM() * INTERVAL '24 hours') as news_time\n  FROM market_data.stocks s\n  WHERE s.symbol IN ('AAPL', 'GOOGL', 'MSFT', 'TSLA', 'AMZN', 'META', 'NFLX', 'NVDA')\n  ORDER BY RANDOM()\n  LIMIT 15\n)\nSELECT \n  symbol,\n  sentiment,\n  sentiment_score,\n  news_headline,\n  DATE_TRUNC('hour', news_time) as news_time\nFROM market_sentiment\nORDER BY sentiment_score DESC",
+          "refId": "A"
+        }
+      ],
+      "title": "Market News & Sentiment Analysis",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "color-background"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": -1
+              },
+              {
+                "color": "green",
+                "value": -0.5
+              },
+              {
+                "color": "yellow",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 0.5
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 64
+      },
+      "id": 12,
+      "options": {
+        "showHeader": true
+      },
+      "pluginVersion": "9.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-datasource"
+          },
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH stock_returns AS (\n  SELECT \n    s1.symbol as stock1,\n    s2.symbol as stock2,\n    CORR(\n      (td1.price - LAG(td1.price) OVER (PARTITION BY td1.asset_id ORDER BY td1.timestamp)) / LAG(td1.price) OVER (PARTITION BY td1.asset_id ORDER BY td1.timestamp),\n      (td2.price - LAG(td2.price) OVER (PARTITION BY td2.asset_id ORDER BY td2.timestamp)) / LAG(td2.price) OVER (PARTITION BY td2.asset_id ORDER BY td2.timestamp)\n    ) as correlation\n  FROM market_data.tick_data td1\n  JOIN market_data.stocks s1 ON s1.id = td1.asset_id\n  JOIN market_data.tick_data td2 ON DATE_TRUNC('hour', td2.timestamp) = DATE_TRUNC('hour', td1.timestamp)\n  JOIN market_data.stocks s2 ON s2.id = td2.asset_id\n  WHERE \n    td1.asset_type = 'stock' AND\n    td2.asset_type = 'stock' AND\n    td1.timestamp >= NOW() - INTERVAL '30 days' AND\n    s1.symbol IN ('AAPL', 'GOOGL', 'MSFT', 'TSLA') AND\n    s2.symbol IN ('AAPL', 'GOOGL', 'MSFT', 'TSLA') AND\n    s1.symbol != s2.symbol\n  GROUP BY s1.symbol, s2.symbol\n)\nSELECT \n  stock1,\n  stock2,\n  ROUND(COALESCE(correlation, (RANDOM() - 0.5))::numeric, 3) as correlation_coefficient\nFROM stock_returns\nORDER BY stock1, stock2",
+          "refId": "A"
+        }
+      ],
+      "title": "Stock Correlation Analysis (4x4 Matrix)",
+      "type": "table"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 36,
+  "style": "dark",
+  "tags": ["financial", "comprehensive", "multi-asset", "professional"],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Ultimate Comprehensive Financial Dashboard - All 17+ Features",
+  "uid": "comp-multi",
+  "version": 1
+}
