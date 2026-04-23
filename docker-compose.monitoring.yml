@@ -30,7 +30,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:?GRAFANA_PASSWORD must be set in .env}
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource,grafana-piechart-panel
     volumes:
@@ -101,7 +101,7 @@ services:
     ports:
       - "9187:9187"
     environment:
-      - DATA_SOURCE_NAME=postgresql://user:password@postgres:5432/financial_monitoring?sslmode=disable
+      - DATA_SOURCE_NAME=postgresql://${POSTGRES_USER:-stock_user}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}@postgres:5432/${POSTGRES_DB:-financial_monitoring}?sslmode=disable
     networks:
       - monitoring
       - financial-network
@@ -109,7 +109,12 @@ services:
     depends_on:
       - postgres
 
-  # cAdvisor for container metrics
+  # cAdvisor for container metrics.
+  # NOTE: cAdvisor reads host-level process/cgroup info, so it needs
+  # elevated privileges. Instead of `privileged: true` (full host root),
+  # we grant only the specific capabilities it needs. If this breaks
+  # on your host, replace `cap_add` with `privileged: true` — but
+  # prefer leaving it as-is and only loosening if a metric is missing.
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
     container_name: financial_cadvisor
@@ -121,7 +126,10 @@ services:
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
       - /dev/disk/:/dev/disk:ro
-    privileged: true
+    cap_add:
+      - SYS_ADMIN
+    security_opt:
+      - no-new-privileges:true
     devices:
       - /dev/kmsg
     networks:
