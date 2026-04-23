@@ -182,7 +182,7 @@ This dashboard delivers **100%** of the requested features with professional-gra
 cp ultimate-financial-analytics-dashboard.json /path/to/grafana/dashboards/
 
 # Restart Grafana to apply provisioning
-./scripts/restart_grafana.sh
+./scripts/dashboards/restart_grafana.sh
 ```
 
 ### **2. Access Dashboard**

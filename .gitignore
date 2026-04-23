@@ -101,6 +101,11 @@ temp/
 # Windows artifact from `/dev/null` redirection (e.g. `git lfs install`)
 /dev/
 
+# Large sample/fixture data (keep out of git — regenerate locally)
+scripts/**/high_frequency_sample_data.json
+*_sample_data.json
+sample_data/
+
 
 # Application specific
 stock_monitor.egg-info/

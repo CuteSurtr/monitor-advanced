@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 INFLUXDB_URL = os.getenv("INFLUXDB_URL", "http://localhost:8086")
 INFLUXDB_TOKEN = os.getenv(
     "INFLUXDB_TOKEN",
-    "xEoh_d1w_9u4rUmgZLCUqckVK5qGnF1FNs2_hzrrzfXQCXLJRRYPh5oqcE_T0nYmF7jqsJ-O6r2OEUVDWV-kew==",
+    "your_influxdb_token_here",
 )
 INFLUXDB_ORG = os.getenv("INFLUXDB_ORG", "stock_monitor")
 

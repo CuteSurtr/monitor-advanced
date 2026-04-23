@@ -23,7 +23,7 @@
 ### 4. Option B: Automated Setup with Sample Data (Recommended)
 
 #### Update the Python script:
-Edit `scripts/setup_influxdb_buckets.py`:
+Edit `scripts/setup/setup_influxdb_buckets_multi_asset.py`:
 ```python
 INFLUXDB_URL = "http://localhost:8086"
 INFLUXDB_TOKEN = "your-actual-token-here"  # Replace with your token
