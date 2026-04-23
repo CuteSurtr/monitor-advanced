@@ -16,7 +16,7 @@ timeout /t 10 /nobreak >nul
 REM Check if Grafana is running
 docker ps | findstr "stock_monitor_grafana_desktop" >nul
 if %errorlevel% equ 0 (
-    echo ✓ Grafana is running!
+    echo  Grafana is running!
     echo Access Grafana at: http://localhost:3000
     echo Username: admin
     echo Password: admin
@@ -29,7 +29,7 @@ if %errorlevel% equ 0 (
     echo If dashboards don't appear, check Grafana logs:
     echo docker-compose -f docker-compose.desktop.yml logs grafana
 ) else (
-    echo ✗ Grafana failed to start. Check logs with:
+    echo  Grafana failed to start. Check logs with:
     echo docker-compose -f docker-compose.desktop.yml logs grafana
 )
 

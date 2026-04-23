@@ -53,7 +53,7 @@ def check_indicators_by_measurement():
     
     measurements = [
         "bls_economic_data",
-        "bea_economic_data", 
+        "bea_economic_data",
         "housing_data",
         "commodity_data",
         "fred_rates",
@@ -138,7 +138,7 @@ def main():
     print("=" * 40)
     
     check_measurements()
-    check_indicators_by_measurement() 
+    check_indicators_by_measurement()
     check_sample_data()
 
 if __name__ == "__main__":

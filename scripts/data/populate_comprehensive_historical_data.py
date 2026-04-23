@@ -21,7 +21,7 @@ def create_realistic_trends():
     base_data = {
         # Treasury yields (inverted curve scenario)
         "2y_yield": {"base": 4.8, "trend": -0.001, "volatility": 0.15, "cycle_days": 60},
-        "10y_yield": {"base": 4.2, "trend": -0.0008, "volatility": 0.12, "cycle_days": 90}, 
+        "10y_yield": {"base": 4.2, "trend": -0.0008, "volatility": 0.12, "cycle_days": 90},
         "30y_yield": {"base": 4.5, "trend": -0.0005, "volatility": 0.10, "cycle_days": 120},
         
         # Economic indicators
@@ -165,13 +165,13 @@ def write_comprehensive_data():
             if response.status_code == 204:
                 batch_points = len(data_lines)
                 total_points += batch_points
-                print(f"   Wrote {batch_points} points (Total: {total_points})")
+                print(f"  Wrote {batch_points} points (Total: {total_points})")
             else:
-                print(f"   Batch failed: {response.status_code} - {response.text}")
+                print(f"  Batch failed: {response.status_code} - {response.text}")
                 return False
                 
         except Exception as e:
-            print(f"   Error writing batch: {e}")
+            print(f"  Error writing batch: {e}")
             return False
     
     print(f"\nSUCCESS! Wrote {total_points} comprehensive data points")
@@ -187,7 +187,7 @@ def verify_data_coverage():
     
     measurements_to_check = [
         "treasury_yield_curve",
-        "treasury_curve_metrics", 
+        "treasury_curve_metrics",
         "bls_economic_data",
         "fred_economic_data",
         "bea_economic_data",
@@ -219,12 +219,12 @@ def verify_data_coverage():
             if response.status_code == 200:
                 # Count data points in response
                 point_count = response.text.count('_result')
-                print(f"   {measurement}: {point_count} data series")
+                print(f"  {measurement}: {point_count} data series")
             else:
-                print(f"   {measurement}: Query failed")
+                print(f"  {measurement}: Query failed")
                 
         except Exception as e:
-            print(f"   {measurement}: Error - {e}")
+            print(f"  {measurement}: Error - {e}")
 
 def main():
     print("Comprehensive Historical Macro Economic Data Population")
@@ -251,7 +251,7 @@ def main():
         print("  • Market structure metrics")
         
         print("\\n Go to http://localhost:3000 and explore your data!")
-        print("   Try different time ranges and zoom into interesting periods.")
+        print("  Try different time ranges and zoom into interesting periods.")
         
     else:
         print("\\n Data population failed")

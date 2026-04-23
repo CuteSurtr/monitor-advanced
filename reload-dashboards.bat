@@ -35,15 +35,15 @@ if %errorLevel% equ 0 (
     echo SUCCESS: Grafana is running!
     echo.
     echo Dashboard Access:
-    echo    URL: http://localhost:3000
-    echo    Login: admin / trading123
+    echo  URL: http://localhost:3000
+    echo  Login: admin / trading123
     echo.
     echo Available Dashboard Folders:
-    echo    - Core Analytics - Main financial dashboards
-    echo    - Advanced Analytics - Technical indicators ^& ML
-    echo    - Economic Data - Macro economic analysis
-    echo    - Professional Suite - Professional tier dashboards
-    echo    - Specialized Views - Custom and specialized dashboards
+    echo  - Core Analytics - Main financial dashboards
+    echo  - Advanced Analytics - Technical indicators ^& ML
+    echo  - Economic Data - Macro economic analysis
+    echo  - Professional Suite - Professional tier dashboards
+    echo  - Specialized Views - Custom and specialized dashboards
     echo.
     echo All dashboards should now be visible in Grafana!
 ) else (

@@ -15,7 +15,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 from influxdb_client import InfluxDBClient
 from src.collectors.macro_collectors import (
-    BEACollector, FINRACollector, FREDCollector, 
+    BEACollector, FINRACollector, FREDCollector,
     EIACollector, CensusCollector, TreasuryCollector,
     BLSCollector, ECBCollector, WorldBankCollector,
     SECCollector, IMFCollector, BISCollector, OECDCollector
@@ -26,17 +26,17 @@ logger = logging.getLogger(__name__)
 
 # Your API Keys
 API_KEYS = {
-    "bea_api_key": "F1E3FC75-5378-43DE-88F6-796F85788A37",
-    "finra_api_key": "3a9634291169447b9912",
-    "fred_api_key": "your_fred_api_key", 
-    "eia_api_key": "6xGrNpJYCBb66oCOtIV7RqdyeSMDBgKBJfQTAPGs",
-    "census_api_key": "5d0db23721b8e48096f63e08f89a84d0e2323422"
+    "bea_api_key": "your_bea_api_key",
+    "finra_api_key": "your_finra_api_key",
+    "fred_api_key": "your_fred_api_key",
+    "eia_api_key": "your_eia_api_key",
+    "census_api_key": "your_census_api_key"
 }
 
 INFLUXDB_CONFIG = {
     "url": "http://localhost:8086",
     "token": "your_influxdb_token_here",
-    "org": "69a6563b80682691"
+    "org": "your_influxdb_org_id"
 }
 
 async def test_api_collector(collector_class, name, *args):
@@ -55,7 +55,7 @@ async def test_api_collector(collector_class, name, *args):
             
             # Show sample data
             sample = data_points[0]
-            logger.info(f"   Sample: {sample.measurement} - {sample.tags} - {sample.fields}")
+            logger.info(f"  Sample: {sample.measurement} - {sample.tags} - {sample.fields}")
             return True
         else:
             logger.warning(f"WARNING {name}: No data returned (may be rate limited or API issue)")
@@ -77,11 +77,11 @@ async def test_all_apis():
     
     # BEA - Bureau of Economic Analysis
     results["BEA"] = await test_api_collector(
-        BEACollector, "BEA (Bureau of Economic Analysis)", 
+        BEACollector, "BEA (Bureau of Economic Analysis)",
         API_KEYS["bea_api_key"]
     )
     
-    # FINRA - Financial Industry Regulatory Authority  
+    # FINRA - Financial Industry Regulatory Authority
     results["FINRA"] = await test_api_collector(
         FINRACollector, "FINRA (Short Interest)",
         API_KEYS["finra_api_key"]
@@ -133,7 +133,7 @@ async def test_all_apis():
         SECCollector, "SEC EDGAR"
     )
     
-    # IMF - No API key required  
+    # IMF - No API key required
     results["IMF"] = await test_api_collector(
         IMFCollector, "IMF (International Monetary Fund)"
     )
@@ -157,7 +157,7 @@ async def test_all_apis():
     
     for api_name, success in results.items():
         status = "WORKING" if success else "FAILED"
-        logger.info(f"   {api_name}: {status}")
+        logger.info(f"  {api_name}: {status}")
     
     logger.info(f"\nOverall Success Rate: {successful}/{total} ({successful/total*100:.1f}%)")
     

@@ -12,7 +12,7 @@ curl -sSL https://raw.githubusercontent.com/CuteSurtr/monitor-advanced-backup/ma
 
 The automated installation script:
 - Detects your Pi model and optimizes configuration
-- Installs Docker and all dependencies  
+- Installs Docker and all dependencies
 - Sets up systemd service for auto-start
 - Configures firewall and system optimizations
 - Creates management scripts
@@ -169,20 +169,20 @@ The installer creates helpful management scripts:
 cd ~/stock-monitor  # or your installation directory
 
 # Basic Operations
-./start.sh          # Start all services
-./stop.sh           # Stop all services  
-./status.sh         # Check service status
-./restart.sh        # Restart all services
+./start.sh  # Start all services
+./stop.sh  # Stop all services
+./status.sh  # Check service status
+./restart.sh  # Restart all services
 
 # Maintenance
-./update.sh         # Update to latest images
-./backup.sh         # Create backup
-./logs.sh           # View service logs
+./update.sh  # Update to latest images
+./backup.sh  # Create backup
+./logs.sh  # View service logs
 
 # System Information
-free -h            # Check memory usage
-df -h              # Check disk usage
-docker stats       # Monitor containers
+free -h  # Check memory usage
+df -h  # Check disk usage
+docker stats  # Monitor containers
 ```
 
 ### Systemd Service (Auto-start)
@@ -192,9 +192,9 @@ docker stats       # Monitor containers
 sudo systemctl enable stock-monitor
 
 # Manual control
-sudo systemctl start stock-monitor    # Start now
-sudo systemctl stop stock-monitor     # Stop now
-sudo systemctl status stock-monitor   # Check status
+sudo systemctl start stock-monitor  # Start now
+sudo systemctl stop stock-monitor  # Stop now
+sudo systemctl status stock-monitor  # Check status
 ```
 
 ## Available Dashboards
@@ -266,7 +266,7 @@ services:
 **Ports used:**
 - 3000: Grafana (Web UI)
 - 5432: PostgreSQL
-- 6379: Redis  
+- 6379: Redis
 - 8086: InfluxDB
 - 9090: Prometheus
 
@@ -421,7 +421,7 @@ docker-compose up -d
 ### Change Default Passwords
 Update these in your `.env` file:
 - Grafana admin password
-- Database passwords  
+- Database passwords
 - InfluxDB credentials
 
 ### Network Security

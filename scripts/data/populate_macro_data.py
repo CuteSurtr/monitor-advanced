@@ -188,7 +188,7 @@ def generate_financial_data():
 
 def main():
     """Main function to populate all data"""
-    print("� Populating InfluxDB macro_data bucket with sample economic data...")
+    print(" Populating InfluxDB macro_data bucket with sample economic data...")
     print(f"Target: {INFLUXDB_URL}")
     print(f"Organization: {ORG}")
     print(f"Bucket: {BUCKET}")

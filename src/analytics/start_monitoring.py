@@ -90,7 +90,7 @@ if __name__ == "__main__":
         config = get_config()
         if config.database.type not in ["influxdb", "dual"]:
             print("Warning: Database type is not set to 'influxdb' or 'dual'")
-            print("   Update config/config.yaml to enable InfluxDB integration")
+            print("  Update config/config.yaml to enable InfluxDB integration")
         else:
             print("InfluxDB integration enabled")
     except Exception as e:

@@ -42,7 +42,7 @@ def create_bucket(bucket_name):
             "retentionRules": [{"type": "expire", "everySeconds": 0}]  # No expiration
         }
         
-        response = requests.post(f"{INFLUXDB_URL}/api/v2/buckets", 
+        response = requests.post(f"{INFLUXDB_URL}/api/v2/buckets",
                                json=bucket_data, headers=headers, timeout=10)
         
         if response.status_code == 201:

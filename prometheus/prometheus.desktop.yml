@@ -2,8 +2,8 @@
 # Enhanced configuration for desktop environments with higher resources
 
 global:
-  scrape_interval: 10s        # Faster scraping for desktop
-  evaluation_interval: 10s    # Faster rule evaluation
+  scrape_interval: 10s  # Faster scraping for desktop
+  evaluation_interval: 10s  # Faster rule evaluation
   scrape_timeout: 8s
   external_labels:
     monitor: 'stock-market-monitor'
@@ -87,7 +87,7 @@ scrape_configs:
     static_configs:
       - targets: ['stock_monitor_app_desktop:8000']
     metrics_path: '/metrics'
-    scrape_interval: 5s         # Very frequent for real-time trading
+    scrape_interval: 5s  # Very frequent for real-time trading
     honor_labels: true
     metric_relabel_configs:
       - source_labels: [__name__]

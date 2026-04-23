@@ -27,7 +27,7 @@ scipy>=1.7.0,<1.12.0
 ta>=0.10.2
 statsmodels>=0.13.0,<0.14.0
 # tensorflow>=2.15.0  # Commented out - not compatible with Python 3.13
-# torch>=2.1.2        # Commented out - not compatible with Python 3.13
+# torch>=2.1.2  # Commented out - not compatible with Python 3.13
 
 # Visualization
 plotly==5.24.1
@@ -94,4 +94,4 @@ investpy==1.0.8
 cvxpy==1.4.1
 pyportfolioopt==1.5.5
 
-# Azure dependencies removed - no longer needed for this project 
+# Azure dependencies removed - no longer needed for this project

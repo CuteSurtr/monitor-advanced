@@ -266,9 +266,9 @@ def populate_sectoral_data():
         
         # Financial market data
         financial_data = [
-            ("finra_margin_debt", {"category": "margin_debt", "market": "nyse"}, 
+            ("finra_margin_debt", {"category": "margin_debt", "market": "nyse"},
              {"debt_billions": round(margin_debt_values[day_idx], 1)}),
-            ("finra_short_interest", {"category": "short_interest", "market": "nyse"}, 
+            ("finra_short_interest", {"category": "short_interest", "market": "nyse"},
              {"short_ratio": round(short_ratio_values[day_idx], 3)}),
         ]
         

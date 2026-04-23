@@ -126,13 +126,13 @@ echo.
 echo Setting up log rotation...
 echo sudo tee /etc/logrotate.d/trading-monitor ^> /dev/null ^<^<EOF
 echo /home/$USER/trading-monitor/logs/*.log {
-echo     daily
-echo     missingok
-echo     rotate 7
-echo     compress
-echo     delaycompress
-echo     notifempty
-echo     create 644 $USER $USER
+echo  daily
+echo  missingok
+echo  rotate 7
+echo  compress
+echo  delaycompress
+echo  notifempty
+echo  create 644 $USER $USER
 echo }
 echo EOF
 echo.
@@ -162,24 +162,24 @@ echo Creating restore script...
 echo cat ^> /home/$USER/trading-monitor/restore_data.sh ^<^< 'EOF'
 echo #!/bin/bash
 echo if [ -z "$1" ]; then
-echo     echo "Usage: $0 ^<backup_date^>"
-echo     echo "Example: $0 20241201_143022"
-echo     exit 1
+echo  echo "Usage: $0 ^<backup_date^>"
+echo  echo "Example: $0 20241201_143022"
+echo  exit 1
 echo fi
 echo BACKUP_DATE=$1
 echo BACKUP_DIR="/home/$USER/backups"
 echo echo "Restoring from backup: $BACKUP_DATE"
 echo if [ -f "$BACKUP_DIR/postgres_$BACKUP_DATE.sql" ]; then
-echo     docker exec -i trading_postgres_pi psql -U stock_user trading_monitor ^< $BACKUP_DIR/postgres_$BACKUP_DATE.sql
-echo     echo "PostgreSQL restored"
+echo  docker exec -i trading_postgres_pi psql -U stock_user trading_monitor ^< $BACKUP_DIR/postgres_$BACKUP_DATE.sql
+echo  echo "PostgreSQL restored"
 echo else
-echo     echo "PostgreSQL backup not found"
+echo  echo "PostgreSQL backup not found"
 echo fi
 echo if [ -d "$BACKUP_DIR/backup_$BACKUP_DATE" ]; then
-echo     docker exec trading_influxdb_pi influx restore /var/lib/influxdb2/backup_$BACKUP_DATE
-echo     echo "InfluxDB restored"
+echo  docker exec trading_influxdb_pi influx restore /var/lib/influxdb2/backup_$BACKUP_DATE
+echo  echo "InfluxDB restored"
 echo else
-echo     echo "InfluxDB backup not found"
+echo  echo "InfluxDB backup not found"
 echo fi
 echo echo "Restore completed"
 echo EOF

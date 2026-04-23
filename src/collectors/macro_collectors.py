@@ -1680,7 +1680,7 @@ if __name__ == "__main__":
     client = InfluxDBClient(
         url="http://localhost:8086",
         token=os.getenv("INFLUXDB_TOKEN", "your_influxdb_token"),
-        org="69a6563b80682691",
+        org="your_influxdb_org_id",
     )
 
     # API keys

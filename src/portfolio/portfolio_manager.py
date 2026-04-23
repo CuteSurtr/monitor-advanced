@@ -14,7 +14,7 @@ class PortfolioManager:
         self.portfolios = {}
         self.positions = {}
 
-    async def create_portfolio(self, name: str, description: str = None, 
+    async def create_portfolio(self, name: str, description: str = None,
                              initial_value: Decimal = None, currency: str = "USD",
                              risk_tolerance: str = "moderate") -> Dict[str, Any]:
         """Create a new portfolio"""
@@ -54,13 +54,13 @@ class PortfolioManager:
         """Get portfolio by ID"""
         if self.db_manager:
             return await self.db_manager.fetch_one(
-                "SELECT * FROM portfolios WHERE id = %s", 
+                "SELECT * FROM portfolios WHERE id = %s",
                 (portfolio_id,)
             )
         else:
             return self.portfolios.get(portfolio_id)
 
-    async def add_position(self, portfolio_id: str, stock_id: int, 
+    async def add_position(self, portfolio_id: str, stock_id: int,
                           quantity: Decimal, price: Decimal) -> Dict[str, Any]:
         """Add position to portfolio"""
         try:
@@ -102,7 +102,7 @@ class PortfolioManager:
                 (portfolio_id,)
             )
         else:
-            positions = [p for p in self.positions.values() 
+            positions = [p for p in self.positions.values()
                         if p.get("portfolio_id") == portfolio_id]
         
         total_value = sum(Decimal(str(p.get("market_value", 0))) for p in positions)
@@ -132,7 +132,7 @@ class PortfolioManager:
                 (portfolio_id,)
             )
         else:
-            return [p for p in self.positions.values() 
+            return [p for p in self.positions.values()
                    if p.get("portfolio_id") == portfolio_id]
 
     async def update_position_prices(self, price_updates: Dict[str, Decimal]) -> Dict[str, Any]:
@@ -160,7 +160,7 @@ class PortfolioManager:
             "positions_updated": updated_count
         }
 
-    async def rebalance_portfolio(self, portfolio_id: str, 
+    async def rebalance_portfolio(self, portfolio_id: str,
                                  target_weights: Dict[str, float]) -> Dict[str, Any]:
         """Rebalance portfolio to target weights"""
         # Mock implementation for testing
@@ -182,7 +182,7 @@ class PortfolioManager:
             "correlation_spy": 0.85
         }
 
-    async def get_portfolio_performance(self, portfolio_id: str, 
+    async def get_portfolio_performance(self, portfolio_id: str,
                                       start_date: datetime = None) -> List[Dict[str, Any]]:
         """Get portfolio performance over time"""
         # Mock implementation for testing
@@ -242,7 +242,7 @@ class PortfolioManager:
         
         return True
 
-    def _calculate_position_weight(self, position_value: Decimal, 
+    def _calculate_position_weight(self, position_value: Decimal,
                                  total_portfolio_value: Decimal) -> float:
         """Calculate position weight in portfolio"""
         if total_portfolio_value == 0:

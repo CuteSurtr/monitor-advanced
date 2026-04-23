@@ -4,7 +4,7 @@ WITH stock_data AS (
   SELECT id, symbol, market_cap FROM market_data.stocks ORDER BY market_cap DESC LIMIT 30
 )
 INSERT INTO market_data.tick_data (asset_id, asset_type, timestamp, last_price, volume)
-SELECT 
+SELECT
   s.id,
   'stock',
   generate_series(
@@ -13,7 +13,7 @@ SELECT
     INTERVAL '1 hour'
   ),
   -- Generate realistic stock prices based on market cap
-  CASE 
+  CASE
     WHEN s.market_cap > 1000000000000 THEN 150 + (RANDOM() * 200) + SIN(EXTRACT(EPOCH FROM generate_series(NOW() - INTERVAL '24 hours', NOW(), INTERVAL '1 hour')) / 3600) * 20
     WHEN s.market_cap > 500000000000 THEN 80 + (RANDOM() * 120) + SIN(EXTRACT(EPOCH FROM generate_series(NOW() - INTERVAL '24 hours', NOW(), INTERVAL '1 hour')) / 3600) * 15
     ELSE 40 + (RANDOM() * 80) + SIN(EXTRACT(EPOCH FROM generate_series(NOW() - INTERVAL '24 hours', NOW(), INTERVAL '1 hour')) / 3600) * 10
@@ -26,7 +26,7 @@ WITH crypto_data AS (
   SELECT id, symbol, market_cap FROM market_data.cryptocurrencies ORDER BY market_cap DESC LIMIT 30
 )
 INSERT INTO market_data.tick_data (asset_id, asset_type, timestamp, last_price, volume)
-SELECT 
+SELECT
   c.id,
   'crypto',
   generate_series(
@@ -35,7 +35,7 @@ SELECT
     INTERVAL '1 hour'
   ),
   -- Generate realistic crypto prices
-  CASE 
+  CASE
     WHEN c.symbol = 'BTC' THEN 40000 + (RANDOM() * 10000) + SIN(EXTRACT(EPOCH FROM generate_series(NOW() - INTERVAL '24 hours', NOW(), INTERVAL '1 hour')) / 3600) * 2000
     WHEN c.symbol = 'ETH' THEN 2500 + (RANDOM() * 800) + SIN(EXTRACT(EPOCH FROM generate_series(NOW() - INTERVAL '24 hours', NOW(), INTERVAL '1 hour')) / 3600) * 200
     WHEN c.market_cap > 50000000000 THEN 100 + (RANDOM() * 200) + SIN(EXTRACT(EPOCH FROM generate_series(NOW() - INTERVAL '24 hours', NOW(), INTERVAL '1 hour')) / 3600) * 20
@@ -50,7 +50,7 @@ WITH forex_data AS (
   SELECT id, symbol FROM market_data.forex_pairs ORDER BY is_major DESC, id LIMIT 30
 )
 INSERT INTO market_data.tick_data (asset_id, asset_type, timestamp, last_price, volume)
-SELECT 
+SELECT
   f.id,
   'forex',
   generate_series(
@@ -59,7 +59,7 @@ SELECT
     INTERVAL '1 hour'
   ),
   -- Generate realistic forex rates
-  CASE 
+  CASE
     WHEN f.symbol LIKE '%JPY' THEN 100 + (RANDOM() * 50) + SIN(EXTRACT(EPOCH FROM generate_series(NOW() - INTERVAL '24 hours', NOW(), INTERVAL '1 hour')) / 3600) * 5
     WHEN f.symbol LIKE 'USD%' AND f.symbol NOT LIKE '%JPY' THEN 0.5 + (RANDOM() * 2) + SIN(EXTRACT(EPOCH FROM generate_series(NOW() - INTERVAL '24 hours', NOW(), INTERVAL '1 hour')) / 3600) * 0.1
     ELSE 1 + (RANDOM() * 0.5) + SIN(EXTRACT(EPOCH FROM generate_series(NOW() - INTERVAL '24 hours', NOW(), INTERVAL '1 hour')) / 3600) * 0.05
@@ -72,7 +72,7 @@ WITH commodity_data AS (
   SELECT id, symbol, asset_class FROM market_data.commodities ORDER BY id LIMIT 30
 )
 INSERT INTO market_data.tick_data (asset_id, asset_type, timestamp, last_price, volume)
-SELECT 
+SELECT
   cm.id,
   'commodity',
   generate_series(
@@ -81,7 +81,7 @@ SELECT
     INTERVAL '1 hour'
   ),
   -- Generate realistic commodity prices
-  CASE 
+  CASE
     WHEN cm.asset_class = 'Precious Metals' AND cm.symbol = 'GOLD' THEN 1800 + (RANDOM() * 400) + SIN(EXTRACT(EPOCH FROM generate_series(NOW() - INTERVAL '24 hours', NOW(), INTERVAL '1 hour')) / 3600) * 50
     WHEN cm.asset_class = 'Precious Metals' AND cm.symbol = 'SILVER' THEN 20 + (RANDOM() * 10) + SIN(EXTRACT(EPOCH FROM generate_series(NOW() - INTERVAL '24 hours', NOW(), INTERVAL '1 hour')) / 3600) * 2
     WHEN cm.asset_class = 'Energy' AND cm.symbol IN ('WTI', 'BRENT') THEN 60 + (RANDOM() * 30) + SIN(EXTRACT(EPOCH FROM generate_series(NOW() - INTERVAL '24 hours', NOW(), INTERVAL '1 hour')) / 3600) * 5

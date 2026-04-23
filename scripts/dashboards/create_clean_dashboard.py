@@ -93,9 +93,9 @@ def create_clean_dashboard_json():
   |> filter(fn: (r) => r["_field"] == "value")
   |> filter(fn: (r) => r["indicator"] == "cpi" or r["indicator"] == "core_cpi" or r["indicator"] == "ppi")
   |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)
-  |> map(fn: (r) => ({ r with _field: 
+  |> map(fn: (r) => ({ r with _field:
     if r.indicator == "cpi" then "CPI"
-    else if r.indicator == "core_cpi" then "Core CPI" 
+    else if r.indicator == "core_cpi" then "Core CPI"
     else if r.indicator == "ppi" then "PPI"
     else r.indicator
   }))
@@ -159,7 +159,7 @@ def create_clean_dashboard_json():
   |> filter(fn: (r) => r["_field"] == "value")
   |> filter(fn: (r) => r["indicator"] == "unemployment_rate" or r["indicator"] == "lfpr")
   |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)
-  |> map(fn: (r) => ({ r with _field: 
+  |> map(fn: (r) => ({ r with _field:
     if r.indicator == "unemployment_rate" then "Unemployment"
     else if r.indicator == "lfpr" then "Labor Force"
     else r.indicator
@@ -224,7 +224,7 @@ def create_clean_dashboard_json():
   |> filter(fn: (r) => r["_field"] == "value")
   |> filter(fn: (r) => r["indicator"] == "nfp" or r["indicator"] == "jobless_claims" or r["indicator"] == "wages")
   |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)
-  |> map(fn: (r) => ({ r with _field: 
+  |> map(fn: (r) => ({ r with _field:
     if r.indicator == "nfp" then "Jobs"
     else if r.indicator == "jobless_claims" then "Claims"
     else if r.indicator == "wages" then "Wages"
@@ -493,7 +493,7 @@ def create_clean_dashboard_json():
   |> filter(fn: (r) => r["_field"] == "value")
   |> filter(fn: (r) => r["indicator"] == "gdp_growth" or r["indicator"] == "industrial_production")
   |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)
-  |> map(fn: (r) => ({ r with _field: 
+  |> map(fn: (r) => ({ r with _field:
     if r.indicator == "gdp_growth" then "GDP"
     else if r.indicator == "industrial_production" then "Industrial"
     else r.indicator
@@ -619,9 +619,9 @@ def create_clean_dashboard_json():
   |> filter(fn: (r) => r["_field"] == "value")
   |> filter(fn: (r) => r["indicator"] == "credit_spread" or r["indicator"] == "cds_spreads")
   |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)
-  |> map(fn: (r) => ({ r with _field: 
+  |> map(fn: (r) => ({ r with _field:
     if r.indicator == "credit_spread" and r.grade == "investment_grade" then "IG"
-    else if r.indicator == "credit_spread" and r.grade == "high_yield" then "HY" 
+    else if r.indicator == "credit_spread" and r.grade == "high_yield" then "HY"
     else if r.indicator == "cds_spreads" then "CDS"
     else r.indicator
   }))
@@ -695,7 +695,7 @@ def create_clean_dashboard_json():
   |> filter(fn: (r) => r["_field"] == "value")
   |> filter(fn: (r) => r["indicator"] == "retail_sales" or r["indicator"] == "pce")
   |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)
-  |> map(fn: (r) => ({ r with _field: 
+  |> map(fn: (r) => ({ r with _field:
     if r.indicator == "retail_sales" and r.type == "headline" then "Retail Sales"
     else if r.indicator == "retail_sales" and r.type == "core" then "Retail Core"
     else if r.indicator == "pce" and r.type == "headline" then "PCE"
@@ -762,7 +762,7 @@ def create_clean_dashboard_json():
   |> filter(fn: (r) => r["_field"] == "value")
   |> filter(fn: (r) => r["indicator"] == "housing_starts" or r["indicator"] == "new_home_sales")
   |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)
-  |> map(fn: (r) => ({ r with _field: 
+  |> map(fn: (r) => ({ r with _field:
     if r.indicator == "housing_starts" then "Starts"
     else if r.indicator == "new_home_sales" then "Sales"
     else r.indicator
@@ -827,7 +827,7 @@ def create_clean_dashboard_json():
   |> filter(fn: (r) => r["_field"] == "value")
   |> filter(fn: (r) => r["indicator"] == "case_shiller_index" or r["indicator"] == "mortgage_30y")
   |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)
-  |> map(fn: (r) => ({ r with _field: 
+  |> map(fn: (r) => ({ r with _field:
     if r.indicator == "case_shiller_index" then "Home Prices"
     else if r.indicator == "mortgage_30y" then "Mortgage Rate"
     else r.indicator
@@ -857,10 +857,14 @@ def create_clean_dashboard_json():
 
 def main():
     import json
-    
+    from pathlib import Path
+
     dashboard = create_clean_dashboard_json()
-    
-    with open('C:/Users/nex88/OneDrive/Desktop/monitor advanced/grafana/provisioning/dashboards/clean_macro_dashboard.json', 'w') as f:
+
+    repo_root = Path(__file__).resolve().parents[2]
+    out_path = repo_root / 'grafana' / 'provisioning' / 'dashboards' / 'clean_macro_dashboard.json'
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(out_path, 'w') as f:
         json.dump(dashboard, f, indent=2)
     
     print("Created ultra-clean dashboard with simplified legend labels:")

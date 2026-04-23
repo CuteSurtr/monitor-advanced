@@ -335,29 +335,29 @@ def create_timescale_hypertables():
         
         # Convert tick_data to hypertable
         cursor.execute("""
-            SELECT create_hypertable('market_data.tick_data', 'timestamp', 
-                                   if_not_exists => TRUE, 
+            SELECT create_hypertable('market_data.tick_data', 'timestamp',
+                                   if_not_exists => TRUE,
                                    migrate_data => TRUE);
         """)
         
         # Convert microstructure_features to hypertable
         cursor.execute("""
-            SELECT create_hypertable('analytics.microstructure_features', 'timestamp', 
-                                   if_not_exists => TRUE, 
+            SELECT create_hypertable('analytics.microstructure_features', 'timestamp',
+                                   if_not_exists => TRUE,
                                    migrate_data => TRUE);
         """)
         
         # Convert market_regime to hypertable
         cursor.execute("""
-            SELECT create_hypertable('analytics.market_regime', 'timestamp', 
-                                   if_not_exists => TRUE, 
+            SELECT create_hypertable('analytics.market_regime', 'timestamp',
+                                   if_not_exists => TRUE,
                                    migrate_data => TRUE);
         """)
         
         # Convert performance_attribution to hypertable
         cursor.execute("""
-            SELECT create_hypertable('analytics.performance_attribution', 'timestamp', 
-                                   if_not_exists => TRUE, 
+            SELECT create_hypertable('analytics.performance_attribution', 'timestamp',
+                                   if_not_exists => TRUE,
                                    migrate_data => TRUE);
         """)
         

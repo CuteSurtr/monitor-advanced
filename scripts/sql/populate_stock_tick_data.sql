@@ -9,7 +9,7 @@ INSERT INTO market_data.tick_data (asset_id, asset_type, timestamp, price, volum
 (1, 'stock', NOW() - INTERVAL '2 minutes', 175.80, 950, 'BUY'),
 (1, 'stock', NOW() - INTERVAL '1 minute', 176.00, 750, 'BUY'),
 
--- MSFT (assuming ID 2)  
+-- MSFT (assuming ID 2)
 (2, 'stock', NOW() - INTERVAL '5 minutes', 380.25, 800, 'SELL'),
 (2, 'stock', NOW() - INTERVAL '4 minutes', 379.50, 1100, 'SELL'),
 (2, 'stock', NOW() - INTERVAL '3 minutes', 380.75, 900, 'BUY'),
@@ -60,12 +60,12 @@ INSERT INTO market_data.tick_data (asset_id, asset_type, timestamp, price, volum
 
 -- Add some historical data (last 24 hours) for trending
 INSERT INTO market_data.tick_data (asset_id, asset_type, timestamp, price, volume, aggressor_side)
-SELECT 
+SELECT
     (ARRAY[1,2,3,5,6,7,8,9])[ceil(random()*8)], -- Random stock ID
     'stock',
     generate_series(
         NOW() - INTERVAL '24 hours',
-        NOW() - INTERVAL '10 minutes', 
+        NOW() - INTERVAL '10 minutes',
         INTERVAL '30 minutes'
     ),
     -- Generate realistic price movements

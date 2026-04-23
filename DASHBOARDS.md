@@ -6,7 +6,7 @@ This document lists all available dashboards in your financial monitoring system
 
 Your dashboards are organized into the following folders in Grafana:
 
-### 📊 Core Analytics
+###  Core Analytics
 **Main financial monitoring dashboards for everyday use**
 
 | Dashboard | Description | Key Features |
@@ -15,7 +15,7 @@ Your dashboards are organized into the following folders in Grafana:
 | `final_comprehensive_financial_dashboard.json` | Enhanced comprehensive view | Advanced analytics integration |
 | `complete_financial_dashboard_final.json` | Complete financial overview | Full market coverage |
 
-### 🔬 Advanced Analytics
+###  Advanced Analytics
 **Technical analysis and machine learning predictions**
 
 | Dashboard | Description | Key Features |
@@ -24,7 +24,7 @@ Your dashboards are organized into the following folders in Grafana:
 | `advanced_visualizations_dashboard.json` | Advanced chart visualizations | Custom indicators, advanced charts |
 | `combined_advanced_analytics_dashboard.json` | Combined analytics view | Integrated advanced features |
 
-### 🌍 Economic Data
+###  Economic Data
 **Macro economic analysis and indicators**
 
 | Dashboard | Description | Key Features |
@@ -33,7 +33,7 @@ Your dashboards are organized into the following folders in Grafana:
 | `macroeconomics_dashboard_finalized.json` | Complete macro analysis | Federal Reserve data, yield curves |
 | `comprehensive_macro_dashboard_combined.json` | Combined macro view | All economic indicators |
 
-### 💼 Professional Suite
+###  Professional Suite
 **Professional-grade analytics for advanced users**
 
 | Dashboard | Description | Key Features |
@@ -42,7 +42,7 @@ Your dashboards are organized into the following folders in Grafana:
 | `complete_professional_dashboard.json` | Complete professional suite | All professional features |
 | `complete_professional_macro_dashboard.json` | Professional macro analysis | Advanced economic modeling |
 
-### 🎯 Specialized Views
+###  Specialized Views
 **Custom and specialized dashboard views**
 
 | Dashboard | Description | Key Features |
@@ -89,19 +89,19 @@ docker-compose -f docker-compose.raspberry-pi.yml restart grafana
 
 ## Dashboard Features
 
-### 🎨 Visual Features
+###  Visual Features
 - **Professional color schemes** - Color-coded for different asset classes
 - **Real-time updates** - 30-second refresh intervals
 - **Interactive charts** - Hover for detailed information
 - **Responsive design** - Works on desktop and mobile
 
-### 📈 Data Features
+###  Data Features
 - **Multi-asset coverage** - Stocks, crypto, forex, commodities
 - **Technical indicators** - RSI, MACD, Bollinger Bands
 - **Risk analytics** - VaR, CVaR, Sharpe ratios
 - **Economic data** - Federal Reserve, BEA, EIA data
 
-### 🔧 Customization
+###  Customization
 - **Editable panels** - Modify queries and visualizations
 - **Time range selection** - From minutes to years
 - **Variable templating** - Dynamic dashboard behavior

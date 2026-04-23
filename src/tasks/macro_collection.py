@@ -481,20 +481,20 @@ if __name__ == "__main__":
 
     logging.basicConfig(level=logging.INFO)
 
-    print("� Testing macro data collection...")
+    print(" Testing macro data collection...")
 
     # Test Treasury data collection
-    print("\n� Testing Treasury data collection...")
+    print("\n Testing Treasury data collection...")
     result = asyncio.run(_async_collect_treasury_data())
     print(f"Treasury result: {result}")
 
     # Test BLS data collection
-    print("\n� Testing BLS data collection...")
+    print("\n Testing BLS data collection...")
     result = asyncio.run(_async_collect_bls_data())
     print(f"BLS result: {result}")
 
     # Test metric calculations
-    print("\n� Testing metric calculations...")
+    print("\n Testing metric calculations...")
     result = asyncio.run(_async_calculate_macro_metrics())
     print(f"Metrics result: {result}")
 

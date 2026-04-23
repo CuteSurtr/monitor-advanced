@@ -82,7 +82,7 @@ receivers:
         subject: 'CRITICAL: Financial Monitor Alert'
         body: |
           {{ range .Alerts }}
-          🚨 CRITICAL ALERT 🚨
+           CRITICAL ALERT
           Alert: {{ .Annotations.summary }}
           Description: {{ .Annotations.description }}
           Severity: {{ .Labels.severity }}
@@ -91,7 +91,7 @@ receivers:
     slack_configs:
       - channel: '#critical-alerts'
         color: 'danger'
-        title: '🚨 Critical Financial Alert'
+        title: ' Critical Financial Alert'
         text: |
           {{ range .Alerts }}
           *Alert:* {{ .Annotations.summary }}
@@ -136,7 +136,7 @@ receivers:
     slack_configs:
       - channel: '#trading-alerts'
         color: 'danger'
-        title: '💰 Trading Alert'
+        title: ' Trading Alert'
         text: |
           {{ range .Alerts }}
           *Alert:* {{ .Annotations.summary }}
@@ -157,7 +157,7 @@ receivers:
     slack_configs:
       - channel: '#ops-alerts'
         color: 'warning'
-        title: '🔧 Operations Alert'
+        title: ' Operations Alert'
 
   - name: 'data-team'
     email_configs:
@@ -174,4 +174,4 @@ receivers:
     slack_configs:
       - channel: '#data-alerts'
         color: 'warning'
-        title: '📊 Data Quality Alert'
+        title: ' Data Quality Alert'

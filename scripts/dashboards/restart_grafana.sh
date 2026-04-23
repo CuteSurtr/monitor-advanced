@@ -16,7 +16,7 @@ sleep 10
 
 # Check if Grafana is running
 if docker ps | grep -q "stock_monitor_grafana_desktop"; then
-    echo "✓ Grafana is running!"
+    echo " Grafana is running!"
     echo "Access Grafana at: http://localhost:3000"
     echo "Username: admin"
     echo "Password: admin"
@@ -29,6 +29,6 @@ if docker ps | grep -q "stock_monitor_grafana_desktop"; then
     echo "If dashboards don't appear, check Grafana logs:"
     echo "docker-compose -f docker-compose.desktop.yml logs grafana"
 else
-    echo "✗ Grafana failed to start. Check logs with:"
+    echo " Grafana failed to start. Check logs with:"
     echo "docker-compose -f docker-compose.desktop.yml logs grafana"
 fi

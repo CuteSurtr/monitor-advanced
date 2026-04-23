@@ -133,7 +133,7 @@ def run_anomaly_detection(self, symbols: List[str] = None, lookback_hours: int =
                     # Run anomaly detection for this symbol
                     # Mock async call - would use sync operations
                     # symbol_anomalies = asyncio.run(
-                    #     anomaly_detector.detect_anomalies(symbol, lookback_hours)
+                    #  anomaly_detector.detect_anomalies(symbol, lookback_hours)
                     # )
                     symbol_anomalies = []  # Placeholder
                     anomalies_detected.extend(symbol_anomalies)
@@ -196,7 +196,7 @@ def update_ml_predictions(self, symbols: List[str] = None, models: List[str] = N
                         # Generate prediction
                         # Mock async call - would use sync operations
                         # prediction = asyncio.run(
-                        #     analytics_engine.generate_prediction(symbol, model)
+                        #  analytics_engine.generate_prediction(symbol, model)
                         # )
                         prediction = {
                             "symbol": symbol,
@@ -262,7 +262,7 @@ def analyze_sentiment(self, symbols: List[str] = None, sources: List[str] = None
                     # Analyze sentiment for this symbol
                     # Mock async call - would use sync operations
                     # sentiment = asyncio.run(
-                    #     analytics_engine.analyze_sentiment(symbol, sources)
+                    #  analytics_engine.analyze_sentiment(symbol, sources)
                     # )
                     sentiment = {"symbol": symbol, "sentiment": 0.5, "sources": sources}
                     if sentiment:
@@ -304,7 +304,7 @@ def calculate_correlations(self, symbols: List[str] = None, lookback_days: int =
         # Calculate correlation matrix
         # Mock async call - would use sync operations
         # correlations = asyncio.run(
-        #     analytics_engine.calculate_correlations(symbols, lookback_days)
+        #  analytics_engine.calculate_correlations(symbols, lookback_days)
         # )
         correlations = {"correlations": [[1.0, 0.8], [0.8, 1.0]]}
 
@@ -312,9 +312,9 @@ def calculate_correlations(self, symbols: List[str] = None, lookback_days: int =
         cache_manager = get_cache_manager()
         # Mock cache operation - would use sync cache
         # cache_manager.set(
-        #     'correlation_matrix',
-        #     correlations,
-        #     ttl=3600  # 1 hour
+        #  'correlation_matrix',
+        #  correlations,
+        #  ttl=3600  # 1 hour
         # )
 
         return {
@@ -354,7 +354,7 @@ def sector_analysis(self, sectors: List[str] = None):
                 # Analyze sector performance
                 # Mock async call - would use sync operations
                 # analysis = asyncio.run(
-                #     analytics_engine.analyze_sector(sector)
+                #  analytics_engine.analyze_sector(sector)
                 # )
                 analysis = {"sector": sector, "performance": 0.05}
                 if analysis:
@@ -394,7 +394,7 @@ def market_regime_detection(self, lookback_days: int = 252):
         # Analyze market regime using multiple indicators
         # Mock async call - would use sync operations
         # regime = asyncio.run(
-        #     analytics_engine.detect_market_regime(lookback_days)
+        #  analytics_engine.detect_market_regime(lookback_days)
         # )
         regime = {"regime": "bull", "confidence": 0.75}
 
@@ -402,9 +402,9 @@ def market_regime_detection(self, lookback_days: int = 252):
         cache_manager = get_cache_manager()
         # Mock cache operation - would use sync cache
         # cache_manager.set(
-        #     'market_regime',
-        #     regime,
-        #     ttl=3600  # 1 hour
+        #  'market_regime',
+        #  regime,
+        #  ttl=3600  # 1 hour
         # )
 
         return {
@@ -439,7 +439,7 @@ def validate_predictions(self, hours_back: int = 24):
 
         # Mock async call - would use sync operations
         # validation_results = asyncio.run(
-        #     analytics_engine.validate_predictions(validation_start)
+        #  analytics_engine.validate_predictions(validation_start)
         # )
         validation_results = [
             {"model_name": "lstm", "timeframe": "1h", "accuracy": 0.75}

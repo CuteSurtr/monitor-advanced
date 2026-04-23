@@ -203,9 +203,9 @@ class GlobalFinancialMonitor:
                                 vix_futures[f"M{i+1}"] = float(
                                     future_data["Close"].iloc[-1]
                                 )
-                        except:
+                        except Exception:
                             continue
-                except:
+                except Exception:
                     pass
 
                 # Sync VIX data to InfluxDB

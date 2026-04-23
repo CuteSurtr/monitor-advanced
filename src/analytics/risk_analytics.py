@@ -483,7 +483,7 @@ class RiskAnalytics:
 
             # Beta (if market data available)
             # metrics.beta = await self.analytics_engine.calculate_portfolio_beta(
-            #     portfolio_returns.to_frame(), market_returns
+            #  portfolio_returns.to_frame(), market_returns
             # )
 
             return metrics

@@ -432,18 +432,18 @@ Configure target portfolio allocations for rebalancing:
 
 ```python
 target_allocations = {
-    'AAPL': 0.15,    # 15% allocation
-    'GOOGL': 0.12,   # 12% allocation
-    'MSFT': 0.12,    # 12% allocation
-    'TSLA': 0.10,    # 10% allocation
-    'AMZN': 0.10,    # 10% allocation
-    'META': 0.08,    # 8% allocation
-    'NVDA': 0.08,    # 8% allocation
-    'NFLX': 0.05,    # 5% allocation
-    'PYPL': 0.05,    # 5% allocation
-    'ADBE': 0.05,    # 5% allocation
-    'CRM': 0.03,     # 3% allocation
-    'ORCL': 0.02     # 2% allocation
+    'AAPL': 0.15,  # 15% allocation
+    'GOOGL': 0.12,  # 12% allocation
+    'MSFT': 0.12,  # 12% allocation
+    'TSLA': 0.10,  # 10% allocation
+    'AMZN': 0.10,  # 10% allocation
+    'META': 0.08,  # 8% allocation
+    'NVDA': 0.08,  # 8% allocation
+    'NFLX': 0.05,  # 5% allocation
+    'PYPL': 0.05,  # 5% allocation
+    'ADBE': 0.05,  # 5% allocation
+    'CRM': 0.03,  # 3% allocation
+    'ORCL': 0.02  # 2% allocation
 }
 ```
 
@@ -453,10 +453,10 @@ Configure tax optimization parameters:
 
 ```python
 tax_settings = {
-    'short_term_rate': 0.22,      # 22% short-term capital gains rate
-    'long_term_rate': 0.15,       # 15% long-term capital gains rate
-    'tax_lot_method': 'fifo',     # FIFO tax lot identification
-    'wash_sale_window': 30        # 30-day wash sale window
+    'short_term_rate': 0.22,  # 22% short-term capital gains rate
+    'long_term_rate': 0.15,  # 15% long-term capital gains rate
+    'tax_lot_method': 'fifo',  # FIFO tax lot identification
+    'wash_sale_window': 30  # 30-day wash sale window
 }
 ```
 
@@ -652,4 +652,4 @@ logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
 ---
 
-This documentation provides a comprehensive guide to the Enhanced Portfolio Management System. For specific implementation details, refer to the source code and API documentation. 
+This documentation provides a comprehensive guide to the Enhanced Portfolio Management System. For specific implementation details, refer to the source code and API documentation.

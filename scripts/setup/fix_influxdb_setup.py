@@ -31,7 +31,7 @@ def setup_influxdb():
         except:
             pass
         time.sleep(2)
-        print(f"   Attempt {i+1}/30...")
+        print(f"  Attempt {i+1}/30...")
     else:
         print("InfluxDB not ready after 60 seconds")
         return None
@@ -115,7 +115,7 @@ def create_macro_buckets(token):
     
     macro_buckets = [
         "macro_data",
-        "treasury_data", 
+        "treasury_data",
         "economic_indicators",
         "finra_data"
     ]
@@ -146,16 +146,16 @@ def create_macro_buckets(token):
                 }
                 
                 try:
-                    response = requests.post(f"{INFLUXDB_URL}/api/v2/buckets", 
+                    response = requests.post(f"{INFLUXDB_URL}/api/v2/buckets",
                                            json=bucket_data, headers=headers, timeout=10)
                     if response.status_code == 201:
-                        print(f"   Created bucket: {bucket_name}")
+                        print(f"  Created bucket: {bucket_name}")
                     elif response.status_code == 422:
-                        print(f"   Bucket exists: {bucket_name}")
+                        print(f"  Bucket exists: {bucket_name}")
                     else:
-                        print(f"   Failed to create {bucket_name}: {response.status_code}")
+                        print(f"  Failed to create {bucket_name}: {response.status_code}")
                 except Exception as e:
-                    print(f"   Error creating {bucket_name}: {e}")
+                    print(f"  Error creating {bucket_name}: {e}")
                     
     except Exception as e:
         print(f"Error getting organization: {e}")
@@ -171,10 +171,10 @@ def main():
         print(f"\nSUCCESS! Your InfluxDB token is:")
         print(f"{token}")
         print(f"\nUpdate your Grafana datasource with this token:")
-        print(f"   1. Go to http://localhost:3000/connections/datasources")
-        print(f"   2. Click on 'InfluxDB' datasource")
-        print(f"   3. Update the token field with: {token}")
-        print(f"   4. Click 'Save & test'")
+        print(f"  1. Go to http://localhost:3000/connections/datasources")
+        print(f"  2. Click on 'InfluxDB' datasource")
+        print(f"  3. Update the token field with: {token}")
+        print(f"  4. Click 'Save & test'")
         
         # Create macro buckets
         create_macro_buckets(token)
@@ -183,7 +183,7 @@ def main():
         
     else:
         print(f"\nFailed to get InfluxDB token")
-        print(f"   Try restarting InfluxDB: docker-compose restart influxdb")
+        print(f"  Try restarting InfluxDB: docker-compose restart influxdb")
 
 if __name__ == "__main__":
     main()

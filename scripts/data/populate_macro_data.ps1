@@ -42,7 +42,7 @@ Write-Host "Generating Treasury yield curve data..." -ForegroundColor Cyan
 for ($i = 0; $i -lt 30; $i++) {
     # Treasury yields with realistic variations
     $yield10Y = 4.2 + ($i * 0.01)  # Gradual increase
-    $yield2Y = 4.8 + ($i * 0.015)   # Slightly faster increase
+    $yield2Y = 4.8 + ($i * 0.015)  # Slightly faster increase
     $yield30Y = 4.5 + ($i * 0.008)  # Slower increase
     
     # Write Treasury data

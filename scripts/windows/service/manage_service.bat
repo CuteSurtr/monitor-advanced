@@ -10,7 +10,7 @@ set SCRIPT_DIR=%~dp0
 :menu
 cls
 echo ================================================================
-echo   Stock Monitor - Service Management
+echo  Stock Monitor - Service Management
 echo ================================================================
 echo.
 echo Service Name: %SERVICE_NAME%
@@ -30,31 +30,31 @@ echo.
 echo Available Actions:
 echo.
 if "%SERVICE_STATE%" == "NOT_INSTALLED" (
-    echo   [1] Install Service
-    echo   [2] View Installation Guide
+    echo  [1] Install Service
+    echo  [2] View Installation Guide
 ) else (
     if "%SERVICE_STATE%" == "RUNNING" (
-        echo   [1] Stop Service
-        echo   [2] Restart Service
-        echo   [3] View Service Status
-        echo   [4] View Logs
-        echo   [5] Open Dashboard
-        echo   [6] Uninstall Service
+        echo  [1] Stop Service
+        echo  [2] Restart Service
+        echo  [3] View Service Status
+        echo  [4] View Logs
+        echo  [5] Open Dashboard
+        echo  [6] Uninstall Service
     ) else (
-        echo   [1] Start Service
-        echo   [2] View Service Status
-        echo   [3] View Logs
-        echo   [4] Uninstall Service
-        echo   [5] Reinstall Service
+        echo  [1] Start Service
+        echo  [2] View Service Status
+        echo  [3] View Logs
+        echo  [4] Uninstall Service
+        echo  [5] Reinstall Service
     )
 )
 echo.
-echo   [8] Service Configuration
-echo   [9] Help
-echo   [0] Exit
+echo  [8] Service Configuration
+echo  [9] Help
+echo  [0] Exit
 echo.
 
-set /p choice=Enter your choice (0-9): 
+set /p choice=Enter your choice (0-9):
 
 if "%choice%" == "0" goto :exit
 if "%choice%" == "1" goto :action1
@@ -78,18 +78,18 @@ if "%SERVICE_STATE%" == "NOT_INSTALLED" (
     echo Stopping service...
     net stop %SERVICE_NAME%
     if %errorLevel% equ 0 (
-        echo ✓ Service stopped successfully
+        echo  Service stopped successfully
     ) else (
-        echo ✗ Failed to stop service
+        echo  Failed to stop service
     )
 ) else (
     echo Starting service...
     net start %SERVICE_NAME%
     if %errorLevel% equ 0 (
-        echo ✓ Service started successfully
+        echo  Service started successfully
         echo Dashboard available at: http://localhost:8080
     ) else (
-        echo ✗ Failed to start service
+        echo  Failed to start service
         echo Check logs for details
     )
 )
@@ -105,9 +105,9 @@ if "%SERVICE_STATE%" == "NOT_INSTALLED" (
     timeout /t 3 /nobreak >nul
     net start %SERVICE_NAME%
     if %errorLevel% equ 0 (
-        echo ✓ Service restarted successfully
+        echo  Service restarted successfully
     ) else (
-        echo ✗ Failed to restart service
+        echo  Failed to restart service
     )
 ) else (
     echo Displaying service status...
@@ -190,7 +190,7 @@ goto :menu
 :config
 cls
 echo ================================================================
-echo   Service Configuration
+echo  Service Configuration
 echo ================================================================
 echo.
 if "%SERVICE_STATE%" == "NOT_INSTALLED" (
@@ -202,16 +202,16 @@ if "%SERVICE_STATE%" == "NOT_INSTALLED" (
     sc qc %SERVICE_NAME%
     echo.
     echo Configuration files:
-    echo   Main Config: ..\..\..\config\config.yaml
-    echo   Desktop Config: ..\..\..\config\config.desktop.yaml
+    echo  Main Config: ..\..\..\config\config.yaml
+    echo  Desktop Config: ..\..\..\config\config.desktop.yaml
     echo.
     echo Log files:
-    echo   Stdout: ..\..\..\logs\service_stdout.log
-    echo   Stderr: ..\..\..\logs\service_stderr.log
-    echo   Application: ..\..\..\logs\stock_monitor.log
+    echo  Stdout: ..\..\..\logs\service_stdout.log
+    echo  Stderr: ..\..\..\logs\service_stderr.log
+    echo  Application: ..\..\..\logs\stock_monitor.log
     echo.
     echo To modify service parameters, use:
-    echo   %SCRIPT_DIR%nssm.exe edit %SERVICE_NAME%
+    echo  %SCRIPT_DIR%nssm.exe edit %SERVICE_NAME%
 )
 pause
 goto :menu
@@ -219,43 +219,43 @@ goto :menu
 :help
 cls
 echo ================================================================
-echo   Stock Monitor Service - Help
+echo  Stock Monitor Service - Help
 echo ================================================================
 echo.
 echo OVERVIEW:
-echo   The Stock Monitor can run as a Windows service for automatic
-echo   startup and background operation.
+echo  The Stock Monitor can run as a Windows service for automatic
+echo  startup and background operation.
 echo.
 echo PREREQUISITES:
-echo   - Python environment must be set up
-echo   - NSSM (Non-Sucking Service Manager) required
-echo   - Administrator privileges for service management
+echo  - Python environment must be set up
+echo  - NSSM (Non-Sucking Service Manager) required
+echo  - Administrator privileges for service management
 echo.
 echo INSTALLATION:
-echo   1. Download NSSM from: https://nssm.cc/download
-echo   2. Extract nssm.exe to: %SCRIPT_DIR%
-echo   3. Run install_service.bat as Administrator
+echo  1. Download NSSM from: https://nssm.cc/download
+echo  2. Extract nssm.exe to: %SCRIPT_DIR%
+echo  3. Run install_service.bat as Administrator
 echo.
 echo CONFIGURATION:
-echo   - Edit config\config.yaml with your API keys
-echo   - Service uses config\config.yaml by default
-echo   - Logs are written to logs\ directory
+echo  - Edit config\config.yaml with your API keys
+echo  - Service uses config\config.yaml by default
+echo  - Logs are written to logs\ directory
 echo.
 echo MANAGEMENT:
-echo   - Use this script for easy management
-echo   - Or use Windows Services console (services.msc)
-echo   - Or use command line: net start/stop %SERVICE_NAME%
+echo  - Use this script for easy management
+echo  - Or use Windows Services console (services.msc)
+echo  - Or use command line: net start/stop %SERVICE_NAME%
 echo.
 echo TROUBLESHOOTING:
-echo   - Check logs in logs\ directory
-echo   - Verify Python environment: venv\Scripts\python.exe
-echo   - Ensure config file exists and is valid
-echo   - Check Windows Event Viewer for system errors
+echo  - Check logs in logs\ directory
+echo  - Verify Python environment: venv\Scripts\python.exe
+echo  - Ensure config file exists and is valid
+echo  - Check Windows Event Viewer for system errors
 echo.
 echo ACCESS:
-echo   - Dashboard: http://localhost:8080
-echo   - Grafana: http://localhost:3000
-echo   - Prometheus: http://localhost:9090
+echo  - Dashboard: http://localhost:8080
+echo  - Grafana: http://localhost:3000
+echo  - Prometheus: http://localhost:9090
 echo.
 echo For more help, see docs\DESKTOP_SETUP.md
 echo.

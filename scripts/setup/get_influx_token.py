@@ -17,7 +17,7 @@ def try_get_token_method1():
     # Force setup (this might create a new token)
     setup_data = {
         "username": os.getenv("INFLUXDB_ADMIN_USER", "admin"),
-        "password": os.getenv("INFLUXDB_ADMIN_PASSWORD", "admin123"), 
+        "password": os.getenv("INFLUXDB_ADMIN_PASSWORD", "admin123"),
         "org": "stock_monitor",
         "bucket": "market_data",
         "retentionPeriodSeconds": 0
@@ -77,7 +77,7 @@ def try_get_token_method2():
                     ]
                 }
                 
-                response = requests.post(f"{INFLUXDB_URL}/api/v2/authorizations", 
+                response = requests.post(f"{INFLUXDB_URL}/api/v2/authorizations",
                                        json=token_data, headers=headers, timeout=10)
                 print(f"Token creation response: {response.status_code}")
                 
@@ -133,7 +133,7 @@ def main():
             print(f"\n*** FINAL TOKEN ***")
             print(f"{token}")
             print(f"\nUpdate your Grafana datasource:")
-            print(f"1. Go to http://localhost:3000/connections/datasources")  
+            print(f"1. Go to http://localhost:3000/connections/datasources")
             print(f"2. Edit the InfluxDB datasource")
             print(f"3. Replace the token with: {token}")
             print(f"4. Save & test")

@@ -28,9 +28,9 @@ write_data() {
         --data-urlencode "precision=ns"
     
     if [ $? -eq 0 ]; then
-        echo "✓ Successfully wrote ${measurement}"
+        echo " Successfully wrote ${measurement}"
     else
-        echo "✗ Failed to write ${measurement}"
+        echo " Failed to write ${measurement}"
     fi
 }
 

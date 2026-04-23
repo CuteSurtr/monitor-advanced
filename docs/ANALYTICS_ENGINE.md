@@ -390,4 +390,4 @@ For issues and questions:
 3. Examine the source code for implementation details
 4. Check logs for error messages
 
-The Analytics Engine is designed to be robust, efficient, and extensible, providing comprehensive financial analysis capabilities for the stock monitoring system. 
+The Analytics Engine is designed to be robust, efficient, and extensible, providing comprehensive financial analysis capabilities for the stock monitoring system.

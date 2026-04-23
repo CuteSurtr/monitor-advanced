@@ -150,7 +150,7 @@ class TestAnalyticsEngine:
         # This test is skipped until the full analytics engine is implemented
         assert True
 
-    @pytest.mark.skipif(True, reason="Analytics engine components may not be fully implemented")  
+    @pytest.mark.skipif(True, reason="Analytics engine components may not be fully implemented")
     def test_correlation_analyzer_placeholder(self):
         """Placeholder test for correlation analyzer"""
         # This test is skipped until the full analytics engine is implemented
@@ -159,7 +159,7 @@ class TestAnalyticsEngine:
     @pytest.mark.skipif(True, reason="Analytics engine components may not be fully implemented")
     def test_volatility_analyzer_placeholder(self):
         """Placeholder test for volatility analyzer"""
-        # This test is skipped until the full analytics engine is implemented  
+        # This test is skipped until the full analytics engine is implemented
         assert True
 
     @pytest.mark.skipif(True, reason="Analytics engine components may not be fully implemented")

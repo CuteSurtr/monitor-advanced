@@ -322,7 +322,7 @@ class MacroDataCollector:
     
     def run_collection(self):
         """Run the complete data collection"""
-        print("� Starting Real Macro Economic Data Collection...")
+        print(" Starting Real Macro Economic Data Collection...")
         print(f"Target: {INFLUXDB_URL}")
         print(f"Bucket: {INFLUXDB_BUCKET}")
         print(f"Organization: {INFLUXDB_ORG}")

@@ -114,7 +114,7 @@ class MarketDataPopulator:
 
                             # Insert price data
                             insert_query = """
-                            INSERT INTO market_data.stock_prices 
+                            INSERT INTO market_data.stock_prices
                             (stock_id, timestamp, open_price, high_price, low_price, close_price, volume)
                             VALUES (%s, %s, %s, %s, %s, %s, %s)
                             ON CONFLICT (stock_id, timestamp) DO UPDATE SET
@@ -175,7 +175,7 @@ class MarketDataPopulator:
                             aggressor_side = random.choice(["BUY", "SELL"])
 
                             tick_query = """
-                            INSERT INTO market_data.tick_data 
+                            INSERT INTO market_data.tick_data
                             (asset_id, asset_type, timestamp, price, volume, aggressor_side)
                             VALUES (%s, %s, %s, %s, %s, %s)
                             """
@@ -207,10 +207,10 @@ class MarketDataPopulator:
                                 size = random.uniform(1000, 50000)
 
                                 ob_query = """
-                                INSERT INTO market_data.order_book_level2 
+                                INSERT INTO market_data.order_book_level2
                                 (asset_id, asset_type, timestamp, side, price_level, size)
                                 VALUES (%s, %s, %s, %s, %s, %s)
-                                ON CONFLICT (asset_id, asset_type, timestamp, side, price_level) 
+                                ON CONFLICT (asset_id, asset_type, timestamp, side, price_level)
                                 DO UPDATE SET size = EXCLUDED.size
                                 """
 
@@ -234,11 +234,11 @@ class MarketDataPopulator:
                         trade_intensity = random.uniform(10, 100)  # Trades per minute
 
                         micro_query = """
-                        INSERT INTO analytics.microstructure_features 
+                        INSERT INTO analytics.microstructure_features
                         (asset_id, asset_type, timestamp, bid_ask_spread, order_flow_imbalance, trade_intensity)
                         VALUES (%s, %s, %s, %s, %s, %s)
-                        ON CONFLICT (asset_id, asset_type, timestamp) 
-                        DO UPDATE SET 
+                        ON CONFLICT (asset_id, asset_type, timestamp)
+                        DO UPDATE SET
                         bid_ask_spread = EXCLUDED.bid_ask_spread,
                         order_flow_imbalance = EXCLUDED.order_flow_imbalance,
                         trade_intensity = EXCLUDED.trade_intensity
@@ -293,7 +293,7 @@ class MarketDataPopulator:
 
                     # Insert transaction
                     trans_query = """
-                    INSERT INTO portfolio.transactions 
+                    INSERT INTO portfolio.transactions
                     (portfolio_id, stock_id, transaction_type, quantity, price, total_amount, transaction_date)
                     VALUES (%s, %s, %s, %s, %s, %s, %s)
                     """
@@ -314,7 +314,7 @@ class MarketDataPopulator:
                     # Update position (simplified)
                     cursor.execute(
                         """
-                        UPDATE portfolio.positions 
+                        UPDATE portfolio.positions
                         SET market_value = quantity * %s,
                             unrealized_pnl = (quantity * %s) - (quantity * average_cost)
                         WHERE portfolio_id = %s AND stock_id = %s
@@ -372,7 +372,7 @@ class MarketDataPopulator:
                     title, severity, message = random.choice(alert_types)
 
                     alert_query = """
-                    INSERT INTO alerts.alert_instances 
+                    INSERT INTO alerts.alert_instances
                     (title, severity, message, status, triggered_at)
                     VALUES (%s, %s, %s, 'ACTIVE', %s)
                     """
@@ -422,7 +422,7 @@ class MarketDataPopulator:
                         for indicator_name, value in indicators.items():
                             cursor.execute(
                                 """
-                                INSERT INTO market_data.technical_indicators 
+                                INSERT INTO market_data.technical_indicators
                                 (stock_id, indicator_name, value, timestamp)
                                 VALUES (%s, %s, %s, %s)
                                 ON CONFLICT (stock_id, indicator_name, timestamp)

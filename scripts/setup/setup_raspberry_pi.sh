@@ -117,9 +117,9 @@ sudo systemctl enable trading-monitor.service
 
 # Configure firewall
 echo "Configuring firewall..."
-sudo ufw allow 22/tcp    # SSH
-sudo ufw allow 80/tcp    # HTTP
-sudo ufw allow 443/tcp   # HTTPS
+sudo ufw allow 22/tcp  # SSH
+sudo ufw allow 80/tcp  # HTTP
+sudo ufw allow 443/tcp  # HTTPS
 sudo ufw allow 3000/tcp  # Grafana
 sudo ufw allow 5432/tcp  # PostgreSQL
 sudo ufw allow 8086/tcp  # InfluxDB

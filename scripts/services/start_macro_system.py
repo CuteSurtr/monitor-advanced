@@ -22,14 +22,14 @@ logger = logging.getLogger(__name__)
 # Configuration
 INFLUXDB_URL = "http://localhost:8086"
 INFLUXDB_TOKEN = "your_influxdb_token_here"
-INFLUXDB_ORG = "69a6563b80682691"
+INFLUXDB_ORG = "your_influxdb_org_id"
 
 API_KEYS = {
-    "bea_api_key": os.getenv("BEA_API_KEY", "F1E3FC75-5378-43DE-88F6-796F85788A37"),
-    "finra_api_key": os.getenv("FINRA_API_KEY", "3a9634291169447b9912"),
+    "bea_api_key": os.getenv("BEA_API_KEY", "your_bea_api_key"),
+    "finra_api_key": os.getenv("FINRA_API_KEY", "your_finra_api_key"),
     "fred_api_key": os.getenv("FRED_API_KEY", "your_fred_api_key"),
-    "eia_api_key": os.getenv("EIA_API_KEY", "6xGrNpJYCBb66oCOtIV7RqdyeSMDBgKBJfQTAPGs"),
-    "census_api_key": os.getenv("CENSUS_API_KEY", "5d0db23721b8e48096f63e08f89a84d0e2323422")
+    "eia_api_key": os.getenv("EIA_API_KEY", "your_eia_api_key"),
+    "census_api_key": os.getenv("CENSUS_API_KEY", "your_census_api_key")
 }
 
 async def main():
@@ -65,7 +65,7 @@ async def main():
         manager = create_macro_manager(client, API_KEYS)
         print(f"SUCCESS: Created macro manager with {len(manager.collectors)} collectors:")
         for name in manager.collectors.keys():
-            print(f"   - {name}")
+            print(f"  - {name}")
         
     except Exception as e:
         print(f"ERROR: Failed to initialize collectors: {e}")
@@ -76,22 +76,22 @@ async def main():
     
     try:
         # Collect from all available sources
-        print("   Collecting from all macro data sources...")
+        print("  Collecting from all macro data sources...")
         all_results = await manager.collect_all_data()
         
-        print("\n   Collection Results:")
+        print("\n  Collection Results:")
         total_points = 0
         successful_collectors = 0
         
         for collector_name, point_count in all_results.items():
             if point_count >= 0:
-                print(f"   SUCCESS: {collector_name}: {point_count} data points")
+                print(f"  SUCCESS: {collector_name}: {point_count} data points")
                 total_points += point_count
                 successful_collectors += 1
             else:
-                print(f"   FAILED: {collector_name}")
+                print(f"  FAILED: {collector_name}")
         
-        print(f"\n   Total: {total_points} data points from {successful_collectors} sources")
+        print(f"\n  Total: {total_points} data points from {successful_collectors} sources")
         print("SUCCESS: Comprehensive data collection completed")
         
     except Exception as e:
@@ -133,12 +133,12 @@ async def main():
                         total_records += record.get_value()
                 
                 if total_records > 0:
-                    print(f"   SUCCESS: {bucket}: {total_records} records")
+                    print(f"  SUCCESS: {bucket}: {total_records} records")
                 else:
-                    print(f"   WARNING: {bucket}: No recent data")
+                    print(f"  WARNING: {bucket}: No recent data")
                     
             except Exception as e:
-                print(f"   ERROR: {bucket}: Query error - {e}")
+                print(f"  ERROR: {bucket}: Query error - {e}")
         
         print("SUCCESS: Data verification completed")
         

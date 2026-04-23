@@ -11,7 +11,7 @@
 ### 2. Start InfluxDB and Get Your Token
 1. Start InfluxDB service
 2. Go to http://localhost:8086
-3. Create an organization (e.g., "financial-org")  
+3. Create an organization (e.g., "financial-org")
 4. Create a bucket called `financial_data`
 5. Generate an API token and copy it
 
@@ -27,7 +27,7 @@ Edit `scripts/setup/setup_influxdb_buckets_multi_asset.py`:
 ```python
 INFLUXDB_URL = "http://localhost:8086"
 INFLUXDB_TOKEN = "your-actual-token-here"  # Replace with your token
-INFLUXDB_ORG = "your-actual-org"           # Replace with your org name
+INFLUXDB_ORG = "your-actual-org"  # Replace with your org name
 ```
 
 #### Install Python dependencies:
@@ -42,11 +42,11 @@ python setup_influxdb_buckets.py
 ```
 
 This will create:
-- ✅ `financial_data` bucket
-- 📈 72 hours of stock price data (AAPL, MSFT, GOOGL, etc.)
-- 💰 Portfolio performance metrics
-- ⚡ High-frequency tick data
-- 📊 Market metrics (volatility, RSI)
+-  `financial_data` bucket
+-  72 hours of stock price data (AAPL, MSFT, GOOGL, etc.)
+-  Portfolio performance metrics
+-  High-frequency tick data
+-  Market metrics (volatility, RSI)
 
 ### 5. Configure Grafana InfluxDB Datasource
 
@@ -67,7 +67,7 @@ Choose one of these dashboards:
 - Shows: Stock prices, volume, volatility, portfolio metrics
 
 #### Advanced Dashboard (Full features):
-- File: `influxdb-financial-analytics.json`  
+- File: `influxdb-financial-analytics.json`
 - Complex analytics and joins
 - Shows: VWAP, anomaly detection, advanced metrics
 
@@ -80,7 +80,7 @@ The setup script creates these measurements:
 - **Fields**: `open`, `high`, `low`, `close`, `volume`
 - **Frequency**: Every minute
 
-### `market_metrics`  
+### `market_metrics`
 - **Tags**: `symbol`
 - **Fields**: `volatility`, `price_change`, `rsi`
 - **Frequency**: Every minute
@@ -96,7 +96,7 @@ The setup script creates these measurements:
 - **Frequency**: Every 5 minutes
 
 ### `tick_data`
-- **Tags**: `symbol`  
+- **Tags**: `symbol`
 - **Fields**: `price`, `volume`, `bid`, `ask`
 - **Frequency**: Every 10 seconds (high-frequency)
 
@@ -119,15 +119,15 @@ generate_stock_prices(client, hours_back=168)  # 1 week of data
 
 ## Next Steps
 
-1. ✅ Import the simple dashboard first to verify connection
-2. 🔧 Customize queries for your specific needs
-3. 📊 Add more measurements for additional financial metrics
-4. ⚡ Set up real-time data ingestion pipelines
+1.  Import the simple dashboard first to verify connection
+2.  Customize queries for your specific needs
+3.  Add more measurements for additional financial metrics
+4.  Set up real-time data ingestion pipelines
 
 ## Advanced Features Available
 
-- 📈 **Window Functions**: Rolling averages, volatility calculations
-- 🔗 **Cross-Measurement Joins**: Correlate volume with volatility  
-- 🎯 **Anomaly Detection**: Z-score based outlier detection
-- ⚡ **High-Frequency Analytics**: Tick-by-tick analysis
-- 📊 **Portfolio Analytics**: Real-time performance tracking
+-  **Window Functions**: Rolling averages, volatility calculations
+-  **Cross-Measurement Joins**: Correlate volume with volatility
+-  **Anomaly Detection**: Z-score based outlier detection
+-  **High-Frequency Analytics**: Tick-by-tick analysis
+-  **Portfolio Analytics**: Real-time performance tracking

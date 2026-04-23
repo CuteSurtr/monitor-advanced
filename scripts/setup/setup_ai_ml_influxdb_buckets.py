@@ -79,8 +79,8 @@ class AIMLInfluxDBSetup:
     
     def __init__(self):
         self.client = InfluxDBClient(
-            url=INFLUXDB_URL, 
-            token=INFLUXDB_TOKEN, 
+            url=INFLUXDB_URL,
+            token=INFLUXDB_TOKEN,
             org=INFLUXDB_ORG
         )
         self.buckets_api = self.client.buckets_api()
@@ -126,7 +126,7 @@ class AIMLInfluxDBSetup:
                 
                 self.logger.info(f"Created bucket: {bucket_name} with {config['retention_period']} retention")
             else:
-                self.logger.info(f"⏭Bucket {bucket_name} already exists")
+                self.logger.info(f"Bucket {bucket_name} already exists")
                 
         except Exception as e:
             self.logger.error(f"Failed to create bucket {bucket_name}: {e}")
@@ -182,7 +182,7 @@ class AIMLInfluxDBSetup:
                 points.append(point)
         
         self.write_api.write(bucket="ai_ml_analytics", record=points)
-        self.logger.info("� Model performance data populated")
+        self.logger.info(" Model performance data populated")
     
     async def _populate_ml_signals_data(self):
         """Populate ML trading signals."""
@@ -210,7 +210,7 @@ class AIMLInfluxDBSetup:
                     points.append(point)
         
         self.write_api.write(bucket="ai_ml_analytics", record=points)
-        self.logger.info("� ML signals data populated")
+        self.logger.info(" ML signals data populated")
     
     async def _populate_feature_importance_data(self):
         """Populate feature importance rankings."""
@@ -236,7 +236,7 @@ class AIMLInfluxDBSetup:
                 points.append(point)
         
         self.write_api.write(bucket="ai_ml_analytics", record=points)
-        self.logger.info("� Feature importance data populated")
+        self.logger.info(" Feature importance data populated")
     
     async def _populate_sentiment_data(self):
         """Populate sentiment analysis data."""
@@ -272,7 +272,7 @@ class AIMLInfluxDBSetup:
                 points.append(point)
         
         self.write_api.write(bucket="sentiment_analytics", record=points)
-        self.logger.info("� Sentiment analysis data populated")
+        self.logger.info(" Sentiment analysis data populated")
     
     async def _populate_risk_analytics_data(self):
         """Populate AI risk analytics."""
@@ -331,7 +331,7 @@ class AIMLInfluxDBSetup:
                 points.append(point)
         
         self.write_api.write(bucket="price_predictions", record=points)
-        self.logger.info("� Price predictions data populated")
+        self.logger.info(" Price predictions data populated")
     
     async def _populate_portfolio_optimization_data(self):
         """Populate portfolio optimization recommendations."""
@@ -383,7 +383,7 @@ class AIMLInfluxDBSetup:
                 points.append(point)
         
         self.write_api.write(bucket="ai_ml_analytics", record=points)
-        self.logger.info("� Model training data populated")
+        self.logger.info(" Model training data populated")
     
     def verify_bucket_setup(self):
         """Verify all buckets are created and accessible."""
@@ -391,7 +391,7 @@ class AIMLInfluxDBSetup:
             buckets = self.buckets_api.find_buckets()
             existing_bucket_names = [b.name for b in buckets.buckets]
             
-            self.logger.info("� Existing buckets:")
+            self.logger.info(" Existing buckets:")
             for bucket_name in AI_ML_BUCKETS.keys():
                 if bucket_name in existing_bucket_names:
                     self.logger.info(f"  {bucket_name}")
@@ -424,28 +424,28 @@ async def main():
     setup = AIMLInfluxDBSetup()
     
     try:
-        print("� Starting AI/ML InfluxDB Setup...")
+        print(" Starting AI/ML InfluxDB Setup...")
         
         # Create buckets
-        print("\n� Creating AI/ML buckets...")
+        print("\n Creating AI/ML buckets...")
         await setup.create_all_buckets()
         
         # Populate with sample data
-        print("\n� Populating sample data...")
+        print("\n Populating sample data...")
         await setup.populate_sample_ai_ml_data()
         await setup.create_model_training_data()
         await setup._populate_portfolio_optimization_data()
         
         # Verify setup
-        print("\n� Verifying setup...")
+        print("\n Verifying setup...")
         setup.verify_bucket_setup()
         
         print("\nAI/ML InfluxDB setup completed successfully!")
-        print("\n� Available buckets:")
+        print("\n Available buckets:")
         for bucket_name, config in AI_ML_BUCKETS.items():
             print(f"  • {bucket_name}: {config['description']}")
         
-        print("\n� Dashboard Integration:")
+        print("\n Dashboard Integration:")
         print("  • Import comprehensive-professional-trading-dashboard-ai-ml-enhanced.json")
         print("  • Configure InfluxDB datasource with URL: http://localhost:8086")
         print("  • Use token for authentication")

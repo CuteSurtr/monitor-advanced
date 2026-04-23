@@ -538,7 +538,7 @@ class PnLEngine:
             start_time = end_time - timedelta(hours=1)
             data = await self.db_manager.get_stock_data(symbol, start_time, end_time)
             return data[-1] if data else None
-        except:
+        except Exception:
             return None
 
     async def _get_latest_forex_price(self, symbol: str) -> Optional[Dict[str, Any]]:
@@ -548,7 +548,7 @@ class PnLEngine:
             start_time = end_time - timedelta(hours=1)
             data = await self.db_manager.get_forex_data(symbol, start_time, end_time)
             return data[-1] if data else None
-        except:
+        except Exception:
             return None
 
     async def _get_latest_crypto_price(self, symbol: str) -> Optional[Dict[str, Any]]:
@@ -558,7 +558,7 @@ class PnLEngine:
             start_time = end_time - timedelta(hours=1)
             data = await self.db_manager.get_crypto_data(symbol, start_time, end_time)
             return data[-1] if data else None
-        except:
+        except Exception:
             return None
 
     async def _get_latest_commodity_price(
@@ -572,7 +572,7 @@ class PnLEngine:
                 symbol, start_time, end_time
             )
             return data[-1] if data else None
-        except:
+        except Exception:
             return None
 
     def _determine_asset_type(self, symbol: str) -> str:

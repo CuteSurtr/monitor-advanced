@@ -140,7 +140,7 @@ from(bucket: "macro_data")
                     "query": '''
 from(bucket: "macro_data")
   |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
-  |> filter(fn: (r) => r._measurement == "market_data" and r.indicator == "vix" or 
+  |> filter(fn: (r) => r._measurement == "market_data" and r.indicator == "vix" or
                        r._measurement == "advanced_financial" and r.indicator == "cds_spreads")
   |> map(fn: (r) => ({
       r with
@@ -155,7 +155,7 @@ from(bucket: "macro_data")
         
         # === GROWTH & MARKETS SECTION ===
         {
-            "title": "GROWTH & MARKETS", 
+            "title": "GROWTH & MARKETS",
             "height": 6,
             "panels": [
                 {
@@ -348,7 +348,7 @@ def main():
     print("=" * 45)
     print("Simple legend labels:")
     print("* case_shiller_index -> Home Prices")
-    print("* unemployment_rate -> Unemployment") 
+    print("* unemployment_rate -> Unemployment")
     print("* fed_funds_rate -> Fed Funds")
     print("* nfp -> Jobs")
     print("* jobless_claims -> Claims")

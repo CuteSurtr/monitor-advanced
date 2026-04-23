@@ -239,7 +239,7 @@ def verify_new_measurements():
     
     new_measurements = [
         "trade_consumption",
-        "housing_real_estate", 
+        "housing_real_estate",
         "corporate_credit",
         "banking_liquidity",
         "energy_commodities_extended",
@@ -275,7 +275,7 @@ def main():
     print("Professional Macro Dashboard - Tier 2 & Tier 3 Data")
     print("=" * 55)
     print("Adding 35+ advanced indicators used by:")
-    print("• Hedge funds & institutional investors") 
+    print("• Hedge funds & institutional investors")
     print("• Economic policymakers & central banks")
     print("• Professional macro analysts")
     print("• Risk management teams\n")
@@ -287,7 +287,7 @@ def main():
         print("\n=== NEW DASHBOARD CATEGORIES ===")
         print("\nTIER 2 - Extended Market & Macro:")
         print("• Trade & Consumption (retail sales, PCE, durables)")
-        print("• Housing & Real Estate (starts, permits, prices)")  
+        print("• Housing & Real Estate (starts, permits, prices)")
         print("• Corporate & Credit (profits, bankruptcies, loans)")
         print("• Banking & Liquidity (money supply, rates, assets)")
         print("• Energy & Commodities (inventories, prices, storage)")

@@ -6,31 +6,31 @@ The Web Dashboard is a comprehensive, real-time interface for the 24/7 Global St
 
 ## Features
 
-### 🏠 **Dashboard Overview**
+###  **Dashboard Overview**
 - **Market Overview**: Real-time market statistics and performance metrics
 - **Key Metrics**: Total symbols, gainers/losers count, active alerts
 - **Market Performance Chart**: Interactive time-series chart of market performance
 - **Top Movers**: Real-time list of stocks with highest price movements
 
-### 💼 **Portfolio Management**
+###  **Portfolio Management**
 - **Portfolio Summary**: Total value, P&L, and position counts
 - **Portfolio Allocation**: Interactive pie chart showing asset allocation
 - **Performance Tracking**: Historical portfolio performance over time
 - **Real-time Updates**: Live portfolio value updates
 
-### 📊 **Technical Analysis**
+###  **Technical Analysis**
 - **Interactive Charts**: Plotly-powered technical indicator charts
 - **Multiple Indicators**: RSI, MACD, Bollinger Bands, Moving Averages
 - **Symbol Selection**: Dropdown to select any available stock symbol
 - **Period Selection**: Customizable analysis periods (1-365 days)
 
-### 🔔 **Alerts Management**
+###  **Alerts Management**
 - **Recent Alerts**: Real-time list of triggered alerts
 - **Alert Statistics**: Total, active, and daily alert counts
 - **Alert Details**: Symbol, message, timestamp, and severity
 - **Alert Acknowledgment**: Mark alerts as read/acknowledged
 
-### 🗺️ **Market Data**
+###  **Market Data**
 - **Market Heatmap**: Visual representation of market performance
 - **Sector Analysis**: Performance across different market sectors
 - **Real-time Data**: Live price, volume, and change data
@@ -41,20 +41,20 @@ The Web Dashboard is a comprehensive, real-time interface for the 24/7 Global St
 ### Components
 
 ```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   Web Browser   │◄──►│  FastAPI Server  │◄──►│ Dashboard Mgr   │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-                                │                        │
-                                ▼                        ▼
-                       ┌──────────────────┐    ┌─────────────────┐
-                       │   API Routes     │    │ System Components│
-                       └──────────────────┘    └─────────────────┘
+┌─────────────────┐  ┌──────────────────┐  ┌─────────────────┐
+│  Web Browser  │◄──►│  FastAPI Server  │◄──►│ Dashboard Mgr  │
+└─────────────────┘  └──────────────────┘  └─────────────────┘
+                                │  │
+                                ▼  ▼
+                       ┌──────────────────┐  ┌─────────────────┐
+                       │  API Routes  │  │ System Components│
+                       └──────────────────┘  └─────────────────┘
                                                         │
                                 ┌───────────────────────┼───────────────────────┐
-                                ▼                       ▼                       ▼
-                       ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-                       │ Database Mgr    │    │ Analytics Engine│    │ Alert Manager   │
-                       └─────────────────┘    └─────────────────┘    └─────────────────┘
+                                ▼  ▼  ▼
+                       ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐
+                       │ Database Mgr  │  │ Analytics Engine│  │ Alert Manager  │
+                       └─────────────────┘  └─────────────────┘  └─────────────────┘
 ```
 
 ### Key Components
@@ -394,4 +394,4 @@ pytest tests/test_dashboard_api.py
 
 ---
 
-*This documentation covers the comprehensive web dashboard system for the 24/7 Global Stock Market Monitoring System. For additional information, refer to the main project documentation.* 
+*This documentation covers the comprehensive web dashboard system for the 24/7 Global Stock Market Monitoring System. For additional information, refer to the main project documentation.*

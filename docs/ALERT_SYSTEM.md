@@ -111,10 +111,10 @@ The Alert System is a comprehensive real-time monitoring and notification system
 
 ```
 Market Data → Analytics Engine → Alert Manager → Notification System
-     ↓              ↓                ↓              ↓
-  Price Data   Technical      Condition      Email/Slack/
-  Volume Data  Indicators     Evaluation     Telegram/etc.
-  News Data    Anomalies      Event Creation
+     ↓  ↓  ↓  ↓
+  Price Data  Technical  Condition  Email/Slack/
+  Volume Data  Indicators  Evaluation  Telegram/etc.
+  News Data  Anomalies  Event Creation
 ```
 
 ## Usage
@@ -506,4 +506,4 @@ alert_manager.log_condition_evaluation = True
 
 The Alert System provides a robust, scalable, and feature-rich solution for real-time market monitoring and notification. With its comprehensive alert types, multiple notification methods, and advanced features, it serves as a critical component of the 24/7 Global Stock Market Monitoring System.
 
-For more information, refer to the API documentation, example scripts, and configuration guides provided in the project repository. 
+For more information, refer to the API documentation, example scripts, and configuration guides provided in the project repository.

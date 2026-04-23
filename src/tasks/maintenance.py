@@ -158,8 +158,8 @@ def cache_cleanup(self):
                 # Check if key is older than 1 hour
                 # ttl = redis_client.ttl(key)
                 # if ttl < 0 or ttl > 3600:
-                #     redis_client.delete(key)
-                #     cleanup_results['cache_entries_removed'] += 1
+                #  redis_client.delete(key)
+                #  cleanup_results['cache_entries_removed'] += 1
                 pass
 
             # Optimize memory usage
@@ -430,11 +430,8 @@ def system_optimization(self):
         # File system optimization
         try:
             # Clean up temporary files
-            temp_dir = (
-                Path("/tmp")
-                if os.name != "nt"
-                else Path(os.environ.get("TEMP", "C:\\temp"))
-            )
+            import tempfile
+            temp_dir = Path(tempfile.gettempdir())
 
             if temp_dir.exists():
                 temp_files_cleaned = 0

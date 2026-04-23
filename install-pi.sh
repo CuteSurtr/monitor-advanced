@@ -383,7 +383,7 @@ main() {
     echo "2. After reboot, navigate to: cd $USER_DIR"
     echo "3. Start the services: ./start.sh"
     echo "4. Access Grafana: http://$(hostname -I | awk '{print $1}'):3000"
-    echo "   Default login: admin/trading123"
+    echo "  Default login: admin/trading123"
     echo ""
     log_info "Management commands:"
     echo "- Start services: ./start.sh"

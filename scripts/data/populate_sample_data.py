@@ -76,7 +76,7 @@ def populate_tick_data():
                 trade_count = random.randint(1, 50)
                 
                 cursor.execute("""
-                    INSERT INTO market_data.tick_data 
+                    INSERT INTO market_data.tick_data
                     (timestamp, asset_id, asset_type, bid_price, ask_price, last_price, volume, trade_count)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                 """, (timestamp, asset_id, asset_type, bid_price, ask_price, current_price, volume, trade_count))
@@ -143,8 +143,8 @@ def populate_microstructure_features():
                             liquidity_score = random.uniform(0.1, 1.0)  # 0.1 to 1.0 score
                 
                                             cursor.execute("""
-                                INSERT INTO analytics.microstructure_features 
-                                (timestamp, asset_id, asset_type, bid_ask_spread, mid_price, price_impact, 
+                                INSERT INTO analytics.microstructure_features
+                                (timestamp, asset_id, asset_type, bid_ask_spread, mid_price, price_impact,
                                  realized_volatility, trade_intensity, order_flow_imbalance, liquidity_score)
                                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                             """, (timestamp, asset_id, asset_type, bid_ask_spread, mid_price, price_impact,
@@ -185,7 +185,7 @@ def populate_market_regime():
             trend_strength = random.uniform(0.1, 0.9)
             
             cursor.execute("""
-                INSERT INTO analytics.market_regime 
+                INSERT INTO analytics.market_regime
                 (timestamp, regime_type, confidence_score, volatility_regime, correlation_regime, trend_strength)
                 VALUES (%s, %s, %s, %s, %s, %s)
             """, (timestamp, regime_type, confidence_score, volatility_regime, correlation_regime, trend_strength))
@@ -203,7 +203,7 @@ def populate_market_regime():
 def main():
     """Main function to populate all tables with sample data"""
     try:
-        logger.info("� Starting Sample Data Population for Multi-Asset Trading System")
+        logger.info(" Starting Sample Data Population for Multi-Asset Trading System")
         logger.info("=" * 60)
         
         # Populate tick data
@@ -216,16 +216,16 @@ def main():
         populate_market_regime()
         
         logger.info("\n" + "=" * 60)
-        logger.info("� Sample Data Population Completed Successfully!")
-        logger.info("\n� Tables populated:")
-        logger.info("   market_data.tick_data")
-        logger.info("   analytics.microstructure_features")
-        logger.info("   analytics.market_regime")
-        logger.info("\n� Next Steps:")
-        logger.info("   1. The PostgreSQL HFT Analytics dashboard should now show data")
-        logger.info("   2. Access Grafana at http://localhost:3000")
-        logger.info("   3. Import the 'postgresql-hft-analytics-fixed.json' dashboard")
-        logger.info("   4. Configure the PostgreSQL data source if needed")
+        logger.info(" Sample Data Population Completed Successfully!")
+        logger.info("\n Tables populated:")
+        logger.info("  market_data.tick_data")
+        logger.info("  analytics.microstructure_features")
+        logger.info("  analytics.market_regime")
+        logger.info("\n Next Steps:")
+        logger.info("  1. The PostgreSQL HFT Analytics dashboard should now show data")
+        logger.info("  2. Access Grafana at http://localhost:3000")
+        logger.info("  3. Import the 'postgresql-hft-analytics-fixed.json' dashboard")
+        logger.info("  4. Configure the PostgreSQL data source if needed")
         
         return True
         

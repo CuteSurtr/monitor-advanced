@@ -309,8 +309,8 @@ async def demo_anomaly_detection():
     print(f"  • Pattern anomalies: {pattern_anomalies.model_info.get('n_anomalies', 0)}")
     
     # Show recent anomalies
-    for anomaly_type, anomaly_result in [('Price', price_anomalies), 
-                                        ('Volume', volume_anomalies), 
+    for anomaly_type, anomaly_result in [('Price', price_anomalies),
+                                        ('Volume', volume_anomalies),
                                         ('Pattern', pattern_anomalies)]:
         if anomaly_result.anomalies.any():
             recent_anomalies = anomaly_result.anomalies.tail(10)
@@ -363,4 +363,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main() 
+    main()

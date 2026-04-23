@@ -72,7 +72,7 @@ def generate_sample_data():
         # Sample yield curve (inverted scenario)
         yields = {
             "3m": 5.3 + random.uniform(-0.1, 0.1),
-            "2y": 4.8 + random.uniform(-0.1, 0.1), 
+            "2y": 4.8 + random.uniform(-0.1, 0.1),
             "10y": 4.2 + random.uniform(-0.1, 0.1),
             "30y": 4.5 + random.uniform(-0.1, 0.1)
         }

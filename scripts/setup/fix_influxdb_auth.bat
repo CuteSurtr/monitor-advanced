@@ -28,9 +28,9 @@ timeout /t 30 /nobreak >nul
 echo Step 5: Testing InfluxDB connection...
 curl -s http://localhost:8086/health >nul 2>&1
 if %errorLevel% equ 0 (
-    echo ✓ InfluxDB is responding
+    echo  InfluxDB is responding
 ) else (
-    echo ✗ InfluxDB is not responding
+    echo  InfluxDB is not responding
     pause
     exit /b 1
 )
@@ -38,9 +38,9 @@ if %errorLevel% equ 0 (
 echo Step 6: Testing authentication...
 docker exec stock_monitor_influxdb influx org list --token your_influxdb_token_here >nul 2>&1
 if %errorLevel% equ 0 (
-    echo ✓ Authentication successful
+    echo  Authentication successful
 ) else (
-    echo ✗ Authentication failed
+    echo  Authentication failed
     pause
     exit /b 1
 )

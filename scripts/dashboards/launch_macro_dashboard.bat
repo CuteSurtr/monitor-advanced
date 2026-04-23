@@ -23,23 +23,23 @@ if %ERRORLEVEL% EQU 0 (
     echo ==================
     echo.
     echo Access your Macro Economic Dashboard:
-    echo    Grafana: http://localhost:3000
-    echo    Login: admin / admin
+    echo  Grafana: http://localhost:3000
+    echo  Login: admin / admin
     echo.
     echo Data Sources Active:
-    echo    - Treasury yield curves and auctions
-    echo    - Federal Reserve economic data (FRED)
-    echo    - Bureau of Labor Statistics (BLS)
-    echo    - Bureau of Economic Analysis (BEA)
-    echo    - Energy Information Administration (EIA)
-    echo    - Census Bureau economic indicators
-    echo    - European Central Bank (ECB)
-    echo    - International Monetary Fund (IMF)
-    echo    - Bank for International Settlements (BIS)
-    echo    - SEC EDGAR filings
-    echo    - FINRA short interest data
-    echo    - World Bank development indicators
-    echo    - OECD leading indicators
+    echo  - Treasury yield curves and auctions
+    echo  - Federal Reserve economic data (FRED)
+    echo  - Bureau of Labor Statistics (BLS)
+    echo  - Bureau of Economic Analysis (BEA)
+    echo  - Energy Information Administration (EIA)
+    echo  - Census Bureau economic indicators
+    echo  - European Central Bank (ECB)
+    echo  - International Monetary Fund (IMF)
+    echo  - Bank for International Settlements (BIS)
+    echo  - SEC EDGAR filings
+    echo  - FINRA short interest data
+    echo  - World Bank development indicators
+    echo  - OECD leading indicators
     echo.
     echo SUCCESS: Your comprehensive macro dashboard is ready!
     echo.
@@ -47,7 +47,7 @@ if %ERRORLEVEL% EQU 0 (
 ) else (
     echo.
     echo ERROR: API tests failed. Please check your internet connection
-    echo    and API key configuration.
+    echo  and API key configuration.
     echo.
     pause
     exit /b 1

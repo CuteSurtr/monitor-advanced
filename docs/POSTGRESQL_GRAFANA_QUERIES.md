@@ -6,18 +6,18 @@ Comprehensive SQL queries for building Grafana dashboards using your PostgreSQL 
 
 ### 1. Real-Time Portfolio Value (Stat Panel)
 ```sql
-SELECT 
+SELECT
     SUM(market_value) as "Total Portfolio Value",
     SUM(unrealized_pnl) as "Unrealized P&L",
     SUM(realized_pnl) as "Realized P&L",
     COUNT(*) as "Position Count"
-FROM portfolio.positions 
+FROM portfolio.positions
 WHERE portfolio_id = '00000000-0000-0000-0000-000000000001';
 ```
 
 ### 2. Top Gainers/Losers Today (Table)
 ```sql
-SELECT 
+SELECT
     s.symbol,
     s.company_name,
     p.unrealized_pnl as "P&L",
@@ -33,7 +33,7 @@ LIMIT 10;
 
 ### 3. Portfolio Allocation by Sector (Pie Chart)
 ```sql
-SELECT 
+SELECT
     s.sector as "metric",
     SUM(p.market_value) as "value"
 FROM portfolio.positions p
@@ -45,12 +45,12 @@ ORDER BY SUM(p.market_value) DESC;
 
 ### 4. Daily Trading Activity (Time Series)
 ```sql
-SELECT 
+SELECT
     DATE_TRUNC('day', transaction_date) as "time",
     SUM(CASE WHEN transaction_type = 'BUY' THEN total_amount ELSE 0 END) as "Purchases",
     SUM(CASE WHEN transaction_type = 'SELL' THEN total_amount ELSE 0 END) as "Sales",
     COUNT(*) as "Trade Count"
-FROM portfolio.transactions 
+FROM portfolio.transactions
 WHERE portfolio_id = '00000000-0000-0000-0000-000000000001'
   AND transaction_date >= NOW() - INTERVAL '30 days'
 GROUP BY DATE_TRUNC('day', transaction_date)
@@ -62,7 +62,7 @@ ORDER BY "time";
 ### 5. Asset Class Performance (Multi-Line Time Series)
 ```sql
 -- Stocks Performance
-SELECT 
+SELECT
     sp.timestamp as "time",
     'Stocks' as "metric",
     AVG(sp.close_price) as "value"
@@ -75,7 +75,7 @@ GROUP BY sp.timestamp, 'Stocks'
 UNION ALL
 
 -- Crypto Performance (from tick data)
-SELECT 
+SELECT
     td.timestamp as "time",
     'Crypto' as "metric",
     AVG(td.price) as "value"
@@ -89,7 +89,7 @@ GROUP BY td.timestamp, 'Crypto'
 UNION ALL
 
 -- Commodities Performance
-SELECT 
+SELECT
     td.timestamp as "time",
     'Commodities' as "metric",
     AVG(td.price) as "value"
@@ -105,7 +105,7 @@ ORDER BY "time";
 
 ### 6. Cross-Asset Volume Analysis (Bar Chart)
 ```sql
-SELECT 
+SELECT
     'Stocks' as "Asset Class",
     SUM(sp.volume) as "Total Volume"
 FROM market_data.stock_prices sp
@@ -113,7 +113,7 @@ WHERE sp.timestamp >= CURRENT_DATE
 
 UNION ALL
 
-SELECT 
+SELECT
     'Crypto' as "Asset Class",
     SUM(td.volume::bigint) as "Total Volume"
 FROM market_data.tick_data td
@@ -122,7 +122,7 @@ WHERE td.asset_type = 'crypto'
 
 UNION ALL
 
-SELECT 
+SELECT
     'Forex' as "Asset Class",
     SUM(td.volume::bigint) as "Total Volume"
 FROM market_data.tick_data td
@@ -131,7 +131,7 @@ WHERE td.asset_type = 'forex'
 
 UNION ALL
 
-SELECT 
+SELECT
     'Commodities' as "Asset Class",
     SUM(td.volume::bigint) as "Total Volume"
 FROM market_data.tick_data td
@@ -142,7 +142,7 @@ WHERE td.asset_type = 'commodity'
 ### 7. Top Movers Across All Asset Classes (Table)
 ```sql
 -- Top Stock Movers
-SELECT 
+SELECT
     s.symbol,
     s.company_name as "Name",
     'Stock' as "Type",
@@ -151,18 +151,18 @@ SELECT
     ROUND(((sp_current.close_price - sp_prev.close_price) / sp_prev.close_price * 100)::numeric, 2) as "Change %"
 FROM market_data.stocks s
 JOIN LATERAL (
-    SELECT close_price 
-    FROM market_data.stock_prices 
-    WHERE stock_id = s.id 
-    ORDER BY timestamp DESC 
+    SELECT close_price
+    FROM market_data.stock_prices
+    WHERE stock_id = s.id
+    ORDER BY timestamp DESC
     LIMIT 1
 ) sp_current ON true
 JOIN LATERAL (
-    SELECT close_price 
-    FROM market_data.stock_prices 
-    WHERE stock_id = s.id 
+    SELECT close_price
+    FROM market_data.stock_prices
+    WHERE stock_id = s.id
       AND timestamp < CURRENT_DATE
-    ORDER BY timestamp DESC 
+    ORDER BY timestamp DESC
     LIMIT 1
 ) sp_prev ON true
 WHERE s.is_active = true
@@ -170,7 +170,7 @@ WHERE s.is_active = true
 UNION ALL
 
 -- Top Crypto Movers
-SELECT 
+SELECT
     c.symbol,
     c.name as "Name",
     'Crypto' as "Type",
@@ -179,18 +179,18 @@ SELECT
     ROUND(((td_current.price - td_prev.price) / td_prev.price * 100)::numeric, 2) as "Change %"
 FROM market_data.cryptocurrencies c
 JOIN LATERAL (
-    SELECT price 
-    FROM market_data.tick_data 
+    SELECT price
+    FROM market_data.tick_data
     WHERE asset_id = c.id AND asset_type = 'crypto'
-    ORDER BY timestamp DESC 
+    ORDER BY timestamp DESC
     LIMIT 1
 ) td_current ON true
 JOIN LATERAL (
-    SELECT price 
-    FROM market_data.tick_data 
+    SELECT price
+    FROM market_data.tick_data
     WHERE asset_id = c.id AND asset_type = 'crypto'
       AND timestamp < CURRENT_DATE
-    ORDER BY timestamp DESC 
+    ORDER BY timestamp DESC
     LIMIT 1
 ) td_prev ON true
 WHERE c.is_active = true
@@ -203,9 +203,9 @@ LIMIT 20;
 
 ### 8. Real-Time Bid-Ask Spreads (Time Series)
 ```sql
-SELECT 
+SELECT
     mf.timestamp as "time",
-    CASE 
+    CASE
         WHEN mf.asset_type = 'stock' THEN s.symbol
         WHEN mf.asset_type = 'crypto' THEN c.symbol
         WHEN mf.asset_type = 'forex' THEN f.symbol
@@ -224,9 +224,9 @@ ORDER BY mf.timestamp;
 
 ### 9. Order Flow Imbalance (Heatmap/Time Series)
 ```sql
-SELECT 
+SELECT
     mf.timestamp as "time",
-    CASE 
+    CASE
         WHEN mf.asset_type = 'stock' THEN s.symbol
         WHEN mf.asset_type = 'crypto' THEN c.symbol
         WHEN mf.asset_type = 'forex' THEN f.symbol
@@ -245,7 +245,7 @@ ORDER BY mf.timestamp;
 
 ### 10. Trade Intensity by Asset Type (Multi-Line Time Series)
 ```sql
-SELECT 
+SELECT
     DATE_TRUNC('minute', mf.timestamp) as "time",
     mf.asset_type as "metric",
     AVG(mf.trade_intensity) as "value"
@@ -260,13 +260,13 @@ ORDER BY "time";
 
 ### 11. Active Risk Alerts (Table)
 ```sql
-SELECT 
+SELECT
     ai.title as "Alert",
     ai.severity as "Severity",
     ai.message as "Description",
     ai.triggered_at as "Time",
     ai.status as "Status",
-    CASE 
+    CASE
         WHEN ai.stock_id IS NOT NULL THEN (SELECT symbol FROM market_data.stocks WHERE id = ai.stock_id)
         ELSE 'Portfolio'
     END as "Asset"
@@ -279,7 +279,7 @@ ORDER BY ai.triggered_at DESC;
 ### 12. Portfolio Risk Metrics Over Time (Time Series)
 ```sql
 -- This would require calculated metrics - simplified example
-SELECT 
+SELECT
     DATE_TRUNC('hour', NOW()) as "time",
     'VaR 95%' as "metric",
     SUM(p.market_value) * 0.025 as "value"  -- Simplified VaR calculation
@@ -289,7 +289,7 @@ GROUP BY DATE_TRUNC('hour', NOW())
 
 UNION ALL
 
-SELECT 
+SELECT
     DATE_TRUNC('hour', NOW()) as "time",
     'Portfolio Volatility' as "metric",
     STDDEV(p.unrealized_pnl) as "value"
@@ -300,15 +300,15 @@ GROUP BY DATE_TRUNC('hour', NOW());
 
 ### 13. Concentration Risk by Position (Bar Chart)
 ```sql
-SELECT 
+SELECT
     s.symbol as "Symbol",
     p.market_value as "Position Value",
     ROUND((p.market_value / portfolio_total.total_value * 100)::numeric, 2) as "Portfolio %"
 FROM portfolio.positions p
 JOIN market_data.stocks s ON p.stock_id = s.id
 CROSS JOIN (
-    SELECT SUM(market_value) as total_value 
-    FROM portfolio.positions 
+    SELECT SUM(market_value) as total_value
+    FROM portfolio.positions
     WHERE portfolio_id = '00000000-0000-0000-0000-000000000001'
 ) portfolio_total
 WHERE p.portfolio_id = '00000000-0000-0000-0000-000000000001'
@@ -320,9 +320,9 @@ LIMIT 15;
 
 ### 14. Trading Sessions Activity (Time Series)
 ```sql
-SELECT 
+SELECT
     td.timestamp as "time",
-    CASE 
+    CASE
         WHEN EXTRACT(HOUR FROM td.timestamp AT TIME ZONE 'UTC') BETWEEN 14 AND 21 THEN 'US Session'
         WHEN EXTRACT(HOUR FROM td.timestamp AT TIME ZONE 'UTC') BETWEEN 8 AND 16 THEN 'European Session'
         WHEN EXTRACT(HOUR FROM td.timestamp AT TIME ZONE 'UTC') BETWEEN 0 AND 6 THEN 'Asian Session'
@@ -331,8 +331,8 @@ SELECT
     COUNT(*) as "value"
 FROM market_data.tick_data td
 WHERE td.timestamp >= NOW() - INTERVAL '24 hours'
-GROUP BY td.timestamp, 
-    CASE 
+GROUP BY td.timestamp,
+    CASE
         WHEN EXTRACT(HOUR FROM td.timestamp AT TIME ZONE 'UTC') BETWEEN 14 AND 21 THEN 'US Session'
         WHEN EXTRACT(HOUR FROM td.timestamp AT TIME ZONE 'UTC') BETWEEN 8 AND 16 THEN 'European Session'
         WHEN EXTRACT(HOUR FROM td.timestamp AT TIME ZONE 'UTC') BETWEEN 0 AND 6 THEN 'Asian Session'
@@ -343,13 +343,13 @@ ORDER BY td.timestamp;
 
 ### 15. Exchange Volume Leaders (Bar Chart)
 ```sql
-SELECT 
+SELECT
     e.name as "Exchange",
     COUNT(DISTINCT s.id) as "Listed Assets",
     SUM(COALESCE(sp.volume, 0)) as "Total Volume"
 FROM market_data.exchanges e
 LEFT JOIN market_data.stocks s ON e.id = s.exchange_id
-LEFT JOIN market_data.stock_prices sp ON s.id = sp.stock_id 
+LEFT JOIN market_data.stock_prices sp ON s.id = sp.stock_id
     AND sp.timestamp >= CURRENT_DATE
 WHERE e.id IS NOT NULL
 GROUP BY e.name, e.code
@@ -361,7 +361,7 @@ ORDER BY SUM(COALESCE(sp.volume, 0)) DESC;
 ### 16. Individual Asset Performance (Time Series with Template Variable)
 ```sql
 -- Use $symbol as Grafana template variable
-SELECT 
+SELECT
     sp.timestamp as "time",
     sp.close_price as "Price",
     sp.volume as "Volume"
@@ -375,7 +375,7 @@ ORDER BY sp.timestamp;
 ### 17. Technical Indicators (Multi-Line Time Series)
 ```sql
 -- Use $symbol as template variable
-SELECT 
+SELECT
     ti.timestamp as "time",
     ti.indicator_name as "metric",
     ti.value as "value"
@@ -390,14 +390,14 @@ ORDER BY ti.timestamp;
 ### 18. Order Book Depth (Current State)
 ```sql
 -- Use $symbol and $asset_type as template variables
-SELECT 
+SELECT
     ob.side as "Side",
     ob.price_level as "Price",
     ob.size as "Size",
     ob.order_count as "Orders"
 FROM market_data.order_book_level2 ob
 WHERE ob.asset_id = (
-    CASE 
+    CASE
         WHEN '$asset_type' = 'stock' THEN (SELECT id FROM market_data.stocks WHERE symbol = '$symbol')
         WHEN '$asset_type' = 'crypto' THEN (SELECT id FROM market_data.cryptocurrencies WHERE symbol = '$symbol')
         WHEN '$asset_type' = 'forex' THEN (SELECT id FROM market_data.forex_pairs WHERE symbol = '$symbol')
@@ -458,7 +458,7 @@ ORDER BY name;
 ### 19. Multi-Symbol Price Comparison (Template Variable Multi-Select)
 ```sql
 -- Use $symbols as multi-select template variable
-SELECT 
+SELECT
     sp.timestamp as "time",
     s.symbol as "metric",
     sp.close_price as "value"
@@ -473,7 +473,7 @@ ORDER BY sp.timestamp;
 ```sql
 -- Normalized to 100 at start date for comparison
 WITH base_prices AS (
-    SELECT 
+    SELECT
         s.symbol,
         FIRST_VALUE(sp.close_price) OVER (PARTITION BY s.symbol ORDER BY sp.timestamp) as base_price
     FROM market_data.stock_prices sp
@@ -481,7 +481,7 @@ WITH base_prices AS (
     WHERE s.symbol = ANY(string_to_array('$symbols', ','))
       AND sp.timestamp >= NOW() - INTERVAL '30 days'
 )
-SELECT 
+SELECT
     sp.timestamp as "time",
     s.symbol as "metric",
     (sp.close_price / bp.base_price * 100) as "value"

@@ -18,7 +18,7 @@ def run_script(script_path, description):
     """Run a Python script and handle errors"""
     try:
         logger.info(f"Running {description}...")
-        result = subprocess.run([sys.executable, script_path], 
+        result = subprocess.run([sys.executable, script_path],
                               capture_output=True, text=True, check=True)
         logger.info(f"{description} completed successfully")
         return True
@@ -64,7 +64,7 @@ def wait_for_services():
     while attempt < max_attempts:
         try:
             result = subprocess.run([
-                'docker', 'exec', 'stock_monitor_postgres_desktop', 
+                'docker', 'exec', 'stock_monitor_postgres_desktop',
                 'pg_isready', '-U', 'stock_user', '-d', 'stock_monitor'
             ], capture_output=True, text=True)
             
@@ -108,7 +108,7 @@ def wait_for_services():
 
 def main():
     """Main setup function"""
-    logger.info("� Starting Complete Multi-Asset Trading System Setup")
+    logger.info(" Starting Complete Multi-Asset Trading System Setup")
     logger.info("=" * 60)
     
     # Check if we're in the right directory
@@ -127,38 +127,38 @@ def main():
         return False
     
     # Step 1: Set up PostgreSQL database
-    logger.info("\n� Step 1: Setting up PostgreSQL database...")
+    logger.info("\n Step 1: Setting up PostgreSQL database...")
     if not run_script('scripts/setup/setup_multi_asset_database.py', 'PostgreSQL database setup'):
         logger.error("PostgreSQL setup failed")
         return False
     
     # Step 2: Set up InfluxDB buckets
-    logger.info("\n� Step 2: Setting up InfluxDB buckets...")
+    logger.info("\n Step 2: Setting up InfluxDB buckets...")
     if not run_script('scripts/setup/setup_influxdb_buckets_multi_asset.py', 'InfluxDB bucket setup'):
         logger.error("InfluxDB setup failed")
         return False
     
     # Step 3: Populate with sample data
-    logger.info("\n� Step 3: Populating with sample data...")
+    logger.info("\n Step 3: Populating with sample data...")
     if not run_script('scripts/generate_high_frequency_data.py', 'Sample data generation'):
         logger.error("Sample data generation failed")
         return False
     
     logger.info("\n" + "=" * 60)
-    logger.info("� Multi-Asset Trading System Setup Completed Successfully!")
-    logger.info("\n� What was set up:")
-    logger.info("   PostgreSQL database with multi-asset schemas")
-    logger.info("   InfluxDB buckets for different asset types")
-    logger.info("   Sample data for stocks, forex, crypto, and commodities")
-    logger.info("   TimescaleDB hypertables for time-series optimization")
-    logger.info("\n� Available Dashboards:")
-    logger.info("   � Multi-Asset Trading Dashboard (InfluxDB)")
-    logger.info("   � PostgreSQL HFT Analytics Dashboard")
-    logger.info("\n� Next Steps:")
-    logger.info("   1. Access Grafana at http://localhost:3000")
-    logger.info("   2. Import the new dashboards")
-    logger.info("   3. Configure data sources if needed")
-    logger.info("   4. Start monitoring your multi-asset trading system!")
+    logger.info(" Multi-Asset Trading System Setup Completed Successfully!")
+    logger.info("\n What was set up:")
+    logger.info("  PostgreSQL database with multi-asset schemas")
+    logger.info("  InfluxDB buckets for different asset types")
+    logger.info("  Sample data for stocks, forex, crypto, and commodities")
+    logger.info("  TimescaleDB hypertables for time-series optimization")
+    logger.info("\n Available Dashboards:")
+    logger.info("  Multi-Asset Trading Dashboard (InfluxDB)")
+    logger.info("  PostgreSQL HFT Analytics Dashboard")
+    logger.info("\n Next Steps:")
+    logger.info("  1. Access Grafana at http://localhost:3000")
+    logger.info("  2. Import the new dashboards")
+    logger.info("  3. Configure data sources if needed")
+    logger.info("  4. Start monitoring your multi-asset trading system!")
     
     return True
 

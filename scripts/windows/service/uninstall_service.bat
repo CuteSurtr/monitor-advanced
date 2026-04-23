@@ -5,7 +5,7 @@ REM This script removes the Stock Monitor Windows service
 setlocal enabledelayedexpansion
 
 echo ================================================================
-echo   Stock Monitor - Windows Service Uninstaller
+echo  Stock Monitor - Windows Service Uninstaller
 echo ================================================================
 echo.
 
@@ -47,16 +47,16 @@ if %errorLevel% neq 0 (
     exit /b 0
 )
 
-echo ✓ Service found
+echo  Service found
 echo.
 
 REM Stop the service if running
 echo Stopping service...
 "%SCRIPT_DIR%nssm.exe" stop "%SERVICE_NAME%" >nul 2>&1
 if %errorLevel% equ 0 (
-    echo ✓ Service stopped
+    echo  Service stopped
 ) else (
-    echo ⚠ Service was not running or failed to stop
+    echo  Service was not running or failed to stop
 )
 
 REM Wait a moment for service to fully stop
@@ -69,7 +69,7 @@ echo Removing service...
 "%SCRIPT_DIR%nssm.exe" remove "%SERVICE_NAME%" confirm
 
 if %errorLevel% equ 0 (
-    echo ✓ Service removed successfully
+    echo  Service removed successfully
 ) else (
     echo ERROR: Failed to remove service
     echo.
@@ -85,9 +85,9 @@ REM Clean up any remaining registry entries (optional)
 echo Cleaning up registry entries...
 reg delete "HKLM\SYSTEM\CurrentControlSet\Services\%SERVICE_NAME%" /f >nul 2>&1
 if %errorLevel% equ 0 (
-    echo ✓ Registry entries cleaned
+    echo  Registry entries cleaned
 ) else (
-    echo ⚠ No additional registry entries found
+    echo  No additional registry entries found
 )
 
 echo.
@@ -95,15 +95,15 @@ echo.
 REM Check if service is completely removed
 sc query "%SERVICE_NAME%" >nul 2>&1
 if %errorLevel% neq 0 (
-    echo ✓ Service completely removed
+    echo  Service completely removed
 else
-    echo ⚠ Service may still exist in registry
+    echo  Service may still exist in registry
     echo Try rebooting the system
 )
 
 echo.
 echo ================================================================
-echo   SERVICE UNINSTALLATION COMPLETED
+echo  SERVICE UNINSTALLATION COMPLETED
 echo ================================================================
 echo.
 echo The Stock Monitor service has been removed from your system.
@@ -112,11 +112,11 @@ echo The application files and configuration remain intact.
 echo You can still run the application manually or reinstall the service.
 echo.
 echo To run manually:
-echo   1. Open Command Prompt in the application directory
-echo   2. Run: venv\Scripts\activate.bat
-echo   3. Run: python src\main.py
+echo  1. Open Command Prompt in the application directory
+echo  2. Run: venv\Scripts\activate.bat
+echo  3. Run: python src\main.py
 echo.
 echo To reinstall the service:
-echo   Run: scripts\windows\service\install_service.bat
+echo  Run: scripts\windows\service\install_service.bat
 echo.
 pause

@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS market_data.stocks (
 CREATE TABLE IF NOT EXISTS market_data.cryptocurrencies (
     id SERIAL PRIMARY KEY,
     symbol VARCHAR(20) UNIQUE NOT NULL,  -- e.g., 'BTC', 'ETH'
-    name VARCHAR(100) NOT NULL,          -- e.g., 'Bitcoin', 'Ethereum'
+    name VARCHAR(100) NOT NULL,  -- e.g., 'Bitcoin', 'Ethereum'
     market_cap BIGINT,
     circulating_supply DECIMAL(30,8),
     total_supply DECIMAL(30,8),
@@ -69,10 +69,10 @@ CREATE TABLE IF NOT EXISTS market_data.cryptocurrencies (
 CREATE TABLE IF NOT EXISTS market_data.forex_pairs (
     id SERIAL PRIMARY KEY,
     symbol VARCHAR(10) UNIQUE NOT NULL,  -- e.g., 'EUR/USD', 'GBP/JPY'
-    base_currency VARCHAR(3) NOT NULL,   -- e.g., 'EUR' in EUR/USD
+    base_currency VARCHAR(3) NOT NULL,  -- e.g., 'EUR' in EUR/USD
     quote_currency VARCHAR(3) NOT NULL,  -- e.g., 'USD' in EUR/USD
     pip_size DECIMAL(10,8) DEFAULT 0.0001,
-    is_major BOOLEAN DEFAULT false,      -- Major pairs like EUR/USD, GBP/USD
+    is_major BOOLEAN DEFAULT false,  -- Major pairs like EUR/USD, GBP/USD
     is_active BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -82,9 +82,9 @@ CREATE TABLE IF NOT EXISTS market_data.forex_pairs (
 CREATE TABLE IF NOT EXISTS market_data.commodities (
     id SERIAL PRIMARY KEY,
     symbol VARCHAR(20) UNIQUE NOT NULL,  -- e.g., 'XAU/USD', 'WTI', 'BRENT'
-    name VARCHAR(100) NOT NULL,          -- e.g., 'Gold', 'Crude Oil WTI'
-    asset_class VARCHAR(50) NOT NULL,    -- e.g., 'Metals', 'Energy', 'Agriculture'
-    unit VARCHAR(20),                    -- e.g., 'Troy Ounce', 'Barrel', 'Bushel'
+    name VARCHAR(100) NOT NULL,  -- e.g., 'Gold', 'Crude Oil WTI'
+    asset_class VARCHAR(50) NOT NULL,  -- e.g., 'Metals', 'Energy', 'Agriculture'
+    unit VARCHAR(20),  -- e.g., 'Troy Ounce', 'Barrel', 'Bushel'
     contract_size DECIMAL(15,4),
     tick_size DECIMAL(10,8),
     is_active BOOLEAN DEFAULT true,
@@ -99,15 +99,15 @@ CREATE TABLE IF NOT EXISTS market_data.commodities (
 -- NEW: Tick data table for HFT monitoring (most crucial table)
 CREATE TABLE IF NOT EXISTS market_data.tick_data (
     id BIGSERIAL PRIMARY KEY,
-    asset_id INTEGER NOT NULL,                    -- References one of the master tables
-    asset_type VARCHAR(20) NOT NULL,              -- 'stock', 'crypto', 'forex', 'commodity'
-    timestamp TIMESTAMPTZ(6) NOT NULL,            -- Microsecond precision for HFT
+    asset_id INTEGER NOT NULL,  -- References one of the master tables
+    asset_type VARCHAR(20) NOT NULL,  -- 'stock', 'crypto', 'forex', 'commodity'
+    timestamp TIMESTAMPTZ(6) NOT NULL,  -- Microsecond precision for HFT
     price DECIMAL(20,8) NOT NULL,
     volume DECIMAL(20,8) NOT NULL,
-    aggressor_side VARCHAR(4),                    -- 'BUY' or 'SELL'
-    trade_id VARCHAR(50),                         -- Exchange-specific trade ID
-    exchange_timestamp TIMESTAMPTZ(6),            -- Original exchange timestamp
-    latency_us INTEGER,                           -- Latency in microseconds from exchange
+    aggressor_side VARCHAR(4),  -- 'BUY' or 'SELL'
+    trade_id VARCHAR(50),  -- Exchange-specific trade ID
+    exchange_timestamp TIMESTAMPTZ(6),  -- Original exchange timestamp
+    latency_us INTEGER,  -- Latency in microseconds from exchange
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
     -- Constraints
@@ -121,12 +121,12 @@ CREATE TABLE IF NOT EXISTS market_data.order_book_level2 (
     asset_id INTEGER NOT NULL,
     asset_type VARCHAR(20) NOT NULL,
     timestamp TIMESTAMPTZ(6) NOT NULL,
-    side VARCHAR(4) NOT NULL,                     -- 'BID' or 'ASK'
+    side VARCHAR(4) NOT NULL,  -- 'BID' or 'ASK'
     price_level DECIMAL(20,8) NOT NULL,
     size DECIMAL(20,8) NOT NULL,
-    order_count INTEGER,                          -- Number of orders at this level
+    order_count INTEGER,  -- Number of orders at this level
     exchange_timestamp TIMESTAMPTZ(6),
-    sequence_number BIGINT,                       -- For maintaining order book integrity
+    sequence_number BIGINT,  -- For maintaining order book integrity
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
     -- Constraints
@@ -171,39 +171,39 @@ CREATE TABLE IF NOT EXISTS analytics.microstructure_features (
     timestamp TIMESTAMPTZ(6) NOT NULL,
     
     -- Spread and liquidity metrics
-    bid_ask_spread DECIMAL(15,6),                 -- Absolute spread
-    bid_ask_spread_bps DECIMAL(10,4),             -- Spread in basis points
-    bid_ask_spread_percent DECIMAL(10,6),         -- Spread as percentage of mid-price
-    mid_price DECIMAL(20,8),                      -- (best_bid + best_ask) / 2
+    bid_ask_spread DECIMAL(15,6),  -- Absolute spread
+    bid_ask_spread_bps DECIMAL(10,4),  -- Spread in basis points
+    bid_ask_spread_percent DECIMAL(10,6),  -- Spread as percentage of mid-price
+    mid_price DECIMAL(20,8),  -- (best_bid + best_ask) / 2
     
     -- Order flow metrics
-    order_flow_imbalance DECIMAL(15,6),           -- (bid_volume - ask_volume) / (bid_volume + ask_volume)
-    buy_volume_ratio DECIMAL(6,4),                -- Buy volume / Total volume
-    sell_volume_ratio DECIMAL(6,4),               -- Sell volume / Total volume
+    order_flow_imbalance DECIMAL(15,6),  -- (bid_volume - ask_volume) / (bid_volume + ask_volume)
+    buy_volume_ratio DECIMAL(6,4),  -- Buy volume / Total volume
+    sell_volume_ratio DECIMAL(6,4),  -- Sell volume / Total volume
     
     -- Trading intensity metrics
-    trade_intensity DECIMAL(15,6),                -- Trades per second over time window
-    volume_intensity DECIMAL(15,6),               -- Volume per second over time window
-    price_volatility DECIMAL(15,6),               -- Price volatility over time window
+    trade_intensity DECIMAL(15,6),  -- Trades per second over time window
+    volume_intensity DECIMAL(15,6),  -- Volume per second over time window
+    price_volatility DECIMAL(15,6),  -- Price volatility over time window
     
     -- Market impact measures
-    realized_spread DECIMAL(15,6),                -- Post-trade price impact
-    effective_spread DECIMAL(15,6),               -- Immediate price impact
-    price_improvement DECIMAL(15,6),              -- Price improvement vs. quoted spread
+    realized_spread DECIMAL(15,6),  -- Post-trade price impact
+    effective_spread DECIMAL(15,6),  -- Immediate price impact
+    price_improvement DECIMAL(15,6),  -- Price improvement vs. quoted spread
     
     -- Liquidity metrics
-    market_depth_bid DECIMAL(20,8),               -- Total volume in top 5 bid levels
-    market_depth_ask DECIMAL(20,8),               -- Total volume in top 5 ask levels
-    book_pressure DECIMAL(10,6),                  -- Pressure from order book imbalance
+    market_depth_bid DECIMAL(20,8),  -- Total volume in top 5 bid levels
+    market_depth_ask DECIMAL(20,8),  -- Total volume in top 5 ask levels
+    book_pressure DECIMAL(10,6),  -- Pressure from order book imbalance
     
     -- High-frequency patterns
-    momentum_5s DECIMAL(10,6),                    -- 5-second momentum
-    momentum_30s DECIMAL(10,6),                   -- 30-second momentum
-    volume_weighted_price DECIMAL(20,8),          -- VWAP over time window
+    momentum_5s DECIMAL(10,6),  -- 5-second momentum
+    momentum_30s DECIMAL(10,6),  -- 30-second momentum
+    volume_weighted_price DECIMAL(20,8),  -- VWAP over time window
     
     -- Timing metrics
-    time_since_last_trade INTEGER,                -- Milliseconds since last trade
-    trade_duration_avg INTEGER,                   -- Average time between trades (ms)
+    time_since_last_trade INTEGER,  -- Milliseconds since last trade
+    trade_duration_avg INTEGER,  -- Average time between trades (ms)
     
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
@@ -487,19 +487,19 @@ END;
 $$ language 'plpgsql';
 
 -- Create triggers for updated_at (keeping original + new ones)
-CREATE TRIGGER update_exchanges_updated_at BEFORE UPDATE ON market_data.exchanges 
+CREATE TRIGGER update_exchanges_updated_at BEFORE UPDATE ON market_data.exchanges
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_stocks_updated_at BEFORE UPDATE ON market_data.stocks 
+CREATE TRIGGER update_stocks_updated_at BEFORE UPDATE ON market_data.stocks
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_cryptocurrencies_updated_at BEFORE UPDATE ON market_data.cryptocurrencies 
+CREATE TRIGGER update_cryptocurrencies_updated_at BEFORE UPDATE ON market_data.cryptocurrencies
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_forex_pairs_updated_at BEFORE UPDATE ON market_data.forex_pairs 
+CREATE TRIGGER update_forex_pairs_updated_at BEFORE UPDATE ON market_data.forex_pairs
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_commodities_updated_at BEFORE UPDATE ON market_data.commodities 
+CREATE TRIGGER update_commodities_updated_at BEFORE UPDATE ON market_data.commodities
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_portfolios_updated_at BEFORE UPDATE ON portfolio.portfolios 
+CREATE TRIGGER update_portfolios_updated_at BEFORE UPDATE ON portfolio.portfolios
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_alert_rules_updated_at BEFORE UPDATE ON alerts.alert_rules 
+CREATE TRIGGER update_alert_rules_updated_at BEFORE UPDATE ON alerts.alert_rules
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- NEW: Function to get latest tick price for any asset
@@ -528,13 +528,13 @@ RETURNS TABLE(
 ) AS $$
 BEGIN
     RETURN QUERY
-    SELECT 
+    SELECT
         AVG(mf.bid_ask_spread_bps) as avg_spread_bps,
         MAX(mf.bid_ask_spread_bps) as max_spread_bps,
         MIN(mf.bid_ask_spread_bps) as min_spread_bps,
         STDDEV(mf.bid_ask_spread_bps) as spread_volatility
     FROM analytics.microstructure_features mf
-    WHERE mf.asset_id = p_asset_id 
+    WHERE mf.asset_id = p_asset_id
       AND mf.asset_type = p_asset_type
       AND mf.timestamp >= (NOW() - (p_minutes || ' minutes')::INTERVAL);
 END;
@@ -550,7 +550,7 @@ RETURNS TABLE(
 ) AS $$
 BEGIN
     RETURN QUERY
-    SELECT 
+    SELECT
         COALESCE(SUM(pos.market_value), 0) as total_value,
         COALESCE(SUM(pos.quantity * pos.average_cost), 0) as total_cost,
         COALESCE(SUM(pos.unrealized_pnl), 0) as unrealized_pnl,
@@ -582,7 +582,7 @@ $$ LANGUAGE plpgsql;
 
 -- Portfolio summary view (keeping original)
 CREATE OR REPLACE VIEW portfolio.portfolio_summary AS
-SELECT 
+SELECT
     p.id,
     p.name,
     p.currency,
@@ -620,7 +620,7 @@ CREATE OR REPLACE VIEW market_data.latest_tick_prices AS
 SELECT DISTINCT ON (td.asset_id, td.asset_type)
     td.asset_id,
     td.asset_type,
-    CASE 
+    CASE
         WHEN td.asset_type = 'stock' THEN s.symbol
         WHEN td.asset_type = 'crypto' THEN c.symbol
         WHEN td.asset_type = 'forex' THEN f.symbol
@@ -643,7 +643,7 @@ CREATE OR REPLACE VIEW analytics.current_spreads AS
 SELECT DISTINCT ON (mf.asset_id, mf.asset_type)
     mf.asset_id,
     mf.asset_type,
-    CASE 
+    CASE
         WHEN mf.asset_type = 'stock' THEN s.symbol
         WHEN mf.asset_type = 'crypto' THEN c.symbol
         WHEN mf.asset_type = 'forex' THEN f.symbol

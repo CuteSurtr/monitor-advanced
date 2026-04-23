@@ -78,13 +78,13 @@ def create_buckets(token):
     
     buckets = [
         {"name": "ai_ml_analytics", "orgID": "stock_monitor"},
-        {"name": "price_predictions", "orgID": "stock_monitor"}, 
+        {"name": "price_predictions", "orgID": "stock_monitor"},
         {"name": "sentiment_analytics", "orgID": "stock_monitor"}
     ]
     
     for bucket_data in buckets:
         try:
-            response = requests.post(f"{INFLUXDB_URL}/api/v2/buckets", 
+            response = requests.post(f"{INFLUXDB_URL}/api/v2/buckets",
                                    headers=headers, json=bucket_data)
             if response.status_code in [201, 422]:  # 422 means already exists
                 print(f"[SUCCESS] Bucket '{bucket_data['name']}' ready")
@@ -116,7 +116,7 @@ def populate_simple_data(token):
             line = f"feature_importance,feature_name={feature} importance_score={importance} {timestamp}"
             data_lines.append(line)
     
-    # ML signals data  
+    # ML signals data
     symbols = ['AAPL', 'GOOGL', 'MSFT']
     models = ['lstm', 'rf', 'xgb']
     for i in range(30):

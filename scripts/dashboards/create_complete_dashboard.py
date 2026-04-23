@@ -138,7 +138,7 @@ from(bucket: "macro_data")
             "query": '''
 from(bucket: "macro_data")
   |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
-  |> filter(fn: (r) => 
+  |> filter(fn: (r) =>
     (r._measurement == "market_data" and r.indicator == "vix") or
     (r._measurement == "advanced_financial" and r.indicator == "cds_spreads"))
   |> keep(columns: ["_time", "_value", "indicator"])
@@ -330,7 +330,7 @@ from(bucket: "macro_data")
             "query": '''
 from(bucket: "macro_data")
   |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
-  |> filter(fn: (r) => 
+  |> filter(fn: (r) =>
     (r._measurement == "bea_economic_data" and r.indicator == "capacity_utilization") or
     (r._measurement == "global_indicators" and (r.indicator == "pmi_manufacturing" or r.indicator == "pmi_services")))
   |> keep(columns: ["_time", "_value", "indicator"])
@@ -364,7 +364,7 @@ from(bucket: "macro_data")
             "query": '''
 from(bucket: "macro_data")
   |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
-  |> filter(fn: (r) => 
+  |> filter(fn: (r) =>
     (r._measurement == "business_confidence" and r.indicator == "business_inventories") or
     (r._measurement == "consumer_data" and r.indicator == "consumer_confidence"))
   |> keep(columns: ["_time", "_value", "indicator"])
@@ -695,7 +695,7 @@ from(bucket: "macro_data")
             "query": '''
 from(bucket: "macro_data")
   |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
-  |> filter(fn: (r) => 
+  |> filter(fn: (r) =>
     (r._measurement == "market_data" and r.indicator == "equity_risk_premium") or
     (r._measurement == "census_economic_data" and r.indicator == "auto_sales"))
   |> keep(columns: ["_time", "_value", "indicator"])

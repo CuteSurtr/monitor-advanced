@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 # InfluxDB configuration
 INFLUXDB_URL = "http://localhost:8086"
 INFLUXDB_TOKEN = "your_influxdb_token_here"
-INFLUXDB_ORG = "69a6563b80682691"
+INFLUXDB_ORG = "your_influxdb_org_id"
 
 # Macro data buckets with retention policies
 MACRO_BUCKETS = {
@@ -99,7 +99,7 @@ def create_influxdb_buckets():
                 )
                 
                 logger.info(f"Created bucket '{bucket_name}' with {config['retention_period']//86400} day retention")
-                logger.info(f"   Data types: {', '.join(config['data_types'])}")
+                logger.info(f"  Data types: {', '.join(config['data_types'])}")
                 created_count += 1
                 
             except ApiException as e:
@@ -111,15 +111,15 @@ def create_influxdb_buckets():
             except Exception as e:
                 logger.error(f"Unexpected error creating bucket '{bucket_name}': {e}")
         
-        logger.info(f"\n� Macro data buckets setup complete!")
-        logger.info(f"   Created: {created_count} new buckets")
-        logger.info(f"   Total macro buckets: {len(MACRO_BUCKETS)}")
+        logger.info(f"\n Macro data buckets setup complete!")
+        logger.info(f"  Created: {created_count} new buckets")
+        logger.info(f"  Total macro buckets: {len(MACRO_BUCKETS)}")
         
         # Display bucket summary
-        logger.info(f"\n� Macro Data Bucket Summary:")
+        logger.info(f"\n Macro Data Bucket Summary:")
         for bucket_name, config in MACRO_BUCKETS.items():
             retention_days = config["retention_period"] // 86400
-            logger.info(f"   • {bucket_name}: {retention_days} days retention")
+            logger.info(f"  • {bucket_name}: {retention_days} days retention")
             
         return True
         
@@ -147,14 +147,14 @@ def verify_buckets():
         existing_buckets = buckets_api.find_buckets().buckets
         existing_bucket_names = [b.name for b in existing_buckets] if existing_buckets else []
         
-        logger.info(f"\n� Verifying macro data buckets...")
+        logger.info(f"\n Verifying macro data buckets...")
         
         all_exist = True
         for bucket_name in MACRO_BUCKETS.keys():
             if bucket_name in existing_bucket_names:
-                logger.info(f"   {bucket_name}")
+                logger.info(f"  {bucket_name}")
             else:
-                logger.error(f"   {bucket_name} - MISSING")
+                logger.error(f"  {bucket_name} - MISSING")
                 all_exist = False
                 
         if all_exist:
@@ -177,7 +177,7 @@ def verify_buckets():
 def main():
     """Main setup function"""
     
-    logger.info("� Setting up InfluxDB for Macro Economic Data")
+    logger.info(" Setting up InfluxDB for Macro Economic Data")
     logger.info("=" * 60)
     
     # Create buckets
@@ -194,13 +194,13 @@ def main():
         logger.error("Bucket verification failed")
         sys.exit(1)
     
-    logger.info("\n� Next Steps:")
+    logger.info("\n Next Steps:")
     logger.info("1. Run macro data collection: python -m src.tasks.macro_collection")
     logger.info("2. View data in Grafana: http://localhost:3000")
     logger.info("3. Configure alerts for economic events")
     logger.info("4. Set up automated data collection schedule")
     
-    logger.info("\n� Your macro economic data infrastructure is ready!")
+    logger.info("\n Your macro economic data infrastructure is ready!")
 
 if __name__ == "__main__":
     main()

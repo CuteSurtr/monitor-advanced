@@ -64,22 +64,22 @@ This system provides continuous global financial market monitoring across multip
 
 ```
 monitor-advanced/
-├── config/                 # Configuration management
-├── data/                   # Data storage and retention
-├── src/                    # Source code
-│   ├── collectors/         # Data collection modules
-│   ├── analytics/          # Analytics and ML modules
-│   ├── portfolio/          # Portfolio management
-│   ├── alerts/             # Alert system
-│   ├── dashboard/          # Web dashboard
-│   ├── monitoring/         # Prometheus integration
-│   └── utils/              # Utility functions
-├── tests/                  # Test suite
-├── docs/                   # Technical documentation
-├── docker/                 # Containerization
-├── prometheus/             # Monitoring configuration
-├── grafana/                # Visualization dashboards
-└── scripts/                # Automation and setup
+├── config/  # Configuration management
+├── data/  # Data storage and retention
+├── src/  # Source code
+│  ├── collectors/  # Data collection modules
+│  ├── analytics/  # Analytics and ML modules
+│  ├── portfolio/  # Portfolio management
+│  ├── alerts/  # Alert system
+│  ├── dashboard/  # Web dashboard
+│  ├── monitoring/  # Prometheus integration
+│  └── utils/  # Utility functions
+├── tests/  # Test suite
+├── docs/  # Technical documentation
+├── docker/  # Containerization
+├── prometheus/  # Monitoring configuration
+├── grafana/  # Visualization dashboards
+└── scripts/  # Automation and setup
 ```
 
 ## Quick Start
@@ -153,7 +153,7 @@ monitor-advanced/
 - **Multi-Asset Data Collection**: Real-time collection across stocks, crypto, forex, and commodities
 - **Database Architecture**: Dual PostgreSQL/InfluxDB setup with optimized schemas
 - **Analytics Engine**: Technical indicators, risk metrics, and correlation analysis
-- **Professional Dashboards**: 
+- **Professional Dashboards**:
   - Comprehensive Financial Dashboard with 17+ panels
   - Macro Economic Dashboard with 12+ economic indicators
 - **Portfolio Management**: Complete transaction tracking and performance analysis
@@ -197,4 +197,4 @@ MIT License - See LICENSE file for details
 ## Contributing
 
 This is a personal project for educational and research purposes. The codebase demonstrates professional software engineering practices including modular architecture, comprehensive testing, and production-ready deployment configurations. # monitor-advanced
-# Updated Wed Sep 17 19:29:34     2025
+# Updated Wed Sep 17 19:29:34  2025

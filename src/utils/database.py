@@ -649,7 +649,7 @@ class DatabaseManager:
             result = await session.execute(
                 text(
                     """
-                    SELECT symbol, crypto, timestamp, price, open_price, high_price, low_price, volume, 
+                    SELECT symbol, crypto, timestamp, price, open_price, high_price, low_price, volume,
                            market_cap, change_24h, change_24h_percent, volume_24h, source
                     FROM crypto_data
                     WHERE symbol = :symbol AND timestamp BETWEEN :start_time AND :end_time
@@ -873,7 +873,7 @@ class DatabaseManager:
             async with self.session_factory() as session:
                 query = text(
                     """
-                    SELECT * FROM alerts 
+                    SELECT * FROM alerts
                     WHERE is_active = true
                 """
                 )
@@ -881,7 +881,7 @@ class DatabaseManager:
                 if symbol:
                     query = text(
                         """
-                        SELECT * FROM alerts 
+                        SELECT * FROM alerts
                         WHERE is_active = true AND symbol = :symbol
                     """
                     )

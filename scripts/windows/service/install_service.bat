@@ -5,7 +5,7 @@ REM This script installs the Stock Monitor as a Windows service using NSSM
 setlocal enabledelayedexpansion
 
 echo ================================================================
-echo   Stock Monitor - Windows Service Installation
+echo  Stock Monitor - Windows Service Installation
 echo ================================================================
 echo.
 
@@ -48,7 +48,7 @@ if not exist "%SCRIPT_DIR%nssm.exe" (
     exit /b 1
 )
 
-echo ✓ NSSM found
+echo  NSSM found
 echo.
 
 REM Check if Python virtual environment exists
@@ -60,7 +60,7 @@ if not exist "venv\Scripts\python.exe" (
     exit /b 1
 )
 
-echo ✓ Python virtual environment found
+echo  Python virtual environment found
 echo.
 
 REM Check if service already exists
@@ -69,7 +69,7 @@ if %errorLevel% equ 0 (
     echo Service already exists. Removing existing service...
     "%SCRIPT_DIR%nssm.exe" stop "%SERVICE_NAME%" >nul 2>&1
     "%SCRIPT_DIR%nssm.exe" remove "%SERVICE_NAME%" confirm >nul 2>&1
-    echo ✓ Existing service removed
+    echo  Existing service removed
     echo.
 )
 
@@ -83,7 +83,7 @@ if %errorLevel% neq 0 (
     exit /b 1
 )
 
-echo ✓ Service installed
+echo  Service installed
 echo.
 
 REM Configure service
@@ -118,7 +118,7 @@ REM Set failure actions
 "%SCRIPT_DIR%nssm.exe" set "%SERVICE_NAME%" AppExit Default Restart
 "%SCRIPT_DIR%nssm.exe" set "%SERVICE_NAME%" AppExit 0 Exit
 
-echo ✓ Service configured
+echo  Service configured
 echo.
 
 REM Create log directory if it doesn't exist
@@ -133,35 +133,35 @@ if %errorLevel% neq 0 (
     exit /b 1
 )
 
-echo ✓ Service configuration valid
+echo  Service configuration valid
 echo.
 
 echo ================================================================
-echo   SERVICE INSTALLATION COMPLETED SUCCESSFULLY!
+echo  SERVICE INSTALLATION COMPLETED SUCCESSFULLY!
 echo ================================================================
 echo.
 echo Service Name: %SERVICE_NAME%
 echo Display Name: %SERVICE_DISPLAY_NAME%
 echo.
 echo Management Commands:
-echo   Start Service:    net start %SERVICE_NAME%
-echo   Stop Service:     net stop %SERVICE_NAME%
-echo   Restart Service:  net stop %SERVICE_NAME% ^&^& net start %SERVICE_NAME%
-echo   Uninstall:        scripts\windows\service\uninstall_service.bat
+echo  Start Service:  net start %SERVICE_NAME%
+echo  Stop Service:  net stop %SERVICE_NAME%
+echo  Restart Service:  net stop %SERVICE_NAME% ^&^& net start %SERVICE_NAME%
+echo  Uninstall:  scripts\windows\service\uninstall_service.bat
 echo.
 echo Alternative Commands:
-echo   Start:            sc start %SERVICE_NAME%
-echo   Stop:             sc stop %SERVICE_NAME%
-echo   Status:           sc query %SERVICE_NAME%
+echo  Start:  sc start %SERVICE_NAME%
+echo  Stop:  sc stop %SERVICE_NAME%
+echo  Status:  sc query %SERVICE_NAME%
 echo.
 echo Log Files:
-echo   Standard Output:  logs\service_stdout.log
-echo   Standard Error:   logs\service_stderr.log
-echo   Application Log:  logs\stock_monitor.log
+echo  Standard Output:  logs\service_stdout.log
+echo  Standard Error:  logs\service_stderr.log
+echo  Application Log:  logs\stock_monitor.log
 echo.
 echo Configuration:
-echo   Config File:      config\config.yaml
-echo   Service Manager:  services.msc
+echo  Config File:  config\config.yaml
+echo  Service Manager:  services.msc
 echo.
 echo Next Steps:
 echo 1. Edit config\config.yaml with your API keys

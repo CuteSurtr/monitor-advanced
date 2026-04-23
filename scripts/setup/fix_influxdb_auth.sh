@@ -34,17 +34,17 @@ sleep 30
 
 echo "Step 5: Testing InfluxDB connection..."
 if curl -s http://localhost:8086/health > /dev/null; then
-    echo "✓ InfluxDB is responding"
+    echo " InfluxDB is responding"
 else
-    echo "✗ InfluxDB is not responding"
+    echo " InfluxDB is not responding"
     exit 1
 fi
 
 echo "Step 6: Testing authentication..."
 if docker exec stock_monitor_influxdb influx org list --token your_influxdb_token_here > /dev/null 2>&1; then
-    echo "✓ Authentication successful"
+    echo " Authentication successful"
 else
-    echo "✗ Authentication failed"
+    echo " Authentication failed"
     exit 1
 fi
 

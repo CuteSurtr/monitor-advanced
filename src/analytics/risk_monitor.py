@@ -44,7 +44,7 @@ class RiskMonitor:
         # Alert manager
         try:
             self.alert_manager = AlertManager(config, db_manager)
-        except:
+        except Exception:
             self.alert_manager = None
             self.logger.warning("Alert manager not available")
 
@@ -398,7 +398,7 @@ class RiskMonitor:
             )
 
             return slope
-        except:
+        except Exception:
             return 0.0
 
     async def _check_market_volatility(self):

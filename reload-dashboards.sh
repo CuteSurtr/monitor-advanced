@@ -29,21 +29,21 @@ sleep 15
 
 # Check if Grafana is running
 if docker-compose -f docker-compose.raspberry-pi.yml ps grafana | grep -q "Up"; then
-    echo "✅ Grafana is running!"
+    echo " Grafana is running!"
     echo ""
-    echo "📊 Dashboard Access:"
-    echo "   URL: http://$(hostname -I | awk '{print $1}'):3000"
-    echo "   Login: admin / trading123"
+    echo " Dashboard Access:"
+    echo "  URL: http://$(hostname -I | awk '{print $1}'):3000"
+    echo "  Login: admin / trading123"
     echo ""
-    echo "📁 Available Dashboard Folders:"
-    echo "   • Core Analytics - Main financial dashboards"
-    echo "   • Advanced Analytics - Technical indicators & ML"
-    echo "   • Economic Data - Macro economic analysis"
-    echo "   • Professional Suite - Professional tier dashboards"
-    echo "   • Specialized Views - Custom and specialized dashboards"
+    echo " Available Dashboard Folders:"
+    echo "  • Core Analytics - Main financial dashboards"
+    echo "  • Advanced Analytics - Technical indicators & ML"
+    echo "  • Economic Data - Macro economic analysis"
+    echo "  • Professional Suite - Professional tier dashboards"
+    echo "  • Specialized Views - Custom and specialized dashboards"
     echo ""
-    echo "🔄 All dashboards should now be visible in Grafana!"
+    echo " All dashboards should now be visible in Grafana!"
 else
-    echo "❌ Error: Grafana failed to start properly."
+    echo " Error: Grafana failed to start properly."
     echo "Check logs with: docker-compose -f docker-compose.raspberry-pi.yml logs grafana"
 fi

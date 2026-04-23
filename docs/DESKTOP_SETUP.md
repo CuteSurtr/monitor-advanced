@@ -205,12 +205,12 @@ Get API keys from these providers:
 
 ```yaml
 performance:
-  max_workers: 12          # More workers for desktop
-  memory_limit: "8GB"      # Higher memory limit
-  cpu_limit: 0.9           # Use 90% of CPU
-  cache_ttl: 180           # 3-minute cache
-  max_cache_size: "2GB"    # Larger cache
-  batch_size: 5000         # Larger batch processing
+  max_workers: 12  # More workers for desktop
+  memory_limit: "8GB"  # Higher memory limit
+  cpu_limit: 0.9  # Use 90% of CPU
+  cache_ttl: 180  # 3-minute cache
+  max_cache_size: "2GB"  # Larger cache
+  batch_size: 5000  # Larger batch processing
 
 data_collection:
   stock_data_interval: 30  # Faster updates
@@ -400,11 +400,11 @@ advanced:
 ```bash
 # Check what's using the port
 netstat -ano | findstr :8080  # Windows
-lsof -i :8080                 # macOS/Linux
+lsof -i :8080  # macOS/Linux
 
 # Kill process if needed
-taskkill /PID <PID> /F        # Windows
-kill -9 <PID>                 # macOS/Linux
+taskkill /PID <PID> /F  # Windows
+kill -9 <PID>  # macOS/Linux
 ```
 
 #### Database Connection Issues

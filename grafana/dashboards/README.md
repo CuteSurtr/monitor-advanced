@@ -39,12 +39,12 @@ This directory contains comprehensive Grafana dashboards for multi-asset trading
 ## Color Coding System
 
 ### Risk Level Indicators
-- **🟢 Green**: Safe/Low Risk
-- **🟡 Yellow**: Medium Risk/At Risk
-- **🔴 Red**: High Risk/Negative
+- ** Green**: Safe/Low Risk
+- ** Yellow**: Medium Risk/At Risk
+- ** Red**: High Risk/Negative
 
 ### Thresholds
-- **Portfolio P&L**: 
+- **Portfolio P&L**:
   - Green: > $10,000
   - Yellow: $0 - $10,000
   - Red: < $0
@@ -191,9 +191,9 @@ level = debug
 Test dashboard queries directly in the database:
 ```sql
 -- Example: Test options chain query
-SELECT * FROM analytics.options_chain 
-WHERE underlying = 'AAPL' 
-AND expiration = '2024-01-19' 
+SELECT * FROM analytics.options_chain
+WHERE underlying = 'AAPL'
+AND expiration = '2024-01-19'
 LIMIT 10;
 ```
 

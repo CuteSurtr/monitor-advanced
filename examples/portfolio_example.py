@@ -28,7 +28,7 @@ from src.utils.database import DatabaseManager
 from src.utils.cache import CacheManager
 from src.analytics.analytics_engine import AnalyticsEngine
 from src.portfolio.portfolio_manager import (
-    PortfolioManager, Transaction, TransactionType, Position, 
+    PortfolioManager, Transaction, TransactionType, Position,
     PerformanceMetrics, RebalancingSuggestion, TaxOptimization
 )
 from src.portfolio.portfolio_api import set_portfolio_manager
@@ -340,8 +340,8 @@ class PortfolioExample:
             logger.info("\nUpdating tax settings...")
             self.portfolio_manager.tax_settings.update({
                 'short_term_rate': 0.24,  # Updated rate
-                'long_term_rate': 0.15,   # Same rate
-                'wash_sale_window': 30    # Same window
+                'long_term_rate': 0.15,  # Same rate
+                'wash_sale_window': 30  # Same window
             })
             logger.info("Tax settings updated")
             
@@ -378,13 +378,13 @@ class PortfolioExample:
                 logger.info("  Top Gainers:")
                 for pos in top_gainers:
                     return_pct = (pos.total_pnl / pos.cost_basis * 100) if pos.cost_basis > 0 else 0
-                    logger.info(f"    {pos.symbol}: ${pos.total_pnl:,.2f} ({return_pct:+.2f}%)")
+                    logger.info(f"  {pos.symbol}: ${pos.total_pnl:,.2f} ({return_pct:+.2f}%)")
             
             if top_losers:
                 logger.info("  Top Losers:")
                 for pos in top_losers:
                     return_pct = (pos.total_pnl / pos.cost_basis * 100) if pos.cost_basis > 0 else 0
-                    logger.info(f"    {pos.symbol}: ${pos.total_pnl:,.2f} ({return_pct:+.2f}%)")
+                    logger.info(f"  {pos.symbol}: ${pos.total_pnl:,.2f} ({return_pct:+.2f}%)")
             
             logger.info(f"  Recent Transactions: {len(transactions)}")
             
@@ -459,4 +459,4 @@ async def main():
 
 if __name__ == "__main__":
     # Run the example
-    asyncio.run(main()) 
+    asyncio.run(main())

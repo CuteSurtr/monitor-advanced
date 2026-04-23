@@ -58,41 +58,41 @@ def create_buckets():
     
     buckets = [
         # Core financial data buckets
-        ("financial_data", 90),           # Main bucket for all financial data
-        ("stocks_data", 90),              # Stock-specific data
-        ("forex_data", 90),               # Forex pair data
-        ("crypto_data", 90),              # Cryptocurrency data
-        ("commodities_data", 90),         # Commodity data
+        ("financial_data", 90),  # Main bucket for all financial data
+        ("stocks_data", 90),  # Stock-specific data
+        ("forex_data", 90),  # Forex pair data
+        ("crypto_data", 90),  # Cryptocurrency data
+        ("commodities_data", 90),  # Commodity data
         
         # High-frequency trading buckets
-        ("hft_tick_data", 7),             # High-frequency tick data (7 days retention)
-        ("hft_orderbook", 7),             # Order book snapshots
-        ("hft_trades", 7),                # Trade executions
+        ("hft_tick_data", 7),  # High-frequency tick data (7 days retention)
+        ("hft_orderbook", 7),  # Order book snapshots
+        ("hft_trades", 7),  # Trade executions
         
         # Analytics and derived data
-        ("analytics_indicators", 30),     # Technical indicators
-        ("risk_metrics", 30),             # Risk calculations
-        ("correlation_data", 30),         # Correlation matrices
-        ("volatility_data", 30),          # Volatility calculations
+        ("analytics_indicators", 30),  # Technical indicators
+        ("risk_metrics", 30),  # Risk calculations
+        ("correlation_data", 30),  # Correlation matrices
+        ("volatility_data", 30),  # Volatility calculations
         
         # Portfolio and performance
-        ("portfolio_positions", 90),      # Portfolio positions
-        ("performance_metrics", 90),      # Performance calculations
-        ("pnl_data", 90),                 # Profit/Loss data
+        ("portfolio_positions", 90),  # Portfolio positions
+        ("performance_metrics", 90),  # Performance calculations
+        ("pnl_data", 90),  # Profit/Loss data
         
         # Market microstructure
-        ("microstructure_features", 7),   # Bid-ask spreads, liquidity metrics
-        ("market_regime", 30),            # Market regime classification
-        ("order_flow", 7),                # Order flow analysis
+        ("microstructure_features", 7),  # Bid-ask spreads, liquidity metrics
+        ("market_regime", 30),  # Market regime classification
+        ("order_flow", 7),  # Order flow analysis
         
         # News and sentiment
-        ("news_data", 30),                # News articles
-        ("sentiment_scores", 30),         # Sentiment analysis
+        ("news_data", 30),  # News articles
+        ("sentiment_scores", 30),  # Sentiment analysis
         
         # System monitoring
-        ("system_metrics", 7),            # System performance metrics
-        ("api_latency", 7),               # API response times
-        ("error_logs", 7)                 # Error logging
+        ("system_metrics", 7),  # System performance metrics
+        ("api_latency", 7),  # API response times
+        ("error_logs", 7)  # Error logging
     ]
     
     logger.info("Creating InfluxDB buckets for multi-asset trading...")

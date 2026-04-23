@@ -25,7 +25,7 @@ def create_missing_indicators_trends():
         "lfpr": {"base": 62.8, "trend": -0.002, "volatility": 0.2, "cycle_days": 90},
         "wages": {"base": 4.2, "trend": -0.001, "volatility": 0.3, "cycle_days": 30},
         
-        # Missing Production Indicators  
+        # Missing Production Indicators
         "industrial_production": {"base": 1.8, "trend": -0.002, "volatility": 0.8, "cycle_days": 45},
         "capacity_utilization": {"base": 78.5, "trend": -0.02, "volatility": 1.2, "cycle_days": 60},
         
@@ -159,7 +159,7 @@ def main():
     print("=" * 45)
     print("Completing the professional dashboard with:")
     print("• PPI, NFP, Jobless Claims, LFPR, Wages")
-    print("• Industrial Production, Capacity Utilization") 
+    print("• Industrial Production, Capacity Utilization")
     print("• Demographics/Census data")
     print("• Global PMIs")
     print("• Enhanced option volatility surfaces")
