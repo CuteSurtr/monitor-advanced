@@ -98,6 +98,10 @@ temp/
 *.tmp
 *.temp
 
+# Windows artifact from `/dev/null` redirection (e.g. `git lfs install`)
+/dev/
+
+
 # Application specific
 stock_monitor.egg-info/
 models/
