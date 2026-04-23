@@ -20,7 +20,7 @@ from influxdb_client.client.write_api import SYNCHRONOUS
 INFLUXDB_URL = "http://localhost:8086"
 ORG = "stock_monitor"
 BUCKET = "macro_data"
-TOKEN = os.getenv("INFLUXDB_TOKEN", "your_influxdb_token")
+TOKEN = os.getenv("INFLUXDB_TOKEN", "")
 
 class ComprehensiveDataPopulator:
     def __init__(self):
@@ -28,7 +28,7 @@ class ComprehensiveDataPopulator:
         self.write_api = self.client.write_api(write_options=SYNCHRONOUS)
         
         # API Keys (using free tiers)
-        self.fred_api_key = os.getenv("FRED_API_KEY", "your_fred_api_key")
+        self.fred_api_key = os.getenv("FRED_API_KEY", "")
         
         # Date ranges for historical data
         self.end_date = datetime.now()

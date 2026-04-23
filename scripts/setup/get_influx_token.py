@@ -100,11 +100,8 @@ def try_get_token_method3():
     """Method 3: Try to find existing tokens via config"""
     print("Method 3: Looking for existing config...")
     
-    # Use the original token from datasource config as a test
-    test_tokens = [
-        "your_influxdb_token_here",
-        "LruN3MmatpXFMakJ4rhApSuug29-eI60aA3DlJiYk7LwuEFZyqraujV0vI02eSFmRebAVMesawDWGUXBGeumKA=="
-    ]
+    # Use any token provided via INFLUXDB_TOKEN env var as a test
+    test_tokens = [t for t in [os.getenv("INFLUXDB_TOKEN", "")] if t]
     
     for token in test_tokens:
         print(f"Testing token: {token[:20]}...")

@@ -1679,8 +1679,8 @@ if __name__ == "__main__":
     # InfluxDB configuration
     client = InfluxDBClient(
         url="http://localhost:8086",
-        token=os.getenv("INFLUXDB_TOKEN", "your_influxdb_token"),
-        org="your_influxdb_org_id",
+        token=os.getenv("INFLUXDB_TOKEN", ""),
+        org=os.getenv("INFLUXDB_ORG", ""),
     )
 
     # API keys

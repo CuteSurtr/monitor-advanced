@@ -14,7 +14,7 @@ import numpy as np
 
 # Configuration
 INFLUXDB_URL = "http://localhost:8086"
-INFLUXDB_TOKEN = "your_influxdb_token_here"
+INFLUXDB_TOKEN = os.getenv("INFLUXDB_TOKEN", "")
 INFLUXDB_ORG = "stock_monitor"
 
 # AI/ML specific buckets and retention policies

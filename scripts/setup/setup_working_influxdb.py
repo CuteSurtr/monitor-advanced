@@ -59,7 +59,7 @@ def get_existing_token():
         response = requests.post(f"{INFLUXDB_URL}/api/v2/signin", json=auth_data)
         if response.status_code == 204:
             # Get auth token from cookies or try known token
-            known_token = os.getenv("INFLUXDB_TOKEN", "your_influxdb_token_here")
+            known_token = os.getenv("INFLUXDB_TOKEN", "")
             print("[SUCCESS] Using existing token")
             return known_token
         else:

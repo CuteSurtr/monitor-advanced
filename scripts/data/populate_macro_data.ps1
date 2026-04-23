@@ -1,11 +1,15 @@
 # Populate InfluxDB macro_data bucket with sample economic data
 # Updated for current setup
 
-# InfluxDB configuration
+# InfluxDB configuration - TOKEN must be provided via env var
+if (-not $env:INFLUXDB_TOKEN) {
+    Write-Error "INFLUXDB_TOKEN environment variable is not set."
+    exit 1
+}
 $CONTAINER = "influxdb"
 $BUCKET = "macro_data"
 $ORG = "stock_monitor"
-$TOKEN = "your_influxdb_token_here"
+$TOKEN = $env:INFLUXDB_TOKEN
 
 Write-Host "Populating InfluxDB macro_data bucket with sample economic data..." -ForegroundColor Green
 Write-Host "Container: $CONTAINER" -ForegroundColor Yellow

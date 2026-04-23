@@ -14,15 +14,15 @@ from influxdb_client.client.write_api import SYNCHRONOUS
 
 # Configuration
 INFLUXDB_URL = "http://localhost:8086"
-INFLUXDB_TOKEN = os.getenv("INFLUXDB_TOKEN", "your_influxdb_token")
+INFLUXDB_TOKEN = os.getenv("INFLUXDB_TOKEN", "")
 INFLUXDB_ORG = "stock_monitor"
 INFLUXDB_BUCKET = "macro_data"
 
 # API Keys (set these as environment variables)
-BEA_API_KEY = os.getenv('BEA_API_KEY', 'your_bea_api_key')
-FINRA_API_KEY = os.getenv('FINRA_API_KEY', 'your_finra_api_key')
-EIA_API_KEY = os.getenv('EIA_API_KEY', 'your_eia_api_key')
-CENSUS_API_KEY = os.getenv('CENSUS_API_KEY', 'your_census_api_key')
+BEA_API_KEY = os.getenv('BEA_API_KEY', '')
+FINRA_API_KEY = os.getenv('FINRA_API_KEY', '')
+EIA_API_KEY = os.getenv('EIA_API_KEY', '')
+CENSUS_API_KEY = os.getenv('CENSUS_API_KEY', '')
 
 class MacroDataCollector:
     def __init__(self):
@@ -94,7 +94,7 @@ class MacroDataCollector:
         """Collect BEA economic data"""
         print("Collecting BEA economic data...")
         
-        if BEA_API_KEY == 'your_bea_api_key':
+        if not BEA_API_KEY:
             print("BEA API key not set, using sample data")
             # Generate sample BEA data
             for i in range(30):
@@ -123,7 +123,7 @@ class MacroDataCollector:
         """Collect EIA energy data"""
         print("Collecting EIA energy data...")
         
-        if EIA_API_KEY == 'your_eia_api_key':
+        if not EIA_API_KEY:
             print("EIA API key not set, using sample data")
             # Generate sample EIA data
             for i in range(30):
@@ -152,7 +152,7 @@ class MacroDataCollector:
         """Collect Census Bureau data"""
         print("Collecting Census Bureau data...")
         
-        if CENSUS_API_KEY == 'your_census_api_key':
+        if not CENSUS_API_KEY:
             print("Census API key not set, using sample data")
             # Generate sample Census data
             for i in range(30):
@@ -181,7 +181,7 @@ class MacroDataCollector:
         """Collect FINRA data"""
         print("Collecting FINRA data...")
         
-        if FINRA_API_KEY == 'your_finra_api_key':
+        if not FINRA_API_KEY:
             print("FINRA API key not set, using sample data")
             # Generate sample FINRA data
             for i in range(30):

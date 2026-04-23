@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 # InfluxDB configuration
 INFLUXDB_URL = "http://influxdb:8086"  # Use Docker service name
-INFLUXDB_TOKEN = "your_influxdb_token_here"
+INFLUXDB_TOKEN = os.getenv("INFLUXDB_TOKEN", "")
 INFLUXDB_ORG = "stock_monitor"
 
 def create_bucket(bucket_name, retention_days=30):

@@ -47,7 +47,7 @@ api_keys:
   news_api: "your_news_api_key"
   quandl: "your_quandl_key"
   iex_cloud: "your_iex_cloud_key"
-  fred: "your_fred_api_key"
+  fred: "${FRED_API_KEY}"
 
 # Data Collection Settings - Desktop Enhanced
 data_collection:

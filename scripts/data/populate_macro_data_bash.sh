@@ -4,9 +4,9 @@ echo "Populating InfluxDB macro_data bucket with comprehensive economic data..."
 echo
 
 # InfluxDB configuration
-ORG_ID="0d4ca99e5255fe85"
+ORG_ID="${INFLUXDB_ORG_ID:?INFLUXDB_ORG_ID must be set}"
 BUCKET="macro_data"
-TOKEN="your_influxdb_token_here"
+TOKEN="${INFLUXDB_TOKEN:?INFLUXDB_TOKEN must be set}"
 
 echo "Generating comprehensive economic data..."
 echo

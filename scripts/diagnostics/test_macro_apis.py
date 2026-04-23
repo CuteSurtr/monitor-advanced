@@ -26,17 +26,17 @@ logger = logging.getLogger(__name__)
 
 # Your API Keys
 API_KEYS = {
-    "bea_api_key": "your_bea_api_key",
-    "finra_api_key": "your_finra_api_key",
-    "fred_api_key": "your_fred_api_key",
-    "eia_api_key": "your_eia_api_key",
-    "census_api_key": "your_census_api_key"
+    "bea_api_key": os.getenv("BEA_API_KEY", ""),
+    "finra_api_key": os.getenv("FINRA_API_KEY", ""),
+    "fred_api_key": os.getenv("FRED_API_KEY", ""),
+    "eia_api_key": os.getenv("EIA_API_KEY", ""),
+    "census_api_key": os.getenv("CENSUS_API_KEY", "")
 }
 
 INFLUXDB_CONFIG = {
-    "url": "http://localhost:8086",
-    "token": "your_influxdb_token_here",
-    "org": "your_influxdb_org_id"
+    "url": os.getenv("INFLUXDB_URL", "http://localhost:8086"),
+    "token": os.getenv("INFLUXDB_TOKEN", ""),
+    "org": os.getenv("INFLUXDB_ORG", "")
 }
 
 async def test_api_collector(collector_class, name, *args):

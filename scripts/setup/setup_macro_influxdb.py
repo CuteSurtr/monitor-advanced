@@ -18,8 +18,8 @@ logger = logging.getLogger(__name__)
 
 # InfluxDB configuration
 INFLUXDB_URL = "http://localhost:8086"
-INFLUXDB_TOKEN = "your_influxdb_token_here"
-INFLUXDB_ORG = "your_influxdb_org_id"
+INFLUXDB_TOKEN = os.getenv("INFLUXDB_TOKEN", "")
+INFLUXDB_ORG = os.getenv("INFLUXDB_ORG", "")
 
 # Macro data buckets with retention policies
 MACRO_BUCKETS = {

@@ -21,15 +21,15 @@ logger = logging.getLogger(__name__)
 
 # Configuration
 INFLUXDB_URL = "http://localhost:8086"
-INFLUXDB_TOKEN = "your_influxdb_token_here"
-INFLUXDB_ORG = "your_influxdb_org_id"
+INFLUXDB_TOKEN = os.getenv("INFLUXDB_TOKEN", "")
+INFLUXDB_ORG = os.getenv("INFLUXDB_ORG", "")
 
 API_KEYS = {
-    "bea_api_key": os.getenv("BEA_API_KEY", "your_bea_api_key"),
-    "finra_api_key": os.getenv("FINRA_API_KEY", "your_finra_api_key"),
-    "fred_api_key": os.getenv("FRED_API_KEY", "your_fred_api_key"),
-    "eia_api_key": os.getenv("EIA_API_KEY", "your_eia_api_key"),
-    "census_api_key": os.getenv("CENSUS_API_KEY", "your_census_api_key")
+    "bea_api_key": os.getenv("BEA_API_KEY", ""),
+    "finra_api_key": os.getenv("FINRA_API_KEY", ""),
+    "fred_api_key": os.getenv("FRED_API_KEY", ""),
+    "eia_api_key": os.getenv("EIA_API_KEY", ""),
+    "census_api_key": os.getenv("CENSUS_API_KEY", "")
 }
 
 async def main():

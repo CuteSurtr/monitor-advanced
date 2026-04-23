@@ -6,7 +6,7 @@ echo "Populating InfluxDB macro_data bucket with sample economic data..."
 INFLUXDB_URL="http://localhost:8086"
 ORG="stock_monitor"
 BUCKET="macro_data"
-TOKEN="your_influxdb_token_here"
+TOKEN="${INFLUXDB_TOKEN:?INFLUXDB_TOKEN must be set}"
 
 # Function to write data point
 write_data() {

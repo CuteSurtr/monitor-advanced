@@ -14,7 +14,7 @@ import os
 INFLUXDB_URL = "http://localhost:8086"
 ORG = "stock_monitor"
 BUCKET = "macro_data"
-TOKEN = os.getenv("INFLUXDB_TOKEN", "your_influxdb_token_here")
+TOKEN = os.getenv("INFLUXDB_TOKEN", "")
 
 def write_data(measurement, tags, fields, timestamp):
     """Write data point to InfluxDB"""

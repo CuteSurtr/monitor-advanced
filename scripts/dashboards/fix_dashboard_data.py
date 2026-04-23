@@ -9,7 +9,7 @@ import random
 import os
 
 INFLUXDB_URL = "http://localhost:8086"
-TOKEN = os.getenv("INFLUXDB_TOKEN", "your_influxdb_token_here")
+TOKEN = os.getenv("INFLUXDB_TOKEN", "")
 ORG = "stock_monitor"
 BUCKET = "macro_data"
 

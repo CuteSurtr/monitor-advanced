@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 import random
 
 INFLUXDB_URL = "http://localhost:8086"
-TOKEN = "your_influxdb_token_here"
+TOKEN = os.getenv("INFLUXDB_TOKEN", "")
 ORG = "stock_monitor"
 BUCKET = "market_data"
 

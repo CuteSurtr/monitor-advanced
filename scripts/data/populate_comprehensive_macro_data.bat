@@ -3,10 +3,18 @@ echo Populating InfluxDB macro_data bucket with COMPREHENSIVE economic data...
 echo This will create 3 months of data to make your dashboard functional.
 echo.
 
-REM InfluxDB configuration
-set ORG_ID=0d4ca99e5255fe85
+REM InfluxDB configuration - TOKEN and ORG_ID must come from env vars
+if "%INFLUXDB_TOKEN%"=="" (
+    echo ERROR: INFLUXDB_TOKEN environment variable is not set.
+    exit /b 1
+)
+if "%INFLUXDB_ORG_ID%"=="" (
+    echo ERROR: INFLUXDB_ORG_ID environment variable is not set.
+    exit /b 1
+)
+set ORG_ID=%INFLUXDB_ORG_ID%
 set BUCKET=macro_data
-set TOKEN=your_influxdb_token_here
+set TOKEN=%INFLUXDB_TOKEN%
 
 echo Generating 3 months of comprehensive economic data...
 echo.

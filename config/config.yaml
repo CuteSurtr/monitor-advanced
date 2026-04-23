@@ -47,7 +47,7 @@ api_keys:
   news_api: "${NEWS_API_KEY:-your_news_api_key}"
   quandl: "your_quandl_key"
   iex_cloud: "your_iex_cloud_key"
-  fred: "${FRED_API_KEY:-your_fred_api_key}"
+  fred: "${FRED_API_KEY}"
   # Additional API keys for multi-asset data
   fixer: "${FIXER_API_KEY:-your_fixer_api_key}"
   exchangerate: "your_exchangerate_api_key"

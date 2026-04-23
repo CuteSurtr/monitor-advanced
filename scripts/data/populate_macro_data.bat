@@ -4,11 +4,15 @@ setlocal enabledelayedexpansion
 echo Populating InfluxDB macro_data bucket with sample economic data...
 echo.
 
-REM InfluxDB configuration
+REM InfluxDB configuration - TOKEN must be provided via env var
+if "%INFLUXDB_TOKEN%"=="" (
+    echo ERROR: INFLUXDB_TOKEN environment variable is not set.
+    exit /b 1
+)
 set INFLUXDB_URL=http://localhost:8086
 set ORG=stock_monitor
 set BUCKET=macro_data
-set TOKEN=your_influxdb_token_here
+set TOKEN=%INFLUXDB_TOKEN%
 
 echo Generating Treasury yield curve data...
 
