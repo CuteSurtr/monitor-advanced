@@ -4,7 +4,6 @@ Cache management for the stock monitoring system using Redis.
 
 import asyncio
 import json
-import pickle
 from typing import Any, Optional, Dict, List, Union
 from datetime import datetime, timedelta
 import redis.asyncio as redis
@@ -29,7 +28,7 @@ class CacheManager:
                 port=self.config.redis.port,
                 password=self.config.redis.password or None,
                 db=self.config.redis.db,
-                decode_responses=False,  # Keep as bytes for pickle
+                decode_responses=False,  # Keep as bytes; we decode to UTF-8 ourselves.
                 socket_connect_timeout=5,
                 socket_timeout=5,
                 retry_on_timeout=True,
@@ -86,14 +85,16 @@ class CacheManager:
             if value is None:
                 return default
 
-            # Try to deserialize as JSON first, then pickle
+            # Deserialize as JSON, or return the raw string if it isn't JSON.
+            # pickle was removed intentionally — deserializing attacker-controlled
+            # pickled bytes is RCE-as-a-feature.
             try:
                 return json.loads(value.decode("utf-8"))
             except (json.JSONDecodeError, UnicodeDecodeError):
                 try:
-                    return pickle.loads(value)
-                except pickle.UnpicklingError:
                     return value.decode("utf-8")
+                except UnicodeDecodeError:
+                    return default
 
         except Exception as e:
             self.logger.error(f"Error getting cache key {key}: {e}")
@@ -115,11 +116,14 @@ class CacheManager:
             if not self.redis_client:
                 return False
 
-            # Serialize value
-            if isinstance(value, (dict, list, tuple, int, float, bool, str)):
-                serialized_value = json.dumps(value).encode("utf-8")
-            else:
-                serialized_value = pickle.dumps(value)
+            # Serialize value — JSON only; callers must pass JSON-friendly types.
+            try:
+                serialized_value = json.dumps(value, default=str).encode("utf-8")
+            except (TypeError, ValueError) as e:
+                self.logger.error(
+                    f"Cache set for key {key} failed: value is not JSON-serializable ({e})"
+                )
+                return False
 
             ttl = ttl or self.default_ttl
             await self.redis_client.setex(key, ttl, serialized_value)

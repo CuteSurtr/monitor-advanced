@@ -18,8 +18,10 @@ class AlertManager:
     async def start_monitoring(self):
         """Start alert monitoring."""
         self.monitoring_active = True
-        # Add your alert monitoring logic here
-        pass
+
+    async def stop_monitoring(self):
+        """Stop alert monitoring."""
+        self.monitoring_active = False
 
     def add_alert(self, alert):
         """Add a new alert"""
